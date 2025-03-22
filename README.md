@@ -12,4 +12,4 @@ The portfolio showcases my educational background, work experience, and technica
 
 ## License
 
-This repository is for personal use and is not intended for redistribution. If you have any questions or suggestions, feel free to reach out via the contact information on the live site (if available).
+This repository is for personal use and is not intended for redistribution. If you have any questions or suggestions, feel free to reach out via the contact information on the live site.
