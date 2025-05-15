@@ -1,11 +1,25 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Add this at the beginning of your DOMContentLoaded event listener
+    // Initialize Firebase if SDKs are loaded (Note: Replace placeholder values with actual config)
+    if (typeof firebase !== 'undefined') {
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID",
+            measurementId: "YOUR_MEASUREMENT_ID"
+        };
+        firebase.initializeApp(firebaseConfig);
+    }
+
     setupMobileNavigation();
     setupSmoothScrolling();
 
-    // Add animation delays to role items
+    // Add animation delays to role items on initial load
     const roleItems = document.querySelectorAll('.role-item');
     roleItems.forEach((item, index) => {
+        item.classList.add('animate');
         item.style.animationDelay = `${index * 0.2}s`;
         
         // Add delays to list items within each role
@@ -32,11 +46,26 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Calculate and display experience duration
-    document.querySelectorAll('.role-date').forEach(dateSpan => {
-        const dates = dateSpan.textContent.split(' - ');
-        const startDate = new Date(dates[0]);
-        const endDate = dates[1] === 'Present' ? new Date() : new Date(dates[1]);
+    document.querySelectorAll('.experience-date').forEach(dateSpan => {
+        const startStr = dateSpan.getAttribute('data-start');
+        const endStr = dateSpan.getAttribute('data-end');
         
+        // Parse start date (format: YYYY or YYYY-MM)
+        const startParts = startStr.includes('-') ? startStr.split('-') : [startStr, '01'];
+        const startDate = new Date(startParts[0], startParts[1] - 1);
+        
+        // Parse end date (format: YYYY or YYYY-MM or 'Present')
+        let endDate;
+        if (endStr === 'Present') {
+            endDate = new Date();
+        } else if (endStr.includes('-')) {
+            const [year, month] = endStr.split('-');
+            endDate = new Date(year, month - 1);
+        } else {
+            endDate = new Date(endStr, 0);
+        }
+        
+        // Calculate months difference
         const months = (endDate.getFullYear() - startDate.getFullYear()) * 12 +
                       (endDate.getMonth() - startDate.getMonth());
         
@@ -98,7 +127,6 @@ function setupMobileNavigation() {
     document.body.appendChild(backdrop);
 
     function toggleMenu() {
-        console.log('Toggle menu clicked'); // Debug log
         mobileMenuToggle.classList.toggle('active');
         navLinks.classList.toggle('active');
         backdrop.classList.toggle('active');
@@ -180,7 +208,7 @@ function setupSmoothScrolling() {
         });
     }
 
-    // Add scroll event listener with throttling
+    // Add scroll event listener with throttling (passive improves scrolling performance)
     let isScrolling = false;
     window.addEventListener('scroll', () => {
         if (!isScrolling) {

@@ -256,6 +256,11 @@ body {
     position: relative;
     padding-left: 2rem;
     margin-bottom: 20px; /* Space between roles */
+    opacity: 1;
+    transform: none;
+}
+
+.role-item.animate {
     opacity: 0;
     transform: translateY(20px);
     animation: fadeInUp 0.5s ease forwards;
@@ -307,13 +312,22 @@ body {
     list-style: none;
 }
 
+.role-description,
 .role-description li {
-    color: var(--text-color);
-    font-size: 0.95rem;
-    line-height: 1.6;
-    margin-bottom: 0.5rem;
-    padding-left: 1.5rem;
     position: relative;
+    padding-left: 1.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+    color: var(--text-color) !important;
+    transition: color 0.3s ease;
+    opacity: 1 !important;
+    transform: none !important;
+    visibility: visible !important;
+    display: block !important;
+}
+
+/* Animation only for initial load */
+.role-item.animate .role-description li {
     opacity: 0;
     transform: translateX(20px);
     animation: fadeInRight 0.5s ease forwards;
@@ -517,18 +531,6 @@ body {
     }
 }
 
-/* Animations */
-@keyframes fadeInRight {
-    from {
-        opacity: 0;
-        transform: translateX(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
 /* Mobile adjustments */
 @media (max-width: 768px) {
     .container {
@@ -601,12 +603,17 @@ body {
 /* Dark mode styles */
 .dark-mode {
     --primary: #ffffff;
-    --gray-light: #2a2a2a;
-    --white: #1a1a1a;
-    --gray-medium: #cccccc;
-    --bg-color: #1a1a1a;
+    --secondary: #23b6d8;
+    --tertiary: #1da2c2;
+    --accent: #034b6d;
+    --background: #1a1a1a;
+    --gray-50: #0d0d0d;
+    --gray-100: #1a1a1a;
+    --gray-200: #2a2a2a;
+    --gray-300: #404040;
+    --gray-400: #5c5c5c;
+    --gray-500: #7a7a7a;
     --text-color: #ffffff;
-    --button-bg: #2a2a2a;  /* Dark gray for dark mode */
 }
 
 /* Skills Section Animation */
