@@ -1,8 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-AE">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <!-- Open Graph / Social Media Meta Tags -->
+    <meta property="og:title" content="Ahmed Alawi Radhi - Applied Mathematics & Statistics Graduate">
+    <meta property="og:description" content="Portfolio of Ahmed Alawi Radhi, specializing in Data Science and Analytics">
+    <meta property="og:image" content="assets/Personal_Photo.jpg">
+    <meta property="og:url" content="https://ahmed-radhi-portfolio.com">
+    <meta name="twitter:card" content="summary_large_image">
+    <!-- Preconnect to Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <meta name="description" content="Ahmed Alawi Radhi - Applied Mathematics & Statistics Graduate specializing in Data Science and Analytics">
     <meta name="keywords" content="Data Science, Applied Mathematics, Statistics, Data Analysis, Machine Learning, Abu Dhabi">
     <title>Ahmed's Portfolio</title>
@@ -18,10 +27,14 @@
     <!-- Scroll Progress Bar -->
     <div class="scroll-progress"></div>
 
+    <!-- Skip to Content Link -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
     <!-- Navigation -->
-    <nav class="navbar">
+    <nav class="navbar" aria-label="Main navigation">
         <div class="nav-content">
-            <div class="nav-logo">AR</div>
+            <a href="#" class="nav-logo">AR</a>
+            <div class="nav-spacer"></div>
             <button class="mobile-menu-toggle" aria-label="Toggle menu">
                 <span class="hamburger-line"></span>
                 <span class="hamburger-line"></span>
@@ -33,13 +46,41 @@
                 <a href="#experience">Experience</a>
                 <a href="#skills">Skills</a>
             </div>
+            <div class="nav-utils">
+                <div class="nav-buttons">
+                    <button class="theme-toggle" aria-label="Toggle dark mode">
+                        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="5"></circle>
+                            <line x1="12" y1="1" x2="12" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="23"></line>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                            <line x1="1" y1="12" x2="3" y2="12"></line>
+                            <line x1="21" y1="12" x2="23" y2="12"></line>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                        </svg>
+                        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                    </button>
+                    <a href="assets/CV_2025_Ahmed_Radhi_Applied_Mathematics_and_Statistics.pdf" download="Ahmed_Radhi_CV.pdf" class="download-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        <span>Download CV</span>
+                    </a>
+                </div>
+            </div>
         </div>
     </nav>
 
     <div class="container">
         <!-- Header Section -->
         <div class="header">
-            <img src="assets/Personal_Photo.jpg" alt="Ahmed Alawi Radhi" class="profile-picture">
+            <img src="assets/Personal_Photo.jpg" alt="Ahmed Alawi Radhi, Applied Mathematics graduate" class="profile-picture" loading="lazy">
             <h1>Ahmed Alawi Radhi</h1>
             <h2 class="subtitle">Applied Mathematics & Statistics Graduate</h2>
             <div class="contact-info">
@@ -260,9 +301,11 @@
         </div>
     </div>
 
-    <!-- Firebase SDKs - Add these just before closing body tag -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+    <!-- NoScript Fallback -->
+    <noscript>
+        <div class="noscript-warning">
+            <p>This website works best with JavaScript enabled. Please enable JavaScript to view the full experience.</p>
+        </div>
+    </noscript>
 </body>
 </html>
