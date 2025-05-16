@@ -1,49 +1,121 @@
+/**
+ * Handles CV download with error handling
+ */
+function setupDownloadButton() {
+    const downloadBtn = document.querySelector('.download-button');
+    if (!downloadBtn) return;
+
+    downloadBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        try {
+            // Check if file exists
+            const response = await fetch('assets/CV_2025_Ahmed_Radhi_Applied_Mathematics_and_Statistics.pdf');
+            if (!response.ok) throw new Error('CV file not found');
+            
+            const link = document.createElement('a');
+            link.href = 'assets/CV_2025_Ahmed_Radhi_Applied_Mathematics_and_Statistics.pdf';
+            link.download = 'Ahmed_Radhi_CV.pdf';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } catch (error) {
+            console.error('Download failed:', error);
+            alert('Sorry, the CV could not be downloaded at this time.');
+        }
+    });
+}
+
+/**
+ * Manages theme toggling with state persistence
+ */
+function setupThemeToggle() {
+    const themeToggle = document.querySelector('.theme-toggle');
+    if (!themeToggle) return;
+
+    const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    
+    // Theme state management
+    const themeState = {
+        current: localStorage.getItem('theme') || 
+                (prefersDarkScheme.matches ? 'dark' : 'light'),
+        
+        setTheme(theme) {
+            this.current = theme;
+            document.body.classList.toggle('dark-mode', theme === 'dark');
+            localStorage.setItem('theme', theme);
+        },
+        
+        toggle() {
+            this.setTheme(this.current === 'dark' ? 'light' : 'dark');
+        }
+    };
+
+    // Apply initial theme
+    themeState.setTheme(themeState.current);
+    
+    // Toggle theme on button click
+    themeToggle.addEventListener('click', () => themeState.toggle());
+    
+    // Watch for system theme changes
+    prefersDarkScheme.addEventListener('change', e => {
+        if (!localStorage.getItem('theme')) {
+            themeState.setTheme(e.matches ? 'dark' : 'light');
+        }
+    });
+}
+
+
+// Debounce function for scroll/resize events
+function debounce(func, wait = 100) {
+    let timeout;
+    return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize Firebase if SDKs are loaded (Note: Replace placeholder values with actual config)
-    if (typeof firebase !== 'undefined') {
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_SENDER_ID",
-            appId: "YOUR_APP_ID",
-            measurementId: "YOUR_MEASUREMENT_ID"
-        };
-        firebase.initializeApp(firebaseConfig);
+    // Initialize modules
+    setupDownloadButton();
+    setupThemeToggle();
+
+    // Setup navigation with null checks
+    const mobileNav = document.querySelector('.mobile-menu-toggle');
+    if (mobileNav) {
+        setupMobileNavigation();
+        setupSmoothScrolling();
     }
 
-    setupMobileNavigation();
-    setupSmoothScrolling();
-
-    // Add animation delays to role items on initial load
+    // Animation setup with null checks
     const roleItems = document.querySelectorAll('.role-item');
-    roleItems.forEach((item, index) => {
-        item.classList.add('animate');
-        item.style.animationDelay = `${index * 0.2}s`;
-        
-        // Add delays to list items within each role
-        const listItems = item.querySelectorAll('.role-description li');
-        listItems.forEach((li, i) => {
-            li.style.animationDelay = `${(index * 0.2) + ((i + 1) * 0.1)}s`;
+    if (roleItems.length) {
+        roleItems.forEach((item, index) => {
+            item.classList.add('animate');
+            item.style.animationDelay = `${index * 0.2}s`;
+            
+            const listItems = item.querySelectorAll('.role-description li');
+            listItems.forEach((li, i) => {
+                li.style.animationDelay = `${(index * 0.2) + ((i + 1) * 0.1)}s`;
+            });
         });
-    });
+    }
 
-    // Intersection Observer for scroll animations
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.animationPlayState = 'running';
-            }
+    // Intersection Observer with error handling
+    try {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationPlayState = 'running';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.company-block, .section').forEach(block => {
+            observer.observe(block);
         });
-    }, {
-        threshold: 0.1
-    });
-
-    // Observe all company blocks
-    document.querySelectorAll('.company-block').forEach(block => {
-        observer.observe(block);
-    });
+    } catch (error) {
+        console.error('Intersection Observer failed:', error);
+    }
 
     // Calculate and display experience duration
     document.querySelectorAll('.experience-date').forEach(dateSpan => {
@@ -127,18 +199,33 @@ function setupMobileNavigation() {
     document.body.appendChild(backdrop);
 
     function toggleMenu() {
+        const isOpening = !navLinks.classList.contains('active');
+        
+        // Toggle classes
         mobileMenuToggle.classList.toggle('active');
         navLinks.classList.toggle('active');
         backdrop.classList.toggle('active');
         body.classList.toggle('menu-open');
+
+        // Animate hamburger icon
+        const lines = mobileMenuToggle.querySelectorAll('.hamburger-line');
+        if (isOpening) {
+            lines[0].style.transform = 'translateY(7px) rotate(45deg)';
+            lines[1].style.opacity = '0';
+            lines[2].style.transform = 'translateY(-7px) rotate(-45deg)';
+        } else {
+            lines[0].style.transform = '';
+            lines[1].style.opacity = '';
+            lines[2].style.transform = '';
+        }
     }
 
     // Add click event listeners
     mobileMenuToggle?.addEventListener('click', toggleMenu);
     backdrop?.addEventListener('click', toggleMenu);
 
-    // Close menu when clicking a link
-    document.querySelectorAll('.nav-links a').forEach(link => {
+    // Close menu when clicking a link or button
+    document.querySelectorAll('.nav-links a, .nav-buttons a, .nav-buttons button').forEach(link => {
         link.addEventListener('click', () => {
             if (navLinks.classList.contains('active')) {
                 toggleMenu();
@@ -147,11 +234,18 @@ function setupMobileNavigation() {
     });
 
     // Close menu when screen is resized beyond mobile breakpoint
-    window.addEventListener('resize', () => {
+    const resizeHandler = debounce(() => {
         if (window.innerWidth > 768 && navLinks.classList.contains('active')) {
             toggleMenu();
         }
-    });
+    }, 100);
+    
+    window.addEventListener('resize', resizeHandler);
+
+    // Cleanup function to remove event listeners
+    return () => {
+        window.removeEventListener('resize', resizeHandler);
+    };
 }
 
 // Function to handle smooth scrolling
@@ -161,7 +255,7 @@ function setupSmoothScrolling() {
     const navbarHeight = navbar ? navbar.offsetHeight : 0;
     
     // Smooth scroll functionality
-    document.querySelectorAll('.nav-links a, a[href^="#"]').forEach(anchor => {
+    document.querySelectorAll('.nav-links a[href^="#"]:not([href="#"])').forEach(anchor => {
         anchor.addEventListener('click', function(e) {
             e.preventDefault();
             const targetId = this.getAttribute('href');
