@@ -28,6 +28,15 @@ function setupDownloadButton() {
 /**
  * Manages theme toggling with state persistence
  */
+function updateLogosForTheme(theme) {
+    const logos = document.querySelectorAll('.company-logo[data-light-src][data-dark-src]');
+    logos.forEach(logo => {
+        logo.src = theme === 'dark' ? 
+            logo.getAttribute('data-dark-src') : 
+            logo.getAttribute('data-light-src');
+    });
+}
+
 function setupThemeToggle() {
     const themeToggle = document.querySelector('.theme-toggle');
     if (!themeToggle) return;
@@ -43,6 +52,7 @@ function setupThemeToggle() {
             this.current = theme;
             document.body.classList.toggle('dark-mode', theme === 'dark');
             localStorage.setItem('theme', theme);
+            updateLogosForTheme(theme);
         },
         
         toggle() {
@@ -50,7 +60,7 @@ function setupThemeToggle() {
         }
     };
 
-    // Apply initial theme
+    // Apply initial theme and logos
     themeState.setTheme(themeState.current);
     
     // Toggle theme on button click
