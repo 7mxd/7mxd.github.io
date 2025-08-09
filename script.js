@@ -65,7 +65,15 @@ function setupThemeToggle() {
     
     // Toggle theme on button click for all theme toggles
     themeToggles.forEach(toggle => {
-        toggle.addEventListener('click', () => themeState.toggle());
+        toggle.addEventListener('click', () => {
+            themeState.toggle();
+            // Close mobile menu if open after toggling theme
+            const navLinks = document.querySelector('.nav-links');
+            const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+            if (navLinks && navLinks.classList.contains('active') && mobileMenuToggle) {
+                mobileMenuToggle.click();
+            }
+        });
     });
     
     // Watch for system theme changes
@@ -261,8 +269,8 @@ function setupMobileNavigation() {
     mobileMenuToggle?.addEventListener('click', toggleMenu);
     backdrop?.addEventListener('click', toggleMenu);
 
-    // Close menu when clicking a link or button
-    document.querySelectorAll('.nav-links a, .nav-buttons a, .nav-buttons button').forEach(link => {
+    // Close menu when clicking a link or button (including theme toggle inside menu)
+    document.querySelectorAll('.nav-links a, .nav-links button, .nav-buttons a, .nav-buttons button').forEach(link => {
         link.addEventListener('click', () => {
             if (navLinks.classList.contains('active')) {
                 toggleMenu();
