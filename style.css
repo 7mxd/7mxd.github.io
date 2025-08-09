@@ -228,7 +228,7 @@ body {
 .company-block {
     margin-bottom: 20px; /* Space between experience entries */
     position: relative;
-    background: var(--white);
+    background: var(--background);
     border-radius: 12px;
     padding: 2rem;
     box-shadow: var(--shadow);
@@ -272,10 +272,10 @@ body {
 }
 
 .company-location {
-    color: var(--gray-medium);
+    color: var(--gray-500);
     font-size: 0.9rem;
     padding: 0.4rem 1rem;
-    background: var(--gray-light);
+    background: var(--gray-100);
     border-radius: 20px;
 }
 
@@ -322,11 +322,11 @@ body {
 
 .experience-date {
     display: inline-block;
-    color: var(--gray-medium);
+    color: var(--gray-500);
     font-size: 0.9rem;
     margin-bottom: 10px; /* Space between date and description */
     padding: 0.2rem 1rem;
-    background: var(--gray-light);
+    background: var(--gray-100);
     border-radius: 15px;
     cursor: help;
     transition: var(--transition);
@@ -334,7 +334,7 @@ body {
 
 .experience-date:hover {
     background: var(--secondary);
-    color: var(--white);
+    color: #ffffff;
 }
 
 .role-description {
@@ -674,7 +674,7 @@ body {
 
     .skills li:hover {
         transform: none;
-        background: var(--gray-light);
+        background: var(--gray-100);
         color: var(--primary);
     }
 
@@ -708,7 +708,7 @@ body {
 
     .skills li:hover {
         transform: none;
-        background: var(--gray-light);
+        background: var(--gray-100);
         color: var(--primary);
     }
 
@@ -813,6 +813,17 @@ body {
 @media (max-width: 768px) {
     .download-button {
         padding: 0.5rem 1rem;
+        background: none !important;
+        color: var(--gray-500) !important;
+    }
+    
+    .theme-toggle {
+        background: none !important;
+    }
+    
+    .download-button:hover,
+    .theme-toggle:hover {
+        background: var(--gray-100) !important;
     }
 }
 
@@ -1233,6 +1244,30 @@ body.dark-mode .moon-icon {
         justify-content: center;
         margin-top: 1rem;
     }
+
+    /* Hide desktop buttons on mobile */
+    .nav-utils .nav-buttons {
+        display: none;
+    }
+
+    /* Show mobile menu buttons */
+    .mobile-menu-button {
+        display: block;
+        width: 100%;
+    }
+}
+
+/* Show desktop buttons on larger screens */
+@media (min-width: 769px) {
+    .mobile-menu-button {
+        display: none;
+    }
+    
+    .nav-utils .nav-buttons {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
 }
 
 .nav-links a {
@@ -1305,6 +1340,10 @@ body.dark-mode .moon-icon {
 @media (max-width: 768px) {
     .mobile-menu-toggle {
         display: block;
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
     }
 
     .nav-content {
@@ -1316,21 +1355,24 @@ body.dark-mode .moon-icon {
     .nav-links {
         position: fixed;
         top: 0;
-        right: -100%;
-        width: 70%;
+        right: 0;
+        width: 85%;
         height: 100vh;
         background: var(--background);
         flex-direction: column;
-        align-items: center;
+        align-items: flex-end;
         justify-content: center;
         gap: 2rem;
-        transition: right 0.3s ease;
+        padding: 0;
+        margin: 0;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
         box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
         z-index: 1000;
     }
 
     .nav-links.active {
-        right: 0;
+        transform: translateX(0);
     }
 
     /* Ensure links are visible and properly spaced in mobile menu */
@@ -1374,6 +1416,34 @@ body.dark-mode .moon-icon {
 /* Prevent body scroll when menu is open */
 body.menu-open {
     overflow: hidden;
+}
+
+/* Mobile menu buttons */
+.mobile-menu-button {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .mobile-menu-button {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        padding: 1rem;
+    }
+    
+    .mobile-menu-button .theme-toggle,
+    .mobile-menu-button .download-button {
+        width: 100%;
+        justify-content: center;
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        background: var(--gray-100);
+    }
+    
+    .mobile-menu-button .theme-toggle:hover,
+    .mobile-menu-button .download-button:hover {
+        background: var(--gray-200);
+    }
 }
 
 /* Ensure navbar stays on top */
