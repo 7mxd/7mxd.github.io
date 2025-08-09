@@ -38,8 +38,8 @@ function updateLogosForTheme(theme) {
 }
 
 function setupThemeToggle() {
-    const themeToggle = document.querySelector('.theme-toggle');
-    if (!themeToggle) return;
+    const themeToggles = document.querySelectorAll('.theme-toggle');
+    if (!themeToggles.length) return;
 
     const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
     
@@ -63,8 +63,10 @@ function setupThemeToggle() {
     // Apply initial theme and logos
     themeState.setTheme(themeState.current);
     
-    // Toggle theme on button click
-    themeToggle.addEventListener('click', () => themeState.toggle());
+    // Toggle theme on button click for all theme toggles
+    themeToggles.forEach(toggle => {
+        toggle.addEventListener('click', () => themeState.toggle());
+    });
     
     // Watch for system theme changes
     prefersDarkScheme.addEventListener('change', e => {
@@ -88,13 +90,38 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize modules
     setupDownloadButton();
     setupThemeToggle();
+    
+    // Setup navigation and smooth scrolling
+    setupMobileNavigation();
+    setupSmoothScrolling();
 
-    // Setup navigation with null checks
-    const mobileNav = document.querySelector('.mobile-menu-toggle');
-    if (mobileNav) {
-        setupMobileNavigation();
-        setupSmoothScrolling();
-    }
+    // Scroll progress bar
+    (function setupScrollProgress() {
+        const progressBar = document.querySelector('.scroll-progress');
+        if (!progressBar) return;
+
+        const updateProgress = () => {
+            const scrollTop = window.scrollY || document.documentElement.scrollTop;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+            progressBar.style.width = `${progress}%`;
+        };
+
+        // Initial update and event listeners
+        updateProgress();
+        let ticking = false;
+        const onScroll = () => {
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    updateProgress();
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        };
+        window.addEventListener('scroll', onScroll, { passive: true });
+        window.addEventListener('resize', updateProgress);
+    })();
 
     // Animation setup with null checks
     const roleItems = document.querySelectorAll('.role-item');
