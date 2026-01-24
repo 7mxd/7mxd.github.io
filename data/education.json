@@ -1,0 +1,22 @@
+{
+  "items": [
+    {
+      "institution": "Khalifa University",
+      "logo": "assets/Khalifa_University_Logo.png",
+      "degree": "BSc in Applied Mathematics and Statistics",
+      "startDate": "2018-08",
+      "endDate": "2023-05",
+      "displayDate": "Aug 2018 - May 2023",
+      "grade": "CGPA: 3.30"
+    },
+    {
+      "institution": "Al Nahda National Schools",
+      "logo": "assets/Al_Nahda_Logo.png",
+      "degree": "High School Diploma",
+      "startDate": "2015",
+      "endDate": "2018",
+      "displayDate": "2015 - 2018",
+      "grade": "Grade: 95.9"
+    }
+  ]
+}

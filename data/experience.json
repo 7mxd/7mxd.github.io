@@ -1,0 +1,54 @@
+{
+  "items": [
+    {
+      "company": "Saal.ai",
+      "logo": {
+        "default": "assets/SAAL_LIGHT.png",
+        "light": "assets/SAAL_LIGHT.png",
+        "dark": "assets/SAAL_DARK.png"
+      },
+      "location": "Abu Dhabi, UAE",
+      "roles": [
+        {
+          "title": "Graduate Trainee – Data Science",
+          "startDate": "2024-09",
+          "endDate": "Present",
+          "displayDate": "09/2024 - Present",
+          "responsibilities": [
+            "Engaging in data-driven projects as a Data Science Graduate Trainee at Saal.ai, developing practical skills in data analysis and machine learning."
+          ]
+        },
+        {
+          "title": "Data Scientist Intern",
+          "startDate": "2024-03",
+          "endDate": "2024-09",
+          "displayDate": "03/2024 - 09/2024",
+          "responsibilities": [
+            "Managed databases with MongoDB, NoSQL, and PyMongo; built and tested a REST API using Flask with Postman and Swagger UI.",
+            "Earned certifications in Dataiku Core Designer and ML Practitioner, applying these skills in data processing case studies.",
+            "Collaborated with UI and development teams to implement a dashboard from wireframe to final product."
+          ]
+        }
+      ]
+    },
+    {
+      "company": "Daman - National Health Insurance Company",
+      "logo": {
+        "default": "assets/Daman_Logo.png"
+      },
+      "location": "Abu Dhabi, UAE",
+      "roles": [
+        {
+          "title": "Data Analyst Intern",
+          "startDate": "2022-07",
+          "endDate": "2022-09",
+          "displayDate": "07/2022 - 09/2022",
+          "responsibilities": [
+            "Completed an eight-week internship in Data Analytics and Business Intelligence, gaining expertise in health insurance industry data models.",
+            "Conducted data analysis on medical topics, contributing to business decision-making case studies."
+          ]
+        }
+      ]
+    }
+  ]
+}
