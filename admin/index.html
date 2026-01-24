@@ -6,6 +6,14 @@
   <meta name="robots" content="noindex" />
   <title>Content Manager | Ahmed's Portfolio</title>
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <script>
+    // Initialize Netlify Identity with the correct Netlify site URL
+    if (window.netlifyIdentity) {
+      window.netlifyIdentity.init({
+        APIUrl: "https://7mxd-auth.netlify.app/.netlify/identity"
+      });
+    }
+  </script>
 </head>
 <body>
   <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
