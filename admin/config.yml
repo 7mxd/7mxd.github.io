@@ -2,6 +2,8 @@ backend:
   name: git-gateway
   branch: main
 
+site_url: https://7mxd-auth.netlify.app
+
 media_folder: "assets"
 public_folder: "assets"
 
