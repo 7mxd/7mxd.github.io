@@ -1,9 +1,6 @@
 backend:
-  name: github
-  repo: 7mxd/7mxd.github.io
+  name: git-gateway
   branch: main
-  base_url: https://api.netlify.com
-  auth_endpoint: auth
 
 media_folder: "assets"
 public_folder: "assets"
