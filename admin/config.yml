@@ -1,8 +1,11 @@
 backend:
-  name: git-gateway
+  name: github
+  repo: 7mxd/7mxd.github.io
   branch: main
+  base_url: https://7mxd-portfolio.up.railway.app
+  auth_endpoint: /auth
 
-site_url: https://7mxd-auth.netlify.app
+site_url: https://7mxd.github.io
 
 media_folder: "assets"
 public_folder: "assets"
