@@ -152,9 +152,13 @@ app.get('/callback', async (req, res) => {
         <script>
           (function() {
             if (window.opener) {
+              const data = {
+                token: '${access_token}',
+                provider: 'github'
+              };
               window.opener.postMessage(
-                'authorization:github:success:{"token":"${access_token}","provider":"github"}',
-                '*'
+                'authorization:github:success:' + JSON.stringify(data),
+                'https://7mxd.github.io'
               );
               setTimeout(function() { window.close(); }, 1000);
             }
@@ -282,9 +286,13 @@ app.get('/success', (req, res) => {
       <script>
         (function() {
           if (window.opener) {
+            const data = {
+              token: '${token}',
+              provider: 'github'
+            };
             window.opener.postMessage(
-              'authorization:github:success:{"token":"${token}","provider":"github"}',
-              '*'
+              'authorization:github:success:' + JSON.stringify(data),
+              'https://7mxd.github.io'
             );
             window.close();
           }
