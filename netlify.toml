@@ -1,0 +1,18 @@
+# Netlify configuration for CORS headers
+# Allows GitHub Pages to access Netlify Identity
+
+[[headers]]
+  for = "/.netlify/identity/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "https://7mxd.github.io"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type, Authorization"
+    Access-Control-Allow-Credentials = "true"
+
+[[headers]]
+  for = "/.netlify/git/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "https://7mxd.github.io"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type, Authorization"
+    Access-Control-Allow-Credentials = "true"
