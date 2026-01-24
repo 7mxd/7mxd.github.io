@@ -1,0 +1,14 @@
+{
+  "name": "Ahmed Alawi Radhi",
+  "title": "Applied Mathematics & Statistics Graduate",
+  "photo": "assets/Personal_Photo.jpg",
+  "contact": {
+    "email": "AhmedARadhi00@gmail.com",
+    "phone": "+971 56 913 5351",
+    "location": "Abu Dhabi, UAE",
+    "linkedin": {
+      "url": "https://www.linkedin.com/in/ahmed-r-828a98141/",
+      "label": "LinkedIn Profile"
+    }
+  }
+}
