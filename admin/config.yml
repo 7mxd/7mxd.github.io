@@ -1,0 +1,155 @@
+backend:
+  name: github
+  repo: 7mxd/7mxd.github.io
+  branch: main
+  base_url: https://api.netlify.com
+  auth_endpoint: auth
+
+media_folder: "assets"
+public_folder: "assets"
+
+collections:
+  # Profile - single file
+  - name: "profile"
+    label: "Profile"
+    files:
+      - name: "profile"
+        label: "Profile Information"
+        file: "data/profile.json"
+        fields:
+          - { name: "name", label: "Full Name", widget: "string" }
+          - { name: "title", label: "Professional Title", widget: "string" }
+          - { name: "photo", label: "Profile Photo", widget: "image" }
+          - name: "contact"
+            label: "Contact Information"
+            widget: "object"
+            fields:
+              - { name: "email", label: "Email", widget: "string" }
+              - { name: "phone", label: "Phone", widget: "string" }
+              - { name: "location", label: "Location", widget: "string" }
+              - name: "linkedin"
+                label: "LinkedIn"
+                widget: "object"
+                fields:
+                  - { name: "url", label: "LinkedIn URL", widget: "string" }
+                  - { name: "label", label: "Display Label", widget: "string", default: "LinkedIn Profile" }
+
+  # Summary - single file
+  - name: "summary"
+    label: "Summary"
+    files:
+      - name: "summary"
+        label: "Professional Summary"
+        file: "data/summary.json"
+        fields:
+          - { name: "content", label: "Summary Text", widget: "text" }
+
+  # Settings - single file
+  - name: "settings"
+    label: "Site Settings"
+    files:
+      - name: "settings"
+        label: "Settings"
+        file: "data/settings.json"
+        fields:
+          - name: "cv"
+            label: "CV/Resume"
+            widget: "object"
+            fields:
+              - { name: "path", label: "CV File", widget: "file" }
+              - { name: "downloadName", label: "Download Filename", widget: "string" }
+          - { name: "siteTitle", label: "Site Title", widget: "string" }
+          - { name: "navLogo", label: "Navigation Logo Text", widget: "string" }
+          - name: "meta"
+            label: "SEO Metadata"
+            widget: "object"
+            fields:
+              - { name: "title", label: "Meta Title", widget: "string" }
+              - { name: "description", label: "Meta Description", widget: "text" }
+              - { name: "keywords", label: "Keywords", widget: "string" }
+              - { name: "url", label: "Site URL", widget: "string" }
+
+  # Education - list in single file
+  - name: "education"
+    label: "Education"
+    files:
+      - name: "education"
+        label: "Education Entries"
+        file: "data/education.json"
+        fields:
+          - name: "items"
+            label: "Education"
+            widget: "list"
+            fields:
+              - { name: "institution", label: "Institution Name", widget: "string" }
+              - { name: "logo", label: "Institution Logo", widget: "image" }
+              - { name: "degree", label: "Degree/Certificate", widget: "string" }
+              - { name: "startDate", label: "Start Date (YYYY-MM or YYYY)", widget: "string" }
+              - { name: "endDate", label: "End Date (YYYY-MM or YYYY)", widget: "string" }
+              - { name: "displayDate", label: "Display Date Text", widget: "string", hint: "e.g., Aug 2018 - May 2023" }
+              - { name: "grade", label: "Grade/GPA", widget: "string" }
+
+  # Experience - list in single file
+  - name: "experience"
+    label: "Experience"
+    files:
+      - name: "experience"
+        label: "Work Experience"
+        file: "data/experience.json"
+        fields:
+          - name: "items"
+            label: "Companies"
+            widget: "list"
+            fields:
+              - { name: "company", label: "Company Name", widget: "string" }
+              - name: "logo"
+                label: "Company Logo"
+                widget: "object"
+                fields:
+                  - { name: "default", label: "Default Logo", widget: "image" }
+                  - { name: "light", label: "Light Theme Logo (optional)", widget: "image", required: false }
+                  - { name: "dark", label: "Dark Theme Logo (optional)", widget: "image", required: false }
+              - { name: "location", label: "Location", widget: "string" }
+              - name: "roles"
+                label: "Roles"
+                widget: "list"
+                fields:
+                  - { name: "title", label: "Job Title", widget: "string" }
+                  - { name: "startDate", label: "Start Date (YYYY-MM)", widget: "string" }
+                  - { name: "endDate", label: "End Date (YYYY-MM or Present)", widget: "string" }
+                  - { name: "displayDate", label: "Display Date Text", widget: "string", hint: "e.g., 09/2024 - Present" }
+                  - { name: "responsibilities", label: "Responsibilities", widget: "list", field: { name: "item", label: "Responsibility", widget: "text" } }
+
+  # Skills - list in single file
+  - name: "skills"
+    label: "Skills"
+    files:
+      - name: "skills"
+        label: "Skills Categories"
+        file: "data/skills.json"
+        fields:
+          - name: "categories"
+            label: "Skill Categories"
+            widget: "list"
+            fields:
+              - { name: "name", label: "Category Name", widget: "string" }
+              - name: "type"
+                label: "Display Type"
+                widget: "select"
+                options:
+                  - { label: "Simple List", value: "list" }
+                  - { label: "Tags", value: "tags" }
+                  - { label: "Proficiency Bars", value: "proficiency" }
+              - name: "items"
+                label: "Skills"
+                widget: "list"
+                types:
+                  - name: "simple"
+                    label: "Simple Skill"
+                    widget: "string"
+                  - name: "proficiency"
+                    label: "Skill with Proficiency"
+                    fields:
+                      - { name: "name", label: "Skill Name", widget: "string" }
+                      - { name: "level", label: "Proficiency Level (0-100)", widget: "number", min: 0, max: 100 }
+                      - { name: "label", label: "Proficiency Label", widget: "string", hint: "e.g., Native, Fluent, Beginner" }
