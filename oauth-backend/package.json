@@ -1,0 +1,27 @@
+{
+  "name": "decap-cms-oauth-backend",
+  "version": "1.0.0",
+  "description": "OAuth backend for Decap CMS on Railway",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "oauth",
+    "decap-cms",
+    "github",
+    "railway"
+  ],
+  "author": "Ahmed Radhi",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "dotenv": "^16.3.1",
+    "axios": "^1.6.0",
+    "cors": "^2.8.5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
