@@ -22,8 +22,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script defer src="script.js"></script>
-    <!-- Netlify Identity Widget for CMS authentication -->
-    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body>
     <!-- Scroll Progress Bar -->
@@ -150,17 +148,5 @@
             <p>This website works best with JavaScript enabled. Please enable JavaScript to view the full experience.</p>
         </div>
     </noscript>
-    <!-- Netlify Identity redirect handler for CMS -->
-    <script>
-      if (window.netlifyIdentity) {
-        window.netlifyIdentity.on("init", user => {
-          if (!user) {
-            window.netlifyIdentity.on("login", () => {
-              document.location.href = "/admin/";
-            });
-          }
-        });
-      }
-    </script>
 </body>
 </html>
