@@ -26,7 +26,8 @@ let siteData = {};
  */
 async function fetchData(filename) {
     try {
-        const response = await fetch(`data/${filename}`);
+        // Add cache-busting to ensure fresh data after CMS edits
+        const response = await fetch(`data/${filename}`, { cache: 'no-store' });
         if (!response.ok) throw new Error(`Failed to load ${filename}`);
         return await response.json();
     } catch (error) {
