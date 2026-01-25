@@ -54,34 +54,42 @@ async function loadAllData() {
 }
 
 /**
- * Render the header/profile section
+ * Render the header/profile section with enhanced hero
  */
 function renderProfile(profile) {
     const container = document.getElementById('header-section');
     if (!container || !profile) return;
 
     container.innerHTML = `
-        <img src="${profile.photo}" alt="${profile.name}, ${profile.title}" class="profile-picture" loading="lazy">
+        <div class="profile-picture-container">
+            <img src="${profile.photo}" alt="${profile.name}, ${profile.title}" class="profile-picture" loading="eager">
+        </div>
         <h1>${profile.name}</h1>
         <h2 class="subtitle">${profile.title}</h2>
-        <div class="contact-info">
-            <a href="mailto:${profile.contact.email}" class="contact-item">
+        <div class="contact-info" role="list" aria-label="Contact information">
+            <a href="mailto:${profile.contact.email}" class="contact-item" role="listitem" aria-label="Email: ${profile.contact.email}">
                 ${ICONS.email}
-                ${profile.contact.email}
+                <span>${profile.contact.email}</span>
             </a>
-            <a href="tel:${profile.contact.phone.replace(/\s/g, '')}" class="contact-item">
+            <a href="tel:${profile.contact.phone.replace(/\s/g, '')}" class="contact-item" role="listitem" aria-label="Phone: ${profile.contact.phone}">
                 ${ICONS.phone}
-                ${profile.contact.phone}
+                <span>${profile.contact.phone}</span>
             </a>
-            <span class="contact-item">
+            <span class="contact-item" role="listitem" aria-label="Location: ${profile.contact.location}">
                 ${ICONS.location}
-                ${profile.contact.location}
+                <span>${profile.contact.location}</span>
             </span>
-            <a href="${profile.contact.linkedin.url}" target="_blank" rel="noopener" class="contact-item">
+            <a href="${profile.contact.linkedin.url}" target="_blank" rel="noopener noreferrer" class="contact-item" role="listitem" aria-label="LinkedIn profile (opens in new tab)">
                 ${ICONS.linkedin}
-                ${profile.contact.linkedin.label}
+                <span>${profile.contact.linkedin.label}</span>
             </a>
         </div>
+        <a href="#summary" class="scroll-indicator" aria-label="Scroll down to summary">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+            <span>Scroll</span>
+        </a>
     `;
 }
 
@@ -276,15 +284,19 @@ function setupThemeToggle() {
         current: localStorage.getItem('theme') ||
                 (prefersDarkScheme.matches ? 'dark' : 'light'),
 
-        setTheme(theme) {
+        setTheme(theme, announce = false) {
             this.current = theme;
             document.body.classList.toggle('dark-mode', theme === 'dark');
             localStorage.setItem('theme', theme);
             updateLogosForTheme(theme);
+            if (announce) {
+                announceThemeChange(theme);
+            }
         },
 
         toggle() {
-            this.setTheme(this.current === 'dark' ? 'light' : 'dark');
+            const newTheme = this.current === 'dark' ? 'light' : 'dark';
+            this.setTheme(newTheme, true);
         }
     };
 
@@ -375,12 +387,47 @@ function setupAnimations() {
             });
         }, { threshold: 0.1 });
 
-        document.querySelectorAll('.company-block, .section').forEach(block => {
+        document.querySelectorAll('.company-block').forEach(block => {
             observer.observe(block);
         });
     } catch (error) {
         console.error('Intersection Observer failed:', error);
     }
+}
+
+/**
+ * Setup scroll reveal animations for sections
+ */
+function setupScrollReveal() {
+    const sections = document.querySelectorAll('.section');
+
+    // Check if reduced motion is preferred
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (prefersReducedMotion) {
+        // If user prefers reduced motion, show all sections immediately
+        sections.forEach(section => {
+            section.classList.add('visible');
+        });
+        return;
+    }
+
+    const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                // Optional: unobserve after revealing
+                revealObserver.unobserve(entry.target);
+            }
+        });
+    }, {
+        threshold: 0.1,
+        rootMargin: '-50px 0px'
+    });
+
+    sections.forEach(section => {
+        revealObserver.observe(section);
+    });
 }
 
 /**
@@ -501,7 +548,7 @@ function initializeSkillCards() {
 }
 
 /**
- * Setup mobile navigation
+ * Setup mobile navigation with accessibility
  */
 function setupMobileNavigation() {
     const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
@@ -510,6 +557,7 @@ function setupMobileNavigation() {
 
     const backdrop = document.createElement('div');
     backdrop.className = 'nav-backdrop';
+    backdrop.setAttribute('aria-hidden', 'true');
     document.body.appendChild(backdrop);
 
     function toggleMenu() {
@@ -520,11 +568,29 @@ function setupMobileNavigation() {
         backdrop.classList.toggle('active');
         body.classList.toggle('menu-open');
 
+        // Update ARIA attributes for accessibility
+        mobileMenuToggle.setAttribute('aria-expanded', isOpening ? 'true' : 'false');
+        navLinks.setAttribute('aria-hidden', isOpening ? 'false' : 'true');
+
+        // Announce to screen readers
+        const announcement = document.createElement('div');
+        announcement.setAttribute('role', 'status');
+        announcement.setAttribute('aria-live', 'polite');
+        announcement.className = 'sr-only';
+        announcement.textContent = isOpening ? 'Navigation menu opened' : 'Navigation menu closed';
+        document.body.appendChild(announcement);
+        setTimeout(() => announcement.remove(), 1000);
+
         const lines = mobileMenuToggle.querySelectorAll('.hamburger-line');
         if (isOpening) {
             lines[0].style.transform = 'translateY(7px) rotate(45deg)';
             lines[1].style.opacity = '0';
             lines[2].style.transform = 'translateY(-7px) rotate(-45deg)';
+            // Focus first link when menu opens
+            setTimeout(() => {
+                const firstLink = navLinks.querySelector('a');
+                if (firstLink) firstLink.focus();
+            }, 300);
         } else {
             lines[0].style.transform = '';
             lines[1].style.opacity = '';
@@ -534,6 +600,14 @@ function setupMobileNavigation() {
 
     mobileMenuToggle?.addEventListener('click', toggleMenu);
     backdrop?.addEventListener('click', toggleMenu);
+
+    // Close menu with Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && navLinks.classList.contains('active')) {
+            toggleMenu();
+            mobileMenuToggle.focus();
+        }
+    });
 
     document.querySelectorAll('.nav-links a, .nav-links button, .nav-buttons a, .nav-buttons button').forEach(link => {
         link.addEventListener('click', () => {
@@ -650,6 +724,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Setup animations and interactions for dynamic content
         setupAnimations();
+        setupScrollReveal();
         setupExperienceDurations();
         initializeSkillCards();
 
@@ -657,3 +732,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('Failed to load site data:', error);
     }
 });
+
+/**
+ * Announce theme change to screen readers
+ */
+function announceThemeChange(theme) {
+    const announcement = document.createElement('div');
+    announcement.setAttribute('role', 'status');
+    announcement.setAttribute('aria-live', 'polite');
+    announcement.className = 'sr-only';
+    announcement.textContent = `Theme changed to ${theme} mode`;
+    document.body.appendChild(announcement);
+    setTimeout(() => announcement.remove(), 1000);
+}
