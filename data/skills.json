@@ -4,45 +4,105 @@
       "name": "Programming Languages",
       "type": "list",
       "items": [
-        { "name": "Python" },
-        { "name": "R" },
-        { "name": "MATLAB" },
-        { "name": "Java" },
-        { "name": "LaTeX" }
+        {
+          "name": "Python"
+        },
+        {
+          "name": "R"
+        },
+        {
+          "name": "MATLAB"
+        },
+        {
+          "name": "Java"
+        },
+        {
+          "name": "LaTeX"
+        }
       ]
     },
     {
       "name": "Data Science & Analytics",
       "type": "tags",
       "items": [
-        { "name": "NumPy" },
-        { "name": "Pandas" },
-        { "name": "Seaborn" },
-        { "name": "Tidyverse" },
-        { "name": "Caret" },
-        { "name": "Power BI" },
-        { "name": "Dataiku" }
+        {
+          "name": "NumPy"
+        },
+        {
+          "name": "Pandas"
+        },
+        {
+          "name": "Seaborn"
+        },
+        {
+          "name": "Tidyverse"
+        },
+        {
+          "name": "Caret"
+        },
+        {
+          "name": "Power BI"
+        },
+        {
+          "name": "Tableau"
+        },
+        {
+          "name": "Dataiku"
+        },
+        {
+          "name": "MongoDB"
+        },
+        {
+          "name": "Postman"
+        },
+        {
+          "name": "Studio 3T"
+        }
       ]
     },
     {
       "name": "Databases & Tools",
       "type": "tags",
       "items": [
-        { "name": "MongoDB" },
-        { "name": "PyMongo" },
-        { "name": "GitHub" },
-        { "name": "VS Code" },
-        { "name": "Jupyter Notebook" },
-        { "name": "RStudio" }
+        {
+          "name": "MongoDB"
+        },
+        {
+          "name": "PyMongo"
+        },
+        {
+          "name": "GitHub"
+        },
+        {
+          "name": "VS Code"
+        },
+        {
+          "name": "Jupyter Notebook"
+        },
+        {
+          "name": "RStudio"
+        }
       ]
     },
     {
       "name": "Languages",
       "type": "proficiency",
       "items": [
-        { "name": "Arabic", "level": 100, "label": "Native" },
-        { "name": "English", "level": 90, "label": "Fluent" },
-        { "name": "Spanish", "level": 30, "label": "Beginner" }
+        {
+          "name": "Arabic",
+          "level": 100,
+          "label": "Native"
+        },
+        {
+          "name": "English",
+          "level": 90,
+          "label": "Fluent"
+        },
+        {
+          "name": "Spanish",
+          "level": 30,
+          "label": "Beginner"
+        }
       ]
     }
   ]
