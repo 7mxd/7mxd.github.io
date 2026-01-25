@@ -2,7 +2,8 @@ backend:
   name: github
   repo: 7mxd/7mxd.github.io
   branch: main
-  base_url: https://7mxd-portfolio.up.railway.app
+  # TODO: Replace with your Vercel deployment URL (e.g., https://your-project.vercel.app)
+  base_url: https://7mxd-oauth.vercel.app
   auth_endpoint: /auth
 
 site_url: https://7mxd.github.io
