@@ -48,15 +48,6 @@
         },
         {
           "name": "Dataiku"
-        },
-        {
-          "name": "MongoDB"
-        },
-        {
-          "name": "Postman"
-        },
-        {
-          "name": "Studio 3T"
         }
       ]
     },
@@ -69,6 +60,12 @@
         },
         {
           "name": "PyMongo"
+        },
+        {
+          "name": "Postman"
+        },
+        {
+          "name": "Studio 3T"
         },
         {
           "name": "GitHub"
