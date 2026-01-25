@@ -6,19 +6,21 @@
       "runtime": "@vercel/node@3"
     }
   },
-  "routes": [
-    {
-      "src": "/auth",
-      "dest": "/api/auth.js"
-    },
-    {
-      "src": "/callback",
-      "dest": "/api/callback.js"
-    }
+  "rewrites": [
+    { "source": "/auth", "destination": "/api/auth" },
+    { "source": "/callback", "destination": "/api/callback" }
   ],
   "headers": [
     {
       "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "https://7mxd.github.io" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type" }
+      ]
+    },
+    {
+      "source": "/(auth|callback)",
       "headers": [
         { "key": "Access-Control-Allow-Origin", "value": "https://7mxd.github.io" },
         { "key": "Access-Control-Allow-Methods", "value": "GET, POST, OPTIONS" },
