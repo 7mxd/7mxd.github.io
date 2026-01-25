@@ -5,15 +5,14 @@ export default async function handler(req, res) {
   const { code } = req.query;
 
   if (!code) {
-    return res.status(400).json({ error: 'No code provided' });
+    return res.status(400).send('Missing code parameter');
   }
 
   const clientId = process.env.GITHUB_CLIENT_ID;
   const clientSecret = process.env.GITHUB_CLIENT_SECRET;
-  const siteUrl = process.env.SITE_URL || 'https://7mxd.github.io';
 
   if (!clientId || !clientSecret) {
-    return res.status(500).json({ error: 'OAuth credentials not configured' });
+    return res.status(500).send('OAuth not configured');
   }
 
   try {
@@ -34,59 +33,58 @@ export default async function handler(req, res) {
     const tokenData = await tokenResponse.json();
 
     if (tokenData.error) {
-      return res.status(400).json({ error: tokenData.error_description || tokenData.error });
+      return res.status(400).send(`OAuth error: ${tokenData.error_description || tokenData.error}`);
     }
 
     const accessToken = tokenData.access_token;
 
-    // Fetch user info to verify the token works
-    const userResponse = await fetch('https://api.github.com/user', {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'Accept': 'application/json',
-      },
-    });
-
-    if (!userResponse.ok) {
-      return res.status(401).json({ error: 'Failed to verify token' });
+    if (!accessToken) {
+      return res.status(400).send('No access token received');
     }
 
-    // Return HTML that posts the token back to Decap CMS
-    // This is the standard flow that Decap CMS expects
-    const html = `
-<!DOCTYPE html>
+    // Return HTML that posts the token back to Decap CMS using the expected format
+    const html = `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
-  <title>OAuth Callback</title>
+  <title>Authorizing...</title>
 </head>
 <body>
+  <p>Authorizing with GitHub...</p>
   <script>
     (function() {
-      function receiveMessage(e) {
-        console.log("receiveMessage %o", e);
-        if (e.data === "authorizing:github") {
-          window.opener.postMessage(
-            "authorization:github:success:${JSON.stringify({ token: accessToken, provider: 'github' })}",
-            e.origin
-          );
-          window.close();
+      function sendMessage(message) {
+        if (window.opener) {
+          window.opener.postMessage(message, "*");
         }
       }
-      window.addEventListener("message", receiveMessage, false);
-      window.opener.postMessage("authorizing:github", "${siteUrl}");
+
+      // Decap CMS expects this exact message format
+      var data = { token: "${accessToken}", provider: "github" };
+
+      // First, tell the parent we're authorizing
+      sendMessage("authorizing:github");
+
+      // Then send the success message with token
+      // Decap CMS expects: "authorization:github:success:" followed by JSON
+      var successMessage = "authorization:github:success:" + JSON.stringify(data);
+      sendMessage(successMessage);
+
+      // Close this window after a short delay
+      setTimeout(function() {
+        window.close();
+      }, 1000);
     })();
   </script>
-  <p>Authenticating with GitHub...</p>
-  <p>If this window doesn't close automatically, please close it and try again.</p>
+  <p>If this window doesn't close automatically, you can close it manually.</p>
 </body>
 </html>`;
 
     res.setHeader('Content-Type', 'text/html');
-    res.status(200).send(html);
+    return res.status(200).send(html);
 
   } catch (error) {
     console.error('OAuth error:', error);
-    res.status(500).json({ error: 'OAuth exchange failed' });
+    return res.status(500).send('OAuth failed: ' + error.message);
   }
 }
