@@ -21,6 +21,17 @@
     <!-- iOS/Apple Touch Icon -->
     <link rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23219ebc'/%3E%3Cstop offset='100%25' style='stop-color:%231d8aa8'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='180' height='180' rx='36' fill='url(%23grad)'/%3E%3Ctext x='90' y='118' font-family='system-ui,-apple-system,sans-serif' font-size='72' fill='white' text-anchor='middle' font-weight='700'%3EAR%3C/text%3E%3C/svg%3E">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* Critical CSS for font-display and prevent FOIT */
+        @font-face {
+            font-family: 'Montserrat';
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Inter';
+            font-display: swap;
+        }
+    </style>
     <link rel="stylesheet" href="style.css">
     <script defer src="script.js"></script>
 </head>
@@ -32,20 +43,20 @@
     <a href="#main-content" class="skip-link">Skip to main content</a>
     
     <!-- Navigation -->
-    <nav class="navbar" aria-label="Main navigation">
+    <nav class="navbar" role="navigation" aria-label="Main navigation">
         <div class="nav-content">
-            <a href="#" class="nav-logo">AR</a>
+            <a href="#" class="nav-logo" aria-label="Ahmed Radhi - Home">AR</a>
             <div class="nav-spacer"></div>
-            <button class="mobile-menu-toggle" aria-label="Toggle menu">
-                <span class="hamburger-line"></span>
-                <span class="hamburger-line"></span>
-                <span class="hamburger-line"></span>
+            <button class="mobile-menu-toggle" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="nav-links">
+                <span class="hamburger-line" aria-hidden="true"></span>
+                <span class="hamburger-line" aria-hidden="true"></span>
+                <span class="hamburger-line" aria-hidden="true"></span>
             </button>
-            <div class="nav-links">
-                <a href="#summary">Summary</a>
-                <a href="#education">Education</a>
-                <a href="#experience">Experience</a>
-                <a href="#skills">Skills</a>
+            <div class="nav-links" id="nav-links" role="menubar">
+                <a href="#summary" role="menuitem">Summary</a>
+                <a href="#education" role="menuitem">Education</a>
+                <a href="#experience" role="menuitem">Experience</a>
+                <a href="#skills" role="menuitem">Skills</a>
                 <div class="mobile-menu-button">
                     <button class="theme-toggle" aria-label="Toggle dark mode">
                         <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
