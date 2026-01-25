@@ -384,36 +384,86 @@ function setupAnimations() {
 }
 
 /**
- * Calculate and display experience duration
+ * Calculate duration between two dates in years and months
+ * @param {string} startStr - Start date (YYYY-MM or YYYY)
+ * @param {string} endStr - End date (YYYY-MM, YYYY, "Present", or "Current")
+ * @returns {string|null} Human-friendly duration string or null if invalid
+ */
+function calculateDuration(startStr, endStr) {
+    if (!startStr || !endStr) return null;
+
+    // Parse start date
+    const startParts = startStr.includes('-') ? startStr.split('-') : [startStr, '01'];
+    const startYear = parseInt(startParts[0], 10);
+    const startMonth = parseInt(startParts[1], 10) - 1; // 0-indexed
+    const startDate = new Date(startYear, startMonth, 1);
+
+    // Parse end date
+    let endDate;
+    const endLower = endStr.toLowerCase();
+    if (endLower === 'present' || endLower === 'current') {
+        endDate = new Date();
+    } else if (endStr.includes('-')) {
+        const [year, month] = endStr.split('-');
+        endDate = new Date(parseInt(year, 10), parseInt(month, 10) - 1, 1);
+    } else {
+        endDate = new Date(parseInt(endStr, 10), 0, 1);
+    }
+
+    // Validate dates
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+        console.warn('Invalid date format:', { startStr, endStr });
+        return null;
+    }
+
+    // Check if end date is before start date
+    if (endDate < startDate) {
+        console.warn('End date is before start date:', { startStr, endStr });
+        return null;
+    }
+
+    // Calculate total months (inclusive of the end month)
+    let totalMonths = (endDate.getFullYear() - startDate.getFullYear()) * 12 +
+                      (endDate.getMonth() - startDate.getMonth()) + 1;
+
+    // Handle edge case: same month
+    if (totalMonths <= 0) totalMonths = 1;
+
+    const years = Math.floor(totalMonths / 12);
+    const months = totalMonths % 12;
+
+    // Format the duration string
+    if (years === 0) {
+        if (months === 1) return '1 month';
+        return `${months} months`;
+    } else if (months === 0) {
+        if (years === 1) return '1 year';
+        return `${years} years`;
+    } else {
+        const yearStr = years === 1 ? '1 year' : `${years} years`;
+        const monthStr = months === 1 ? '1 month' : `${months} months`;
+        return `${yearStr} and ${monthStr}`;
+    }
+}
+
+/**
+ * Calculate and display experience/education duration
  */
 function setupExperienceDurations() {
     document.querySelectorAll('.experience-date').forEach(dateSpan => {
         const startStr = dateSpan.getAttribute('data-start');
         const endStr = dateSpan.getAttribute('data-end');
 
-        if (!startStr || !endStr) return;
+        const duration = calculateDuration(startStr, endStr);
 
-        const startParts = startStr.includes('-') ? startStr.split('-') : [startStr, '01'];
-        const startDate = new Date(startParts[0], startParts[1] - 1);
-
-        let endDate;
-        if (endStr === 'Present') {
-            endDate = new Date();
-        } else if (endStr.includes('-')) {
-            const [year, month] = endStr.split('-');
-            endDate = new Date(year, month - 1);
-        } else {
-            endDate = new Date(endStr, 0);
+        if (duration) {
+            // Create duration badge element
+            const durationBadge = document.createElement('span');
+            durationBadge.className = 'duration-badge';
+            durationBadge.textContent = duration;
+            dateSpan.appendChild(durationBadge);
+            dateSpan.setAttribute('title', `Duration: ${duration}`);
         }
-
-        const months = (endDate.getFullYear() - startDate.getFullYear()) * 12 +
-                      (endDate.getMonth() - startDate.getMonth());
-
-        const duration = months < 12 ?
-            `${months} months` :
-            `${Math.floor(months/12)} year${Math.floor(months/12) !== 1 ? 's' : ''}${months%12 ? ` ${months%12} months` : ''}`;
-
-        dateSpan.setAttribute('title', `Duration: ${duration}`);
     });
 }
 
