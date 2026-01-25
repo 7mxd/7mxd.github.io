@@ -3,17 +3,38 @@
     {
       "name": "Programming Languages",
       "type": "list",
-      "items": ["Python", "R", "MATLAB", "Java", "LaTeX"]
+      "items": [
+        { "name": "Python" },
+        { "name": "R" },
+        { "name": "MATLAB" },
+        { "name": "Java" },
+        { "name": "LaTeX" }
+      ]
     },
     {
       "name": "Data Science & Analytics",
       "type": "tags",
-      "items": ["NumPy", "Pandas", "Seaborn", "Tidyverse", "Caret", "Power BI", "Dataiku"]
+      "items": [
+        { "name": "NumPy" },
+        { "name": "Pandas" },
+        { "name": "Seaborn" },
+        { "name": "Tidyverse" },
+        { "name": "Caret" },
+        { "name": "Power BI" },
+        { "name": "Dataiku" }
+      ]
     },
     {
       "name": "Databases & Tools",
       "type": "tags",
-      "items": ["MongoDB", "PyMongo", "GitHub", "VS Code", "Jupyter Notebook", "RStudio"]
+      "items": [
+        { "name": "MongoDB" },
+        { "name": "PyMongo" },
+        { "name": "GitHub" },
+        { "name": "VS Code" },
+        { "name": "Jupyter Notebook" },
+        { "name": "RStudio" }
+      ]
     },
     {
       "name": "Languages",

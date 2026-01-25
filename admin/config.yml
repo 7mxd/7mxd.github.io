@@ -134,6 +134,7 @@ collections:
           - name: "categories"
             label: "Skill Categories"
             widget: "list"
+            summary: "{{fields.name}} ({{fields.type}})"
             fields:
               - { name: "name", label: "Category Name", widget: "string" }
               - name: "type"
@@ -146,13 +147,8 @@ collections:
               - name: "items"
                 label: "Skills"
                 widget: "list"
-                types:
-                  - name: "simple"
-                    label: "Simple Skill"
-                    widget: "string"
-                  - name: "proficiency"
-                    label: "Skill with Proficiency"
-                    fields:
-                      - { name: "name", label: "Skill Name", widget: "string" }
-                      - { name: "level", label: "Proficiency Level (0-100)", widget: "number", min: 0, max: 100 }
-                      - { name: "label", label: "Proficiency Label", widget: "string", hint: "e.g., Native, Fluent, Beginner" }
+                summary: "{{fields.name}}"
+                fields:
+                  - { name: "name", label: "Skill Name", widget: "string" }
+                  - { name: "level", label: "Proficiency (0-100)", widget: "number", required: false, value_type: "int", min: 0, max: 100, hint: "Only for proficiency type" }
+                  - { name: "label", label: "Level Label", widget: "string", required: false, hint: "Only for proficiency type (e.g., Native, Fluent)" }

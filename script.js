@@ -176,13 +176,13 @@ function renderSkills(skills) {
         if (category.type === 'list') {
             contentHtml = `
                 <ul class="skill-list">
-                    ${category.items.map(item => `<li>${item}</li>`).join('')}
+                    ${category.items.map(item => `<li>${typeof item === 'string' ? item : item.name}</li>`).join('')}
                 </ul>
             `;
         } else if (category.type === 'tags') {
             contentHtml = `
                 <div class="skill-item-container">
-                    ${category.items.map(item => `<span class="skill-item">${item}</span>`).join('')}
+                    ${category.items.map(item => `<span class="skill-item">${typeof item === 'string' ? item : item.name}</span>`).join('')}
                 </div>
             `;
         } else if (category.type === 'proficiency') {
