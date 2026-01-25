@@ -1,0 +1,29 @@
+{
+  "version": 2,
+  "name": "7mxd-oauth",
+  "functions": {
+    "api/*.js": {
+      "runtime": "@vercel/node@3"
+    }
+  },
+  "routes": [
+    {
+      "src": "/auth",
+      "dest": "/api/auth.js"
+    },
+    {
+      "src": "/callback",
+      "dest": "/api/callback.js"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "https://7mxd.github.io" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type" }
+      ]
+    }
+  ]
+}
