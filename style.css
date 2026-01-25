@@ -337,6 +337,23 @@ body {
     color: #ffffff;
 }
 
+.experience-date:hover .duration-badge {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+}
+
+.duration-badge {
+    display: inline-block;
+    margin-left: 0.5rem;
+    padding: 0.1rem 0.5rem;
+    background: var(--secondary);
+    color: #ffffff;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    vertical-align: middle;
+}
+
 .role-description {
     margin: 0;
     padding: 0;
