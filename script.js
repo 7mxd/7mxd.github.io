@@ -494,7 +494,7 @@ function calculateDuration(startStr, endStr) {
 }
 
 /**
- * Calculate and display experience/education duration
+ * Calculate and display experience/education duration on hover/tap
  */
 function setupExperienceDurations() {
     document.querySelectorAll('.experience-date').forEach(dateSpan => {
@@ -504,12 +504,65 @@ function setupExperienceDurations() {
         const duration = calculateDuration(startStr, endStr);
 
         if (duration) {
-            // Create duration badge element
-            const durationBadge = document.createElement('span');
-            durationBadge.className = 'duration-badge';
-            durationBadge.textContent = duration;
-            dateSpan.appendChild(durationBadge);
-            dateSpan.setAttribute('title', `Duration: ${duration}`);
+            // Store duration as data attribute
+            dateSpan.setAttribute('data-duration', duration);
+            dateSpan.setAttribute('aria-describedby', `duration-${Math.random().toString(36).substr(2, 9)}`);
+
+            // Create tooltip element
+            const tooltip = document.createElement('span');
+            tooltip.className = 'duration-tooltip';
+            tooltip.textContent = duration;
+            tooltip.setAttribute('role', 'tooltip');
+            tooltip.id = dateSpan.getAttribute('aria-describedby');
+            dateSpan.appendChild(tooltip);
+
+            // Add keyboard accessibility
+            dateSpan.setAttribute('tabindex', '0');
+            dateSpan.setAttribute('role', 'button');
+            dateSpan.setAttribute('aria-label', `${dateSpan.textContent.trim()}, duration: ${duration}`);
+
+            // Handle touch events for mobile
+            let touchTimeout;
+            dateSpan.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                // Toggle active state on tap
+                const isActive = dateSpan.classList.contains('show-duration');
+
+                // Close all other open tooltips
+                document.querySelectorAll('.experience-date.show-duration').forEach(el => {
+                    if (el !== dateSpan) el.classList.remove('show-duration');
+                });
+
+                dateSpan.classList.toggle('show-duration');
+
+                // Auto-hide after 3 seconds
+                clearTimeout(touchTimeout);
+                if (!isActive) {
+                    touchTimeout = setTimeout(() => {
+                        dateSpan.classList.remove('show-duration');
+                    }, 3000);
+                }
+            }, { passive: false });
+
+            // Handle keyboard events
+            dateSpan.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    dateSpan.classList.toggle('show-duration');
+                }
+                if (e.key === 'Escape') {
+                    dateSpan.classList.remove('show-duration');
+                }
+            });
+        }
+    });
+
+    // Close tooltips when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.experience-date')) {
+            document.querySelectorAll('.experience-date.show-duration').forEach(el => {
+                el.classList.remove('show-duration');
+            });
         }
     });
 }

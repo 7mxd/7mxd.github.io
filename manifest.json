@@ -1,0 +1,23 @@
+{
+  "name": "Ahmed Radhi Portfolio",
+  "short_name": "AR Portfolio",
+  "description": "Portfolio of Ahmed Alawi Radhi - Applied Mathematics & Statistics Graduate",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8f9fa",
+  "theme_color": "#219ebc",
+  "icons": [
+    {
+      "src": "assets/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
