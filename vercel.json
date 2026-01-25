@@ -1,11 +1,5 @@
 {
   "version": 2,
-  "name": "7mxd-oauth",
-  "functions": {
-    "api/*.js": {
-      "runtime": "@vercel/node@3"
-    }
-  },
   "rewrites": [
     { "source": "/auth", "destination": "/api/auth" },
     { "source": "/callback", "destination": "/api/callback" }
