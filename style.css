@@ -569,34 +569,79 @@ body {
     display: inline-block;
     color: var(--gray-500);
     font-size: 0.9rem;
-    margin-bottom: 10px; /* Space between date and description */
+    margin-bottom: 10px;
     padding: 0.2rem 1rem;
     background: var(--gray-100);
     border-radius: 15px;
-    cursor: help;
+    cursor: pointer;
     transition: var(--transition);
+    position: relative;
 }
 
-.experience-date:hover {
+.experience-date:hover,
+.experience-date:focus-visible {
     background: var(--secondary);
     color: #ffffff;
 }
 
-.experience-date:hover .duration-badge {
-    background: rgba(255, 255, 255, 0.2);
-    color: #ffffff;
-}
-
-.duration-badge {
-    display: inline-block;
-    margin-left: 0.5rem;
-    padding: 0.1rem 0.5rem;
-    background: var(--secondary);
-    color: #ffffff;
-    border-radius: 10px;
+/* Duration tooltip - hidden by default */
+.duration-tooltip {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) scale(0.9);
+    padding: 0.4rem 0.8rem;
+    background: var(--primary);
+    color: var(--background);
+    border-radius: 6px;
     font-size: 0.75rem;
-    font-weight: 500;
-    vertical-align: middle;
+    font-weight: 600;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+    z-index: 100;
+    pointer-events: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Tooltip arrow */
+.duration-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: var(--primary);
+}
+
+/* Show tooltip on hover (desktop) */
+@media (hover: hover) and (pointer: fine) {
+    .experience-date:hover .duration-tooltip,
+    .experience-date:focus-visible .duration-tooltip {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-50%) scale(1);
+    }
+}
+
+/* Show tooltip on tap (mobile) - uses .show-duration class */
+.experience-date.show-duration .duration-tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) scale(1);
+}
+
+/* Dark mode tooltip adjustment */
+.dark-mode .duration-tooltip {
+    background: var(--gray-100);
+    color: var(--primary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.dark-mode .duration-tooltip::after {
+    border-top-color: var(--gray-100);
 }
 
 .role-description {
