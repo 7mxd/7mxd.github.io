@@ -15,7 +15,11 @@
           "endDate": "Present",
           "displayDate": "09/2024 - Present",
           "responsibilities": [
-            "Developed and maintained ETL data pipelines using Python, Pandas, and NoSQL databases within a microservices architecture, collaborating through version-controlled repositories."
+            "Developed and maintained ETL data pipelines using Python, Pandas, and NoSQL databases within a microservices architecture, collaborating through version-controlled repositories.",
+            " Implemented automated data pipelines for data wrangling, fuzzy matching, anomaly detection, and exception handling, producing structured outputs and running via Docker-based scheduling.\n",
+            "Built interactive dashboards and visual reports using Power BI and Tableau for proof-of-concept (POC) projects.",
+            "Designed ER diagrams and authored technical documentation describing multiple project use cases.",
+            "Supported client teams by troubleshooting data availability and data update issues, coordinating with internal teams to resolve data-related problems."
           ]
         },
         {
