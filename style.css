@@ -41,7 +41,7 @@ body * {
     text-decoration: none;
     box-shadow: 0 4px 12px rgba(33, 158, 188, 0.3);
 
-    &:focus {
+    &:focus-visible {
         top: 0;
     }
 }
