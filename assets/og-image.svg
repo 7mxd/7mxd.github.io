@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <!-- Background gradient -->
+    <linearGradient id="bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#023047"/>
+      <stop offset="100%" style="stop-color:#0a4a6b"/>
+    </linearGradient>
+    <!-- Logo gradient (matching favicon) -->
+    <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#219ebc"/>
+      <stop offset="100%" style="stop-color:#3db8d6"/>
+    </linearGradient>
+    <!-- Subtle pattern overlay -->
+    <pattern id="grid-pattern" width="60" height="60" patternUnits="userSpaceOnUse">
+      <path d="M 60 0 L 0 0 0 60" fill="none" stroke="rgba(255,255,255,0.02)" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg-gradient)"/>
+
+  <!-- Subtle grid pattern -->
+  <rect width="1200" height="630" fill="url(#grid-pattern)"/>
+
+  <!-- Decorative accent lines -->
+  <line x1="0" y1="0" x2="300" y2="0" stroke="#219ebc" stroke-width="4"/>
+  <line x1="900" y1="630" x2="1200" y2="630" stroke="#219ebc" stroke-width="4"/>
+
+  <!-- Logo container (centered, similar to favicon style) -->
+  <rect x="510" y="140" width="180" height="180" rx="30" fill="url(#logo-gradient)"/>
+
+  <!-- AR initials -->
+  <text x="600" y="262" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-weight="700" font-size="90" fill="white" letter-spacing="-2">AR</text>
+
+  <!-- Name -->
+  <text x="600" y="400" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-weight="600" font-size="48" fill="white">Ahmed Alawi Radhi</text>
+
+  <!-- Role/Title -->
+  <text x="600" y="460" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="400" font-size="28" fill="#8ecae6">Applied Mathematics &amp; Statistics</text>
+
+  <!-- Subtitle -->
+  <text x="600" y="500" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="400" font-size="22" fill="rgba(255,255,255,0.7)">Data Science &amp; Analytics</text>
+
+  <!-- Website URL -->
+  <text x="600" y="580" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="500" font-size="18" fill="rgba(255,255,255,0.5)">7mxd.github.io</text>
+</svg>
