@@ -27,22 +27,40 @@ body * {
 
 /* Skip link styling - hidden until focused */
 .skip-link {
+    /* Visually hidden by default - fully clipped, not just off-screen */
     position: absolute;
-    top: -50px;
-    left: 50%;
-    transform: translateX(-50%);
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+    /* Styling for when visible */
     background: var(--secondary);
     color: white;
-    padding: 12px 24px;
-    border-radius: 0 0 8px 8px;
-    z-index: 10000;
-    transition: top 0.3s ease;
     font-weight: 600;
     text-decoration: none;
-    box-shadow: 0 4px 12px rgba(33, 158, 188, 0.3);
+    z-index: 10000;
 
     &:focus-visible {
+        /* Restore visibility on keyboard focus */
+        position: fixed;
         top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: auto;
+        height: auto;
+        padding: 12px 24px;
+        margin: 0;
+        overflow: visible;
+        clip: auto;
+        clip-path: none;
+        white-space: normal;
+        border-radius: 0 0 8px 8px;
+        box-shadow: 0 4px 12px rgba(33, 158, 188, 0.3);
     }
 }
 
