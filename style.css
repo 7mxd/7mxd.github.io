@@ -38,30 +38,37 @@ body * {
     clip-path: inset(50%);
     white-space: nowrap;
     border: 0;
+    /* Prevent any touch interaction */
+    pointer-events: none;
+    /* Disable tap highlight on iOS */
+    -webkit-tap-highlight-color: transparent;
     /* Styling for when visible */
     background: var(--secondary);
     color: white;
     font-weight: 600;
     text-decoration: none;
     z-index: 10000;
+}
 
-    &:focus-visible {
-        /* Restore visibility on keyboard focus */
-        position: fixed;
-        top: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        width: auto;
-        height: auto;
-        padding: 12px 24px;
-        margin: 0;
-        overflow: visible;
-        clip: auto;
-        clip-path: none;
-        white-space: normal;
-        border-radius: 0 0 8px 8px;
-        box-shadow: 0 4px 12px rgba(33, 158, 188, 0.3);
-    }
+/* Only show skip link when:
+   1. User is navigating with keyboard (html.using-keyboard)
+   2. AND the link is focused */
+html.using-keyboard .skip-link:focus {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
+    height: auto;
+    padding: 12px 24px;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+    clip-path: none;
+    white-space: normal;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 4px 12px rgba(33, 158, 188, 0.3);
+    pointer-events: auto;
 }
 
 /* Screen reader only text */
