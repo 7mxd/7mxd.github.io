@@ -755,9 +755,43 @@ function setupSmoothScrolling() {
 }
 
 /**
+ * Setup keyboard navigation detection for skip link
+ * Only shows skip link when user is actively using keyboard navigation
+ */
+function setupKeyboardDetection() {
+    const html = document.documentElement;
+
+    // Detect keyboard navigation (Tab key)
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Tab') {
+            html.classList.add('using-keyboard');
+        }
+    }, { capture: true });
+
+    // Detect mouse/touch - disable keyboard mode
+    document.addEventListener('mousedown', () => {
+        html.classList.remove('using-keyboard');
+    }, { capture: true });
+
+    document.addEventListener('touchstart', () => {
+        html.classList.remove('using-keyboard');
+    }, { capture: true, passive: true });
+
+    // Also handle pointer events for hybrid devices
+    document.addEventListener('pointerdown', (e) => {
+        if (e.pointerType !== 'keyboard') {
+            html.classList.remove('using-keyboard');
+        }
+    }, { capture: true });
+}
+
+/**
  * Main initialization
  */
 document.addEventListener('DOMContentLoaded', async () => {
+    // Setup keyboard detection first (for skip link)
+    setupKeyboardDetection();
+
     // Setup theme toggle first (before content loads)
     const themeState = setupThemeToggle();
 
