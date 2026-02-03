@@ -36,6 +36,13 @@ collections:
                 fields:
                   - { name: "url", label: "LinkedIn URL", widget: "string" }
                   - { name: "label", label: "Display Label", widget: "string", default: "LinkedIn Profile" }
+              - name: "github"
+                label: "GitHub"
+                widget: "object"
+                required: false
+                fields:
+                  - { name: "url", label: "GitHub URL", widget: "string", required: false, hint: "Leave empty to hide GitHub link" }
+                  - { name: "label", label: "Display Label", widget: "string", default: "github.com/7mxd", required: false }
 
   # Summary - single file
   - name: "summary"
