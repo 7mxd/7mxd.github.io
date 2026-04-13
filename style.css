@@ -53,7 +53,7 @@ html.using-keyboard .skip-link:focus {
     clip-path: none;
     white-space: normal;
     border-radius: 0 0 8px 8px;
-    box-shadow: 0 4px 12px rgba(33, 158, 188, 0.3);
+    box-shadow: 0 4px 12px rgba(26, 143, 168, 0.3);
     pointer-events: auto;
 }
 
@@ -130,9 +130,6 @@ textarea:focus-visible {
     --shadow: 0 4px 12px -2px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.04);
     --shadow-md: 0 12px 28px -6px rgb(0 0 0 / 0.12), 0 4px 8px -4px rgb(0 0 0 / 0.06);
     --gradient: linear-gradient(135deg, var(--secondary), var(--tertiary));
-
-    /* Transitions */
-    --transition: all 0.3s ease;
 }
 
 /* ========================================
@@ -517,14 +514,14 @@ body {
     height: 14px;
     border-radius: 50%;
     background: var(--gradient);
-    box-shadow: 0 0 0 4px rgba(33, 158, 188, 0.15);
+    box-shadow: 0 0 0 4px rgba(26, 143, 168, 0.15);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     z-index: 1;
 }
 
 .role-item:hover::before {
     transform: scale(1.2);
-    box-shadow: 0 0 0 6px rgba(33, 158, 188, 0.25);
+    box-shadow: 0 0 0 6px rgba(26, 143, 168, 0.25);
 }
 
 .role-item::after {
@@ -892,7 +889,7 @@ body {
     padding: 0.3rem 0.6rem;
     border-radius: 6px;
     transition: color 0.3s ease, background 0.3s ease;
-    min-height: 36px;
+    min-height: 44px;
 }
 
 .project-link:hover {
@@ -939,7 +936,7 @@ body {
 }
 
 body.dark-mode .navbar {
-    background: rgba(26, 26, 26, 0.95);
+    background: rgba(17, 19, 21, 0.95);
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
 }
 
@@ -965,15 +962,11 @@ body.dark-mode .navbar {
     letter-spacing: -0.03em;
 }
 
-.nav-spacer {
-    flex: 1;
-    max-width: 100px;
-}
-
 .nav-links {
     flex: 1;
     display: flex;
     justify-content: center;
+    align-items: center;
     gap: 1.5rem;
 }
 
@@ -1025,17 +1018,14 @@ body.dark-mode .navbar {
     transform: scaleX(1);
 }
 
-.nav-utils {
-    flex: 0 0 auto;
-    display: flex;
-    gap: 1.5rem;
-    margin-left: auto;
-}
-
-.nav-buttons {
+/* Action buttons — sit inside nav-links, separated from nav items */
+.nav-actions {
     display: flex;
     gap: 1rem;
     align-items: center;
+    margin-left: 1.5rem;
+    padding-left: 1.5rem;
+    border-left: 1px solid var(--gray-200);
 }
 
 /* Theme Toggle */
@@ -1153,21 +1143,19 @@ body.dark-mode .moon-icon { display: none; }
     transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
-.mobile-menu-button {
-    display: none;
-}
 
-/* Desktop buttons */
-@media (min-width: 769px) {
-    .mobile-menu-button {
-        display: none;
-    }
+/* ========================================
+   Noscript Fallback
+   ======================================== */
 
-    .nav-utils .nav-buttons {
-        display: flex;
-        gap: 1rem;
-        align-items: center;
-    }
+.noscript-warning {
+    max-width: 600px;
+    margin: 4rem auto;
+    padding: 2rem;
+    text-align: center;
+    color: var(--gray-500);
+    font-size: 0.95rem;
+    line-height: 1.6;
 }
 
 /* ========================================
@@ -1297,6 +1285,7 @@ body.dark-mode .moon-icon { display: none; }
     .contact-info {
         flex-direction: column;
         align-items: center;
+        gap: 0.75rem;
     }
 
     .navbar {
@@ -1308,6 +1297,10 @@ body.dark-mode .moon-icon { display: none; }
         height: 3.5rem;
         position: relative;
         justify-content: space-between;
+    }
+
+    .education-details {
+        flex-wrap: wrap;
     }
 
     .role-item {
@@ -1331,30 +1324,25 @@ body.dark-mode .moon-icon { display: none; }
         transform: translateY(-50%);
     }
 
-    /* Hide desktop buttons on mobile */
-    .nav-utils .nav-buttons {
-        display: none;
-    }
-
-    /* Show mobile menu buttons */
-    .mobile-menu-button {
-        padding: 1rem 1.5rem;
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
-        background: var(--background);
-        width: 100%;
-    }
-
-    .mobile-menu-button:first-of-type {
+    /* Reposition action buttons inside mobile drawer */
+    .nav-actions {
         margin-top: auto;
+        margin-left: 0;
+        padding-left: 0;
+        border-left: none;
         border-top: 1px solid var(--gray-200);
         position: sticky;
         bottom: 0;
+        padding: 1rem 1.5rem;
+        background: var(--background);
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        width: 100%;
     }
 
-    .mobile-menu-button .download-button,
-    .mobile-menu-button .theme-toggle {
+    .nav-actions .download-button,
+    .nav-actions .theme-toggle {
         width: 100%;
         height: auto;
         justify-content: center;
@@ -1364,13 +1352,13 @@ body.dark-mode .moon-icon { display: none; }
         color: var(--primary);
     }
 
-    .mobile-menu-button .download-button:hover,
-    .mobile-menu-button .theme-toggle:hover {
+    .nav-actions .download-button:hover,
+    .nav-actions .theme-toggle:hover {
         background: var(--gray-200);
     }
 
-    .mobile-menu-button .download-button svg,
-    .mobile-menu-button .theme-toggle svg {
+    .nav-actions .download-button svg,
+    .nav-actions .theme-toggle svg {
         width: 18px;
         height: 18px;
         stroke: currentColor;
@@ -1409,6 +1397,11 @@ body.dark-mode .moon-icon { display: none; }
         padding: 1rem 2rem;
         width: 100%;
         text-align: center;
+    }
+
+    /* Remove desktop underline animation in mobile drawer */
+    .nav-links a::after {
+        display: none;
     }
 
     .nav-links a:first-of-type {
@@ -1457,6 +1450,17 @@ body.dark-mode .moon-icon { display: none; }
         backdrop-filter: blur(8px);
         -webkit-backdrop-filter: blur(8px);
         pointer-events: auto;
+    }
+}
+
+/* Landscape phone — narrower drawer, tighter spacing */
+@media (max-width: 768px) and (orientation: landscape) {
+    .nav-links {
+        width: 50%;
+    }
+
+    .nav-links a {
+        padding: 0.75rem 2rem;
     }
 }
 

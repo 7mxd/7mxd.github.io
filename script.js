@@ -29,8 +29,7 @@ let siteData = {};
  */
 async function fetchData(filename) {
     try {
-        // Add cache-busting to ensure fresh data after CMS edits
-        const response = await fetch(`data/${filename}`, { cache: 'no-store' });
+        const response = await fetch(`data/${filename}`);
         if (!response.ok) throw new Error(`Failed to load ${filename}`);
         return await response.json();
     } catch (error) {
@@ -69,7 +68,7 @@ function renderProfile(profile) {
             <img src="${profile.photo}" alt="${profile.name}, ${profile.title}" class="profile-picture" loading="eager">
         </div>
         <h1>${profile.name}</h1>
-        <h2 class="subtitle">${profile.title}</h2>
+        <p class="subtitle">${profile.title}</p>
         <div class="contact-info" role="list" aria-label="Contact information">
             <a href="mailto:${profile.contact.email}" class="contact-item" role="listitem" aria-label="Email: ${profile.contact.email}">
                 ${ICONS.email}
@@ -98,7 +97,6 @@ function renderProfile(profile) {
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <polyline points="6 9 12 15 18 9"></polyline>
             </svg>
-            <span>Scroll</span>
         </a>
     `;
 }
@@ -367,7 +365,8 @@ function setupDownloadButton() {
                 document.body.removeChild(link);
             } catch (error) {
                 console.error('Download failed:', error);
-                alert('Sorry, the CV could not be downloaded at this time.');
+                // Fallback: open the CV path directly in a new tab
+                window.open(cvPath, '_blank');
             }
         });
     });
@@ -773,7 +772,7 @@ function setupMobileNavigation() {
         }
     });
 
-    document.querySelectorAll('.nav-links a, .nav-links button, .nav-buttons a, .nav-buttons button').forEach(link => {
+    document.querySelectorAll('.nav-links a, .nav-links button').forEach(link => {
         link.addEventListener('click', () => {
             if (navLinks.classList.contains('active')) {
                 toggleMenu();
