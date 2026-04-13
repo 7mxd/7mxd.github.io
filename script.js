@@ -43,16 +43,17 @@ async function fetchData(filename) {
  * Load all site data
  */
 async function loadAllData() {
-    const [profile, summary, education, experience, skills, settings] = await Promise.all([
+    const [profile, summary, education, experience, skills, settings, projects] = await Promise.all([
         fetchData('profile.json'),
         fetchData('summary.json'),
         fetchData('education.json'),
         fetchData('experience.json'),
         fetchData('skills.json'),
-        fetchData('settings.json')
+        fetchData('settings.json'),
+        fetchData('projects.json')
     ]);
 
-    siteData = { profile, summary, education, experience, skills, settings };
+    siteData = { profile, summary, education, experience, skills, settings, projects };
     return siteData;
 }
 
@@ -225,6 +226,107 @@ function renderSkills(skills) {
             </div>
         `;
     }).join('');
+}
+
+/**
+ * Project link icon SVGs
+ */
+const PROJECT_LINK_ICONS = {
+    github: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+    </svg>`,
+    webapp: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+        <circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line>
+        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+    </svg>`,
+    ios: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+        <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+    </svg>`,
+    android: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+        <path d="M17.523 15.3414c-.5-1.5-2.058-2.316-3.558-1.816-1.5.5-2.316 2.058-1.816 3.558.5 1.5 2.058 2.316 3.558 1.816 1.5-.5 2.316-2.058 1.816-3.558zM7.523 15.3414c.5-1.5-.316-3.058-1.816-3.558-1.5-.5-3.058.316-3.558 1.816-.5 1.5.316 3.058 1.816 3.558 1.5.5 3.058-.316 3.558-1.816z"/>
+        <path d="M1 13h2v-3H1v3zm20-3h-2v3h2v-3zM6.5 2L5 3.5l2 2C5.168 6.8 4 8.786 4 11h16c0-2.214-1.168-4.2-2.99-5.5l2-2L17.5 2l-2.3 2.3A7.474 7.474 0 0 0 12 3.5c-1.14 0-2.21.286-3.2.8L6.5 2z"/>
+    </svg>`,
+    link: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+        <polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line>
+    </svg>`
+};
+
+/**
+ * Render the projects section
+ */
+function renderProjects(projects) {
+    const container = document.getElementById('projects-grid');
+    if (!container || !projects || !projects.items || !projects.items.length) return;
+
+    container.innerHTML = projects.items.map(project => {
+        const linksHtml = [];
+        const links = project.links || {};
+
+        if (links.github) {
+            linksHtml.push(`<a href="${links.github}" target="_blank" rel="noopener noreferrer" class="project-link" aria-label="GitHub repository">${PROJECT_LINK_ICONS.github}<span>GitHub</span></a>`);
+        }
+        if (links.webapp) {
+            linksHtml.push(`<a href="${links.webapp}" target="_blank" rel="noopener noreferrer" class="project-link" aria-label="Web app">${PROJECT_LINK_ICONS.webapp}<span>Web App</span></a>`);
+        }
+        if (links.ios) {
+            linksHtml.push(`<a href="${links.ios}" target="_blank" rel="noopener noreferrer" class="project-link" aria-label="iOS app">${PROJECT_LINK_ICONS.ios}<span>iOS</span></a>`);
+        }
+        if (links.android) {
+            linksHtml.push(`<a href="${links.android}" target="_blank" rel="noopener noreferrer" class="project-link" aria-label="Android app">${PROJECT_LINK_ICONS.android}<span>Android</span></a>`);
+        }
+        if (links.extra && links.extra.length) {
+            links.extra.forEach(extra => {
+                linksHtml.push(`<a href="${extra.url}" target="_blank" rel="noopener noreferrer" class="project-link" aria-label="${extra.label}">${PROJECT_LINK_ICONS.link}<span>${extra.label}</span></a>`);
+            });
+        }
+
+        const tagsHtml = project.tags && project.tags.length
+            ? `<div class="project-tags">${project.tags.map(tag => `<span class="project-tag">${tag}</span>`).join('')}</div>`
+            : '';
+
+        const imageHtml = project.image
+            ? `<div class="project-image"><img src="${project.image}" alt="${project.title}" loading="lazy"></div>`
+            : '';
+
+        return `
+            <div class="project-card">
+                ${imageHtml}
+                <div class="project-card-content">
+                    <h3>${project.title}</h3>
+                    <p class="project-description">${project.description}</p>
+                    ${tagsHtml}
+                    ${linksHtml.length ? `<div class="project-links">${linksHtml.join('')}</div>` : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+/**
+ * Apply section visibility settings — hides disabled sections and their nav links
+ */
+function applySectionVisibility(settings) {
+    const sections = settings?.sections;
+    if (!sections) return;
+
+    const sectionIds = ['summary', 'education', 'experience', 'skills', 'projects'];
+
+    sectionIds.forEach(id => {
+        const config = sections[id];
+        const enabled = config ? config.enabled : true;
+
+        // Hide/show the section
+        const sectionEl = document.getElementById(id);
+        if (sectionEl) {
+            sectionEl.style.display = enabled ? '' : 'none';
+        }
+
+        // Hide/show the corresponding nav link
+        document.querySelectorAll(`.nav-links a[href="#${id}"]`).forEach(link => {
+            link.style.display = enabled ? '' : 'none';
+        });
+    });
 }
 
 /**
@@ -792,6 +894,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Setup keyboard detection first (for skip link)
     setupKeyboardDetection();
 
+    // Set footer year
+    const footerYear = document.getElementById('footer-year');
+    if (footerYear) footerYear.textContent = new Date().getFullYear();
+
     // Setup theme toggle first (before content loads)
     const themeState = setupThemeToggle();
 
@@ -811,7 +917,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderEducation(siteData.education);
         renderExperience(siteData.experience);
         renderSkills(siteData.skills);
+        renderProjects(siteData.projects);
         updateCVLinks(siteData.settings);
+        applySectionVisibility(siteData.settings);
 
         // Apply theme to newly rendered logos
         if (themeState) {

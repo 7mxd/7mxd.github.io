@@ -51,17 +51,6 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="AR Portfolio">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>
-        /* Critical CSS for font-display and prevent FOIT */
-        @font-face {
-            font-family: 'Montserrat';
-            font-display: swap;
-        }
-        @font-face {
-            font-family: 'Inter';
-            font-display: swap;
-        }
-    </style>
     <link rel="stylesheet" href="style.css">
     <script defer src="script.js"></script>
 </head>
@@ -73,7 +62,7 @@
     <a href="#main-content" class="skip-link">Skip to main content</a>
     
     <!-- Navigation -->
-    <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <nav class="navbar" aria-label="Main navigation">
         <div class="nav-content">
             <a href="#" class="nav-logo" aria-label="Ahmed Radhi - Home">AR</a>
             <div class="nav-spacer"></div>
@@ -82,11 +71,12 @@
                 <span class="hamburger-line" aria-hidden="true"></span>
                 <span class="hamburger-line" aria-hidden="true"></span>
             </button>
-            <div class="nav-links" id="nav-links" role="menubar">
-                <a href="#summary" role="menuitem">Summary</a>
-                <a href="#education" role="menuitem">Education</a>
-                <a href="#experience" role="menuitem">Experience</a>
-                <a href="#skills" role="menuitem">Skills</a>
+            <div class="nav-links" id="nav-links">
+                <a href="#summary">Summary</a>
+                <a href="#education">Education</a>
+                <a href="#experience">Experience</a>
+                <a href="#skills">Skills</a>
+                <a href="#projects">Projects</a>
                 <div class="mobile-menu-button">
                     <button class="theme-toggle" aria-label="Toggle dark mode">
                         <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -147,42 +137,56 @@
         </div>
     </nav>
 
-    <div class="container" id="main-content">
+    <main class="container" id="main-content">
         <!-- Header Section -->
-        <div class="header" id="header-section">
+        <header class="header" id="header-section">
             <!-- Populated dynamically from data/profile.json -->
-        </div>
+        </header>
 
         <!-- Summary Section -->
-        <div id="summary" class="section">
+        <section id="summary" class="section">
             <h2>Summary</h2>
             <p class="summary-text" id="summary-content">
                 <!-- Populated dynamically from data/summary.json -->
             </p>
-        </div>
+        </section>
 
         <!-- Education Section -->
-        <div id="education" class="section">
+        <section id="education" class="section">
             <h2>Education</h2>
             <div class="education-grid" id="education-grid">
                 <!-- Populated dynamically from data/education.json -->
             </div>
-        </div>
+        </section>
 
-        <div id="experience" class="section">
+        <!-- Experience Section -->
+        <section id="experience" class="section">
             <h2>Experience</h2>
             <div id="experience-container">
                 <!-- Populated dynamically from data/experience.json -->
             </div>
-        </div>
+        </section>
 
-        <div id="skills" class="section skills">
+        <!-- Skills Section -->
+        <section id="skills" class="section skills">
             <h2>Skills</h2>
             <div class="skills-grid" id="skills-grid">
                 <!-- Populated dynamically from data/skills.json -->
             </div>
-        </div>
-    </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section id="projects" class="section">
+            <h2>Projects</h2>
+            <div class="projects-grid" id="projects-grid">
+                <!-- Populated dynamically from data/projects.json -->
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; <span id="footer-year">2025</span> Ahmed Alawi Radhi</p>
+    </footer>
 
     <!-- NoScript Fallback -->
     <noscript>

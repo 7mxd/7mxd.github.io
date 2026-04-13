@@ -78,6 +78,35 @@ collections:
               - { name: "description", label: "Meta Description", widget: "text" }
               - { name: "keywords", label: "Keywords", widget: "string" }
               - { name: "url", label: "Site URL", widget: "string" }
+          - name: "sections"
+            label: "Section Visibility"
+            widget: "object"
+            fields:
+              - name: "summary"
+                label: "Summary"
+                widget: "object"
+                fields:
+                  - { name: "enabled", label: "Show Summary Section", widget: "boolean", default: true }
+              - name: "education"
+                label: "Education"
+                widget: "object"
+                fields:
+                  - { name: "enabled", label: "Show Education Section", widget: "boolean", default: true }
+              - name: "experience"
+                label: "Experience"
+                widget: "object"
+                fields:
+                  - { name: "enabled", label: "Show Experience Section", widget: "boolean", default: true }
+              - name: "skills"
+                label: "Skills"
+                widget: "object"
+                fields:
+                  - { name: "enabled", label: "Show Skills Section", widget: "boolean", default: true }
+              - name: "projects"
+                label: "Projects"
+                widget: "object"
+                fields:
+                  - { name: "enabled", label: "Show Projects Section", widget: "boolean", default: false }
 
   # Education - list in single file
   - name: "education"
@@ -129,6 +158,43 @@ collections:
                   - { name: "endDate", label: "End Date (YYYY-MM or Present)", widget: "string" }
                   - { name: "displayDate", label: "Display Date Text", widget: "string", hint: "e.g., 09/2024 - Present" }
                   - { name: "responsibilities", label: "Responsibilities", widget: "list", field: { name: "item", label: "Responsibility", widget: "text" } }
+
+  # Projects - list in single file
+  - name: "projects"
+    label: "Projects"
+    files:
+      - name: "projects"
+        label: "Projects"
+        file: "data/projects.json"
+        fields:
+          - name: "items"
+            label: "Projects"
+            widget: "list"
+            summary: "{{fields.title}}"
+            fields:
+              - { name: "title", label: "Project Title", widget: "string" }
+              - { name: "description", label: "Brief Description", widget: "text" }
+              - { name: "image", label: "Project Image (optional)", widget: "image", required: false }
+              - name: "links"
+                label: "Links"
+                widget: "object"
+                fields:
+                  - { name: "github", label: "GitHub URL", widget: "string", required: false }
+                  - { name: "webapp", label: "Web App / Page URL", widget: "string", required: false }
+                  - { name: "ios", label: "iOS App URL", widget: "string", required: false }
+                  - { name: "android", label: "Android App URL", widget: "string", required: false }
+                  - name: "extra"
+                    label: "Additional Links"
+                    widget: "list"
+                    required: false
+                    fields:
+                      - { name: "label", label: "Link Label", widget: "string" }
+                      - { name: "url", label: "URL", widget: "string" }
+              - name: "tags"
+                label: "Tags (optional)"
+                widget: "list"
+                required: false
+                field: { name: "tag", label: "Tag", widget: "string" }
 
   # Skills - list in single file
   - name: "skills"

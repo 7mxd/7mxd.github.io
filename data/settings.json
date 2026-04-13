@@ -10,5 +10,12 @@
     "description": "Portfolio of Ahmed Alawi Radhi, specializing in Data Science and Analytics",
     "keywords": "Data Science, Applied Mathematics, Statistics, Data Analysis, Machine Learning, Abu Dhabi",
     "url": "https://7mxd.github.io/"
+  },
+  "sections": {
+    "summary": { "enabled": true },
+    "education": { "enabled": true },
+    "experience": { "enabled": true },
+    "skills": { "enabled": true },
+    "projects": { "enabled": false }
   }
 }
