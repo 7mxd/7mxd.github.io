@@ -23,5 +23,8 @@ Thumbs.db
 *.log
 npm-debug.log*
 
-# AI coding  tools
+
+# AI workflow artifacts (local design context, not part of the site)
 .claude/
+.impeccable.md
+.shape-brief.md

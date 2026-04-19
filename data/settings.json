@@ -3,19 +3,19 @@
     "path": "assets/ahmed_radhi_cv_2025.pdf",
     "downloadName": "Ahmed_Radhi_CV.pdf"
   },
-  "siteTitle": "Ahmed's Portfolio",
+  "siteTitle": "Ahmed Alawi Radhi, Data Scientist",
   "navLogo": "AR",
   "meta": {
-    "title": "Ahmed Alawi Radhi - Applied Mathematics & Statistics Graduate",
-    "description": "Portfolio of Ahmed Alawi Radhi, specializing in Data Science and Analytics",
-    "keywords": "Data Science, Applied Mathematics, Statistics, Data Analysis, Machine Learning, Abu Dhabi",
+    "title": "Ahmed Alawi Radhi, Data Scientist",
+    "description": "I am a data scientist based in Abu Dhabi. I build ETL pipelines at Saal.ai and work with probability and kernel methods.",
+    "keywords": "Data Science, Applied Mathematics, Statistics, ETL, Kernel Methods, Quantitative Developer, Abu Dhabi, Saal.ai",
     "url": "https://7mxd.github.io/"
   },
   "sections": {
     "summary": { "enabled": true },
-    "education": { "enabled": true },
+    "projects": { "enabled": true },
     "experience": { "enabled": true },
     "skills": { "enabled": true },
-    "projects": { "enabled": false }
+    "education": { "enabled": true }
   }
 }

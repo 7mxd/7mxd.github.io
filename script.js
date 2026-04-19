@@ -2,6 +2,21 @@
  * Data loading and rendering functions
  */
 
+// A small greeting for anyone who opens the dev console.
+// Matches the printed-terminal voice of the site.
+(() => {
+    const title = 'color: #b45742; font-weight: 700; font-family: "Courier Prime", monospace; font-size: 14px;';
+    const body  = 'color: #555; font-family: "Courier Prime", monospace; font-size: 12.5px;';
+    console.log(
+        '%c$ cat welcome.txt%c\n\n' +
+        'you found the dev console.\n' +
+        'press ` anywhere on the page to open an interactive terminal.\n\n' +
+        'this site is vanilla html + css + js, no framework, no build step.\n' +
+        'source: https://github.com/7mxd/7mxd.github.io',
+        title, body
+    );
+})();
+
 // SVG icons used in the site
 const ICONS = {
     email: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
@@ -64,9 +79,7 @@ function renderProfile(profile) {
     if (!container || !profile) return;
 
     container.innerHTML = `
-        <div class="profile-picture-container">
-            <img src="${profile.photo}" alt="${profile.name}, ${profile.title}" class="profile-picture" loading="eager">
-        </div>
+        <span class="header-preamble" aria-hidden="true">$ cat ~/about.md</span>
         <h1>${profile.name}</h1>
         <p class="subtitle">${profile.title}</p>
         <div class="contact-info" role="list" aria-label="Contact information">
@@ -78,26 +91,24 @@ function renderProfile(profile) {
                 ${ICONS.phone}
                 <span>${profile.contact.phone}</span>
             </a>
+            ${profile.contact.linkedin?.url ? `
+            <a href="${profile.contact.linkedin.url}" target="_blank" rel="noopener noreferrer" class="contact-item" role="listitem" aria-label="LinkedIn profile (opens in new tab)">
+                ${ICONS.linkedin}
+                <span>${profile.contact.linkedin.label || 'LinkedIn'}</span>
+            </a>
+            ` : ''}
+            ${profile.contact.github?.url ? `
+            <a href="${profile.contact.github.url.startsWith('http') ? profile.contact.github.url : 'https://' + profile.contact.github.url}" target="_blank" rel="noopener noreferrer" class="contact-item" role="listitem" aria-label="GitHub profile (opens in new tab)">
+                ${ICONS.github}
+                <span>${profile.contact.github.label || 'GitHub'}</span>
+            </a>
+            ` : ''}
             <span class="contact-item" role="listitem" aria-label="Location: ${profile.contact.location}">
                 ${ICONS.location}
                 <span>${profile.contact.location}</span>
             </span>
-            <a href="${profile.contact.linkedin.url}" target="_blank" rel="noopener noreferrer" class="contact-item" role="listitem" aria-label="LinkedIn profile (opens in new tab)">
-                ${ICONS.linkedin}
-                <span>${profile.contact.linkedin.label}</span>
-            </a>
-            ${profile.contact.github?.url ? `
-            <a href="${profile.contact.github.url.startsWith('http') ? profile.contact.github.url : 'https://' + profile.contact.github.url}" target="_blank" rel="noopener noreferrer" class="contact-item" role="listitem" aria-label="GitHub profile (opens in new tab)">
-                ${ICONS.github}
-                <span>${profile.contact.github.label}</span>
-            </a>
-            ` : ''}
+            <span class="live-cursor" aria-hidden="true">_</span>
         </div>
-        <a href="#summary" class="scroll-indicator" aria-label="Scroll down to summary">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-        </a>
     `;
 }
 
@@ -106,9 +117,27 @@ function renderProfile(profile) {
  */
 function renderSummary(summary) {
     const container = document.getElementById('summary-content');
-    if (!container || !summary) return;
-
+    if (!container) return;
+    if (!summary || !summary.content) {
+        hideParentSection(container);
+        return;
+    }
     container.textContent = summary.content;
+}
+
+/**
+ * Hide the nearest enclosing <section> and its matching nav link.
+ * Used when a data file is empty so we never render a lonely header.
+ */
+function hideParentSection(el) {
+    const section = el.closest ? el.closest('section') : null;
+    if (!section) return;
+    section.style.display = 'none';
+    const id = section.id;
+    if (!id) return;
+    document.querySelectorAll(`.nav-links a[href="#${id}"]`).forEach(link => {
+        link.style.display = 'none';
+    });
 }
 
 /**
@@ -116,13 +145,17 @@ function renderSummary(summary) {
  */
 function renderEducation(education) {
     const container = document.getElementById('education-grid');
-    if (!container || !education) return;
+    if (!container) return;
+    if (!education || !education.items || !education.items.length) {
+        hideParentSection(container);
+        return;
+    }
 
     container.innerHTML = education.items.map(item => `
         <div class="education-card">
             <div class="education-content">
                 <div class="institution-header">
-                    <img src="${item.logo}" alt="${item.institution}" class="institution-logo">
+                    <img src="${item.logo}" alt="${item.institution}" class="institution-logo" loading="lazy">
                     <div class="institution">${item.institution}</div>
                 </div>
                 <h3>${item.degree}</h3>
@@ -140,13 +173,18 @@ function renderEducation(education) {
  */
 function renderExperience(experience) {
     const container = document.getElementById('experience-container');
-    if (!container || !experience) return;
+    if (!container) return;
+    if (!experience || !experience.items || !experience.items.length) {
+        hideParentSection(container);
+        return;
+    }
 
     container.innerHTML = experience.items.map(company => {
         const logoHasThemes = company.logo.light && company.logo.dark;
-        const logoAttrs = logoHasThemes
-            ? `src="${company.logo.default}" data-light-src="${company.logo.light}" data-dark-src="${company.logo.dark}"`
-            : `src="${company.logo.default}"`;
+        const logoHtml = logoHasThemes
+            ? `<img src="${company.logo.light}" alt="${company.company}" class="company-logo company-logo--light" loading="lazy">
+               <img src="${company.logo.dark}" alt="" aria-hidden="true" class="company-logo company-logo--dark" loading="lazy">`
+            : `<img src="${company.logo.default}" alt="${company.company}" class="company-logo" loading="lazy">`;
 
         const rolesHtml = company.roles.map(role => `
             <div class="role-item">
@@ -164,7 +202,7 @@ function renderExperience(experience) {
             <div class="company-block">
                 <div class="company-header">
                     <div class="company-info">
-                        <img ${logoAttrs} alt="${company.company}" class="company-logo">
+                        ${logoHtml}
                         <h3>${company.company}</h3>
                     </div>
                     <span class="company-location">${company.location}</span>
@@ -182,11 +220,17 @@ function renderExperience(experience) {
  */
 function renderSkills(skills) {
     const container = document.getElementById('skills-grid');
-    if (!container || !skills) return;
+    if (!container) return;
+    if (!skills || !skills.categories || !skills.categories.length) {
+        hideParentSection(container);
+        return;
+    }
 
-    const delays = [0.2, 0.4, 0.6, 0.8];
+    const escapeHtml = (s) => String(s).replace(/[&<>"']/g, (c) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
 
-    container.innerHTML = skills.categories.map((category, index) => {
+    container.innerHTML = skills.categories.map(category => {
         let contentHtml = '';
 
         if (category.type === 'list') {
@@ -201,20 +245,21 @@ function renderSkills(skills) {
                     ${category.items.map(item => `<span class="skill-item">${typeof item === 'string' ? item : item.name}</span>`).join('')}
                 </div>
             `;
-        } else if (category.type === 'proficiency') {
-            contentHtml = category.items.map(item => `
-                <div class="language-item">
-                    <span class="language-name">${item.name}</span>
-                    <div class="progress-container">
-                        <div class="progress-bar" style="width: ${item.level}%;" data-percent="${item.level}%"></div>
-                    </div>
-                    <span class="proficiency-level">${item.label}</span>
-                </div>
-            `).join('');
+        } else if (category.type === 'languages') {
+            const pills = category.items.map(item => {
+                const name = escapeHtml(item.name || '');
+                const level = escapeHtml(item.level || '');
+                const ariaLabel = `${item.name || ''}${item.level ? ': ' + item.level : ''}`;
+                return `<span class="skill-item skill-item--lang" aria-label="${escapeHtml(ariaLabel)}">
+                    <span class="skill-item-lang-name">${name}</span>
+                    ${level ? `<span class="skill-item-lang-level">${level}</span>` : ''}
+                </span>`;
+            }).join('');
+            contentHtml = `<div class="skill-item-container">${pills}</div>`;
         }
 
         return `
-            <div class="skill-card" data-delay="${delays[index] || 0.2}">
+            <div class="skill-card">
                 <div class="skill-card-header">
                     <h3>${category.name}</h3>
                 </div>
@@ -255,7 +300,11 @@ const PROJECT_LINK_ICONS = {
  */
 function renderProjects(projects) {
     const container = document.getElementById('projects-grid');
-    if (!container || !projects || !projects.items || !projects.items.length) return;
+    if (!container) return;
+    if (!projects || !projects.items || !projects.items.length) {
+        hideParentSection(container);
+        return;
+    }
 
     container.innerHTML = projects.items.map(project => {
         const linksHtml = [];
@@ -287,22 +336,42 @@ function renderProjects(projects) {
             ? `<div class="project-image"><img src="${project.image}" alt="${project.title}" loading="lazy"></div>`
             : '';
 
+        const ALLOWED_STATUSES = ['in-progress', 'shipped', 'research'];
+        const safeStatus = ALLOWED_STATUSES.includes(project.status) ? project.status : null;
+        const statusLabel = safeStatus ? safeStatus.replace('-', ' ') : '';
+        const statusHtml = safeStatus
+            ? `<span class="project-status project-status--${safeStatus}">${statusLabel}</span>`
+            : '';
+
+        const chartHtml = project.chart
+            ? `<figure class="project-chart-figure">
+                  ${project.chartCaption ? `<figcaption class="project-chart-caption">${project.chartCaption}</figcaption>` : ''}
+                  <pre class="project-chart" aria-label="Benchmark chart">${
+                      project.chart.replace(/(\u2588+)/g, '<span class="project-chart-bar">$1</span>')
+                  }</pre>
+              </figure>`
+            : '';
+
         return `
-            <div class="project-card">
+            <article class="project-card">
                 ${imageHtml}
                 <div class="project-card-content">
-                    <h3>${project.title}</h3>
+                    <div class="project-card-header">
+                        <h3>${project.title}</h3>
+                        ${statusHtml}
+                    </div>
                     <p class="project-description">${project.description}</p>
+                    ${chartHtml}
                     ${tagsHtml}
                     ${linksHtml.length ? `<div class="project-links">${linksHtml.join('')}</div>` : ''}
                 </div>
-            </div>
+            </article>
         `;
     }).join('');
 }
 
 /**
- * Apply section visibility settings — hides disabled sections and their nav links
+ * Apply section visibility settings , hides disabled sections and their nav links
  */
 function applySectionVisibility(settings) {
     const sections = settings?.sections;
@@ -373,17 +442,11 @@ function setupDownloadButton() {
 }
 
 /**
- * Manages theme toggling with state persistence
+ * Manages theme toggling with state persistence.
+ * Theme-aware company logos are rendered as paired <img> elements
+ * and switched via CSS on the body.dark-mode class, so no JS
+ * src swap is needed here.
  */
-function updateLogosForTheme(theme) {
-    const logos = document.querySelectorAll('.company-logo[data-light-src][data-dark-src]');
-    logos.forEach(logo => {
-        logo.src = theme === 'dark' ?
-            logo.getAttribute('data-dark-src') :
-            logo.getAttribute('data-light-src');
-    });
-}
-
 function setupThemeToggle() {
     const themeToggles = document.querySelectorAll('.theme-toggle');
     if (!themeToggles.length) return;
@@ -398,7 +461,6 @@ function setupThemeToggle() {
             this.current = theme;
             document.body.classList.toggle('dark-mode', theme === 'dark');
             localStorage.setItem('theme', theme);
-            updateLogosForTheme(theme);
             if (announce) {
                 announceThemeChange(theme);
             }
@@ -429,8 +491,6 @@ function setupThemeToggle() {
         }
     });
 
-    // Return themeState so we can apply theme after content loads
-    return themeState;
 }
 
 // Debounce function for scroll/resize events
@@ -440,104 +500,6 @@ function debounce(func, wait = 100) {
         clearTimeout(timeout);
         timeout = setTimeout(() => func.apply(this, args), wait);
     };
-}
-
-/**
- * Setup scroll progress bar
- */
-function setupScrollProgress() {
-    const progressBar = document.querySelector('.scroll-progress');
-    if (!progressBar) return;
-
-    const updateProgress = () => {
-        const scrollTop = window.scrollY || document.documentElement.scrollTop;
-        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-        const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
-        progressBar.style.width = `${progress}%`;
-    };
-
-    updateProgress();
-    let ticking = false;
-    const onScroll = () => {
-        if (!ticking) {
-            window.requestAnimationFrame(() => {
-                updateProgress();
-                ticking = false;
-            });
-            ticking = true;
-        }
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', updateProgress);
-}
-
-/**
- * Setup animations for dynamically loaded content
- */
-function setupAnimations() {
-    const roleItems = document.querySelectorAll('.role-item');
-    if (roleItems.length) {
-        roleItems.forEach((item, index) => {
-            item.classList.add('animate');
-            item.style.animationDelay = `${index * 0.2}s`;
-
-            const listItems = item.querySelectorAll('.role-description li');
-            listItems.forEach((li, i) => {
-                li.style.animationDelay = `${(index * 0.2) + ((i + 1) * 0.1)}s`;
-            });
-        });
-    }
-
-    try {
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.animationPlayState = 'running';
-                }
-            });
-        }, { threshold: 0.1 });
-
-        document.querySelectorAll('.company-block').forEach(block => {
-            observer.observe(block);
-        });
-    } catch (error) {
-        console.error('Intersection Observer failed:', error);
-    }
-}
-
-/**
- * Setup scroll reveal animations for sections
- */
-function setupScrollReveal() {
-    const sections = document.querySelectorAll('.section');
-
-    // Check if reduced motion is preferred
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    if (prefersReducedMotion) {
-        // If user prefers reduced motion, show all sections immediately
-        sections.forEach(section => {
-            section.classList.add('visible');
-        });
-        return;
-    }
-
-    const revealObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-                // Optional: unobserve after revealing
-                revealObserver.unobserve(entry.target);
-            }
-        });
-    }, {
-        threshold: 0.1,
-        rootMargin: '-50px 0px'
-    });
-
-    sections.forEach(section => {
-        revealObserver.observe(section);
-    });
 }
 
 /**
@@ -678,39 +640,6 @@ function setupExperienceDurations() {
 }
 
 /**
- * Initialize skill cards and handle animations
- */
-function initializeSkillCards() {
-    const skillCards = document.querySelectorAll('.skill-card');
-
-    skillCards.forEach(card => {
-        const delay = parseFloat(card.getAttribute('data-delay')) || 0;
-        setTimeout(() => {
-            card.style.animation = `fadeInUp 0.6s ease forwards`;
-        }, delay * 1000);
-    });
-
-    const progressBars = document.querySelectorAll('.progress-bar');
-    const progressObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const bar = entry.target;
-                const percent = bar.getAttribute('data-percent');
-                bar.style.width = '0%';
-                setTimeout(() => {
-                    bar.style.width = percent;
-                }, 300);
-            }
-        });
-    }, { threshold: 0.5 });
-
-    progressBars.forEach(bar => {
-        bar.style.width = '0%';
-        progressObserver.observe(bar);
-    });
-}
-
-/**
  * Setup mobile navigation with accessibility
  */
 function setupMobileNavigation() {
@@ -819,40 +748,42 @@ function setupSmoothScrolling() {
         });
     });
 
+    /*
+     * Active-nav highlighting via IntersectionObserver.
+     * Previous implementation recomputed section positions on every scroll frame;
+     * the observer fires only when a section enters or leaves a horizontal band
+     * anchored to the sticky navbar, which costs nothing between events.
+     */
     const sections = document.querySelectorAll('.section');
     const navLinksElements = document.querySelectorAll('.nav-links a');
 
-    function updateActiveLink() {
-        const fromTop = window.scrollY + navbarHeight + 10;
-
-        sections.forEach(section => {
-            const sectionTop = section.offsetTop;
-            const sectionHeight = section.clientHeight;
-            const sectionId = section.getAttribute('id');
-
-            if (fromTop >= sectionTop && fromTop < sectionTop + sectionHeight) {
-                navLinksElements.forEach(link => {
-                    link.classList.remove('active');
-                    if (link.getAttribute('href') === `#${sectionId}`) {
-                        link.classList.add('active');
-                    }
-                });
+    const setActive = (id) => {
+        navLinksElements.forEach(link => {
+            const isMatch = link.getAttribute('href') === `#${id}`;
+            link.classList.toggle('active', isMatch);
+            if (isMatch) {
+                link.setAttribute('aria-current', 'location');
+            } else {
+                link.removeAttribute('aria-current');
             }
         });
+    };
+
+    if ('IntersectionObserver' in window && sections.length) {
+        // Band: triggers when a section crosses the top nav area.
+        const rootMargin = `-${navbarHeight + 8}px 0px -70% 0px`;
+        const activeObserver = new IntersectionObserver((entries) => {
+            // Prefer the most-recently-intersecting entry; multiple can fire at once.
+            const visible = entries
+                .filter(e => e.isIntersecting)
+                .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
+            if (visible && visible.target.id) {
+                setActive(visible.target.id);
+            }
+        }, { rootMargin, threshold: 0 });
+
+        sections.forEach(section => activeObserver.observe(section));
     }
-
-    let isScrolling = false;
-    window.addEventListener('scroll', () => {
-        if (!isScrolling) {
-            window.requestAnimationFrame(() => {
-                updateActiveLink();
-                isScrolling = false;
-            });
-            isScrolling = true;
-        }
-    });
-
-    updateActiveLink();
 }
 
 /**
@@ -898,12 +829,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (footerYear) footerYear.textContent = new Date().getFullYear();
 
     // Setup theme toggle first (before content loads)
-    const themeState = setupThemeToggle();
+    setupThemeToggle();
 
     // Setup navigation and UI (these don't depend on data)
     setupMobileNavigation();
     setupSmoothScrolling();
-    setupScrollProgress();
     setupDownloadButton();
 
     // Load and render all data
@@ -920,21 +850,352 @@ document.addEventListener('DOMContentLoaded', async () => {
         updateCVLinks(siteData.settings);
         applySectionVisibility(siteData.settings);
 
-        // Apply theme to newly rendered logos
-        if (themeState) {
-            updateLogosForTheme(themeState.current);
-        }
-
-        // Setup animations and interactions for dynamic content
-        setupAnimations();
-        setupScrollReveal();
+        // Setup interactions for dynamic content
         setupExperienceDurations();
-        initializeSkillCards();
+        setupTerminal();
 
     } catch (error) {
         console.error('Failed to load site data:', error);
     }
 });
+
+/**
+ * Interactive terminal Easter egg.
+ * Toggle with backtick (`), escape to close, up/down for history.
+ * Commands read from siteData so they stay in sync with the page content.
+ */
+function setupTerminal() {
+    const term = document.getElementById('terminal');
+    const log = document.getElementById('terminal-log');
+    const input = document.getElementById('terminal-input');
+    const form = document.getElementById('terminal-form');
+    const trigger = document.getElementById('terminal-trigger');
+    const closeBtn = document.getElementById('terminal-close');
+
+    if (!term || !log || !input || !form || !trigger) return;
+
+    const history = [];
+    let historyIndex = -1;
+    let lastFocused = null;
+
+    const isOpen = () => !term.hidden;
+
+    const escapeHtml = (s) => String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+
+    const write = (lines, cls) => {
+        const arr = Array.isArray(lines) ? lines : [lines];
+        arr.forEach(line => {
+            const div = document.createElement('div');
+            div.className = cls ? `term-line ${cls}` : 'term-line';
+            div.innerHTML = line;
+            log.appendChild(div);
+        });
+        log.scrollTop = log.scrollHeight;
+    };
+
+    const writeEcho = (cmd) => write(
+        `<span class="term-prompt">&gt;</span> <span class="term-echo">${escapeHtml(cmd)}</span>`
+    );
+
+    const clearLog = () => { log.innerHTML = ''; };
+
+    const openTerminal = () => {
+        if (isOpen()) return;
+        lastFocused = document.activeElement;
+        term.hidden = false;
+        if (!log.childElementCount) {
+            write([
+                'ahmed@7mxd ~ $ cat welcome.txt',
+                '',
+                'hello. this is a little interactive terminal.',
+                'type <span class="term-link">help</span> for a list of commands.',
+                'press <span class="term-link">escape</span> or the backtick key to close.',
+                '',
+            ]);
+        }
+        requestAnimationFrame(() => input.focus());
+    };
+
+    const closeTerminal = () => {
+        if (!isOpen()) return;
+        term.hidden = true;
+        if (lastFocused && typeof lastFocused.focus === 'function') {
+            lastFocused.focus();
+        }
+    };
+
+    const toggleTerminal = () => (isOpen() ? closeTerminal() : openTerminal());
+
+    const scrollToId = (id) => {
+        const el = document.getElementById(id);
+        if (!el) return false;
+        const navbar = document.querySelector('.navbar');
+        const offset = (navbar ? navbar.offsetHeight : 0) + 12;
+        const top = el.getBoundingClientRect().top + window.pageYOffset - offset;
+        window.scrollTo({ top, behavior: 'smooth' });
+        return true;
+    };
+
+    const findProject = (slug) => {
+        const projects = siteData.projects?.items || [];
+        const target = slug.toLowerCase();
+        return projects.find(p => {
+            const byTitle = (p.title || '').toLowerCase().includes(target);
+            const byFirstWord = (p.title || '').toLowerCase().split(/[\s:.,-]+/)[0] === target;
+            return byTitle || byFirstWord;
+        });
+    };
+
+    // Section anchors the user can cd/cat into
+    const SECTION_ALIASES = {
+        about: 'summary',
+        'about.md': 'summary',
+        summary: 'summary',
+        whoami: 'summary',
+        projects: 'projects',
+        'projects/': 'projects',
+        experience: 'experience',
+        'experience.log': 'experience',
+        skills: 'skills',
+        'skills.txt': 'skills',
+        education: 'education',
+        'education.yaml': 'education',
+    };
+
+    const resolveSection = (arg) => SECTION_ALIASES[(arg || '').toLowerCase()];
+
+    const HELP = [
+        'commands:',
+        '  <span class="term-link">whoami</span>                print name and role',
+        '  <span class="term-link">ls</span>                    list top-level sections',
+        '  <span class="term-link">ls projects/</span>           list projects by name',
+        '  <span class="term-link">cat &lt;section&gt;</span>         jump to a section',
+        '  <span class="term-link">cat projects/&lt;slug&gt;</span>  show a project inline',
+        '  <span class="term-link">cd &lt;section&gt;</span>           alias of cat &lt;section&gt;',
+        '  <span class="term-link">contact</span>               print contact info',
+        '  <span class="term-link">theme [dark|light]</span>     change theme',
+        '  <span class="term-link">download cv</span>            grab the CV pdf',
+        '  <span class="term-link">clear</span>                 clear this log',
+        '  <span class="term-link">exit</span>                  close this terminal',
+    ];
+
+    const printProject = (p) => {
+        const lines = [];
+        lines.push(`<strong>${escapeHtml(p.title)}</strong>`);
+        if (p.status) lines.push(`status: ${escapeHtml(p.status)}`);
+        lines.push('');
+        lines.push(escapeHtml(p.description));
+        const links = [];
+        if (p.links?.github) links.push(`github: ${p.links.github}`);
+        if (p.links?.ios) links.push(`ios:    ${p.links.ios}`);
+        if (p.links?.webapp) links.push(`web:    ${p.links.webapp}`);
+        (p.links?.extra || []).forEach(x => links.push(`${x.label}: ${x.url}`));
+        if (links.length) {
+            lines.push('');
+            lines.push('links:');
+            links.forEach(l => lines.push(`  ${escapeHtml(l)}`));
+        }
+        return lines;
+    };
+
+    const run = (raw) => {
+        const cmd = raw.trim();
+        if (!cmd) return;
+        writeEcho(cmd);
+        history.unshift(cmd);
+        historyIndex = -1;
+
+        const parts = cmd.split(/\s+/);
+        const head = parts[0].toLowerCase();
+        const rest = parts.slice(1).join(' ');
+
+        switch (head) {
+            case 'help':
+            case '?':
+                write(HELP);
+                break;
+            case 'whoami': {
+                const p = siteData.profile;
+                if (!p) { write('no profile loaded.', 'term-error'); break; }
+                write([
+                    escapeHtml(p.name),
+                    escapeHtml(p.title),
+                    escapeHtml(p.contact?.location || ''),
+                ].filter(Boolean));
+                break;
+            }
+            case 'ls': {
+                if (!rest || rest === 'projects/' || rest === 'projects') {
+                    if (rest.startsWith('projects')) {
+                        const items = siteData.projects?.items || [];
+                        if (!items.length) { write('projects/ is empty.'); break; }
+                        write(items.map(p => '  ' + escapeHtml(p.title)));
+                    } else {
+                        write([
+                            '  summary',
+                            '  projects/',
+                            '  experience.log',
+                            '  skills.txt',
+                            '  education.yaml',
+                        ]);
+                    }
+                } else {
+                    write(`ls: cannot access '${escapeHtml(rest)}': no such file or directory`, 'term-error');
+                }
+                break;
+            }
+            case 'cd':
+            case 'cat': {
+                if (!rest) { write(`${head}: missing argument. try "help".`, 'term-error'); break; }
+                if (rest.toLowerCase().startsWith('projects/')) {
+                    const slug = rest.slice('projects/'.length);
+                    if (!slug) {
+                        scrollToId('projects');
+                        write('(jumped to projects section)');
+                        setTimeout(closeTerminal, 400);
+                        break;
+                    }
+                    const p = findProject(slug);
+                    if (!p) { write(`no project matching '${escapeHtml(slug)}'.`, 'term-error'); break; }
+                    write(printProject(p));
+                    break;
+                }
+                const section = resolveSection(rest);
+                if (section && scrollToId(section)) {
+                    write(`(jumped to ${section})`);
+                    setTimeout(closeTerminal, 400);
+                } else {
+                    write(`${head}: '${escapeHtml(rest)}': not found. try "ls".`, 'term-error');
+                }
+                break;
+            }
+            case 'theme': {
+                const arg = (rest || '').toLowerCase();
+                const body = document.body;
+                if (arg === 'dark') {
+                    body.classList.add('dark-mode');
+                    localStorage.setItem('theme', 'dark');
+                    write('theme: dark');
+                } else if (arg === 'light') {
+                    body.classList.remove('dark-mode');
+                    localStorage.setItem('theme', 'light');
+                    write('theme: light');
+                } else if (!arg || arg === 'toggle') {
+                    const isDark = body.classList.toggle('dark-mode');
+                    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                    write(`theme: ${isDark ? 'dark' : 'light'}`);
+                } else {
+                    write(`theme: expected dark | light | toggle.`, 'term-error');
+                }
+                break;
+            }
+            case 'contact': {
+                const c = siteData.profile?.contact;
+                if (!c) { write('no contact info.', 'term-error'); break; }
+                write([
+                    `email:    ${escapeHtml(c.email || '')}`,
+                    `phone:    ${escapeHtml(c.phone || '')}`,
+                    `location: ${escapeHtml(c.location || '')}`,
+                    c.linkedin?.url ? `linkedin: ${escapeHtml(c.linkedin.url)}` : '',
+                    c.github?.url ? `github:   ${escapeHtml(c.github.url)}` : '',
+                ].filter(Boolean));
+                break;
+            }
+            case 'download': {
+                if ((rest || '').toLowerCase() === 'cv') {
+                    const path = siteData.settings?.cv?.path || 'assets/ahmed_radhi_cv_2025.pdf';
+                    const name = siteData.settings?.cv?.downloadName || 'Ahmed_Radhi_CV.pdf';
+                    const a = document.createElement('a');
+                    a.href = path;
+                    a.download = name;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    write(`downloading ${escapeHtml(name)}...`);
+                } else {
+                    write(`download: usage: download cv`, 'term-error');
+                }
+                break;
+            }
+            case 'clear':
+                clearLog();
+                break;
+            case 'exit':
+            case 'close':
+            case 'quit':
+                closeTerminal();
+                break;
+            case 'pwd':
+                write('/home/ahmed');
+                break;
+            default:
+                write(`command not found: ${escapeHtml(head)}. try "help".`, 'term-error');
+        }
+    };
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const v = input.value;
+        input.value = '';
+        run(v);
+    });
+
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowUp') {
+            if (history.length && historyIndex < history.length - 1) {
+                historyIndex++;
+                input.value = history[historyIndex];
+                requestAnimationFrame(() => {
+                    input.setSelectionRange(input.value.length, input.value.length);
+                });
+            }
+            e.preventDefault();
+        } else if (e.key === 'ArrowDown') {
+            if (historyIndex > 0) {
+                historyIndex--;
+                input.value = history[historyIndex];
+            } else {
+                historyIndex = -1;
+                input.value = '';
+            }
+            e.preventDefault();
+        } else if (e.key === 'Tab') {
+            // Simple command completion for the head word only.
+            const words = input.value.split(/\s+/);
+            if (words.length === 1) {
+                const known = ['help', 'whoami', 'ls', 'cat', 'cd', 'contact', 'theme', 'download', 'clear', 'exit'];
+                const match = known.find(k => k.startsWith(words[0].toLowerCase()));
+                if (match && match !== words[0]) { input.value = match + ' '; }
+                e.preventDefault();
+            }
+        }
+    });
+
+    // Global toggle shortcut: backtick. Ignored when typing in any other input.
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && isOpen()) {
+            closeTerminal();
+            return;
+        }
+        if (e.key !== '`') return;
+        const tag = (e.target.tagName || '').toLowerCase();
+        if (tag === 'input' || tag === 'textarea' || e.target.isContentEditable) {
+            // Don't intercept backtick if the user is actually typing somewhere,
+            // UNLESS it's our own input (where backtick closes).
+            if (e.target.id !== 'terminal-input') return;
+        }
+        e.preventDefault();
+        toggleTerminal();
+    });
+
+    trigger.addEventListener('click', toggleTerminal);
+    closeBtn?.addEventListener('click', closeTerminal);
+}
 
 /**
  * Announce theme change to screen readers

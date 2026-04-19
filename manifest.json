@@ -1,23 +1,23 @@
 {
-  "name": "Ahmed Radhi Portfolio",
-  "short_name": "AR Portfolio",
-  "description": "Portfolio of Ahmed Alawi Radhi - Applied Mathematics & Statistics Graduate",
+  "name": "Ahmed Alawi Radhi",
+  "short_name": "AR",
+  "description": "Data scientist at Saal.ai. ETL pipelines, applied statistics, kernel methods.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f8f9fa",
-  "theme_color": "#219ebc",
+  "background_color": "#f8f3e7",
+  "theme_color": "#173a5e",
   "icons": [
     {
       "src": "assets/android-chrome-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "assets/android-chrome-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ]
 }

@@ -1,10 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <defs>
-    <linearGradient id="bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#219ebc"/>
-      <stop offset="100%" style="stop-color:#023047"/>
-    </linearGradient>
-  </defs>
-  <rect width="32" height="32" rx="6" fill="url(#bg-gradient)"/>
-  <text x="16" y="22" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-weight="700" font-size="14" fill="white">AR</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="AR monogram">
+  <rect width="64" height="64" rx="6" fill="#f8f3e7"/>
+  <g fill="#173a5e" font-family="'Courier Prime','Courier New',Courier,monospace" font-weight="700" font-size="30" text-anchor="middle">
+    <text x="32" y="30">A</text>
+    <text x="32" y="56">R</text>
+  </g>
 </svg>

@@ -1,3 +1,28 @@
 {
-  "items": []
+  "items": [
+    {
+      "title": "Stmnt: AI-powered bank statement analyzer",
+      "status": "in-progress",
+      "description": "A Flutter iOS app that reads a bank statement PDF and turns it into spending analytics, forecasts, and recurring-subscription detection. The app runs a multi-stage AI pipeline on top of OpenRouter: extract, parse, normalize, convert currency, categorize, detect recurring charges, detect reversals, and remove duplicates (both at the file level using SHA-256 and at the transaction level). It uses 159 keyword rules across 17 categories, normalizes 100+ merchant brands, and supports 35+ currencies. Reports can be shared with other users through encrypted Supabase storage. Stmnt is live on the App Store and I ship updates to it every week.",
+      "tags": ["Flutter", "Dart", "OpenRouter", "Supabase", "TypeScript", "iOS", "Xcode Cloud"],
+      "links": {
+        "ios": "https://apps.apple.com/app/stmnt/id6760298169",
+        "webapp": "https://stmnt.7mxd.me"
+      }
+    },
+    {
+      "title": "On a Generalization of Kernel RLS to Nonlinear State-Space Systems",
+      "status": "research",
+      "description": "My senior research project at Khalifa University (May 2023). I derived the ARMA time-series learning algorithm from first principles, rewrote it as a least-squares problem in two unknowns, and turned it into the Kernel Recursive Least Squares (KRLS) algorithm in MATLAB. I then extended the construction to nonlinear state-space systems using tensor products in a reproducing kernel Hilbert space (the KAARMA algorithm). The project was supervised by Prof. Ibrahim M. Elfadel (EECS) and Prof. Jorge P. Zubelli (Mathematics).",
+      "chartCaption": "Benchmarked on the Santa Fe laser time-series, the standard test for chaotic time-series prediction. NMSE (normalized mean squared error) measures how far a prediction lands from the true value. Lower is better.",
+      "chart": "competition winner (NN, 1993)  ███████              0.028\nmy iterative KRLS              ██████████           0.042\ncompetition 2nd place          ████████████████████ 0.080",
+      "tags": ["MATLAB", "Kernel Methods", "Time-Series", "State-Space", "RKHS", "Signal Processing"],
+      "links": {
+        "github": "https://github.com/7mxd/Senior-Research-Project-2022-2023",
+        "extra": [
+          { "url": "assets/SRP_Kernel_RLS_Nonlinear_State_Space_2023.pdf", "label": "paper (PDF)" }
+        ]
+      }
+    }
+  ]
 }

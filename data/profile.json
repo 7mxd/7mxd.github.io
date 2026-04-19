@@ -1,18 +1,17 @@
 {
   "name": "Ahmed Alawi Radhi",
-  "title": "Applied Mathematics & Statistics Graduate",
-  "photo": "assets/Personal_Photo.jpg",
+  "title": "Data scientist at Saal.ai. I build data pipelines and work with kernel methods and applied statistics.",
   "contact": {
     "email": "AhmedARadhi00@gmail.com",
     "phone": "+971 56 913 5351",
     "location": "Abu Dhabi, UAE",
     "linkedin": {
       "url": "https://www.linkedin.com/in/ahmed-r-828a98141/",
-      "label": "LinkedIn Profile"
+      "label": "LinkedIn"
     },
     "github": {
       "url": "https://github.com/7mxd",
-      "label": "GitHub Profile"
+      "label": "GitHub"
     }
   }
 }

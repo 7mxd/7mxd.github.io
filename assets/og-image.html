@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>OG image source — 1200x630</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Literata:opsz,wght@7..72,500;7..72,700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cream: #f8f3e7;
+            --ink: #1a1a1a;
+            --blue: #173a5e;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html, body {
+            background: #2a2a2a;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            font-family: system-ui, sans-serif;
+        }
+
+        /* The actual OG canvas. Fixed 1200x630, the standard Open Graph
+           dimensions used by WhatsApp, LinkedIn, Twitter, Facebook. */
+        .og-canvas {
+            width: 1200px;
+            height: 630px;
+            background: var(--cream);
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            padding: 0 110px;
+            gap: 70px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Subtle paper grain — SVG noise filter as a low-opacity overlay.
+           Mimics the fiber texture of warm cream stock without dominating. */
+        .og-canvas::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.05 0'/></filter><rect width='300' height='300' filter='url(%23n)'/></svg>");
+            pointer-events: none;
+            mix-blend-mode: multiply;
+            opacity: 0.6;
+        }
+
+        .og-text {
+            flex: 1 1 auto;
+            min-width: 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        .og-name {
+            font-family: 'Literata', 'Iowan Old Style', Georgia, serif;
+            font-weight: 500;
+            font-size: 96px;
+            line-height: 1.05;
+            color: var(--ink);
+            letter-spacing: -0.012em;
+            margin-bottom: 26px;
+        }
+
+        .og-tagline {
+            font-family: 'Courier Prime', 'Courier New', Courier, monospace;
+            font-weight: 400;
+            font-size: 38px;
+            line-height: 1.2;
+            color: var(--blue);
+            letter-spacing: 0;
+        }
+
+        .og-tagline .dot {
+            display: inline-block;
+            margin: 0 0.4em;
+            opacity: 0.7;
+        }
+
+        /* Bracket-arrow chart on the right. Pure typeset Unicode, no images. */
+        .og-chart {
+            flex-shrink: 0;
+            font-family: 'Courier Prime', 'Courier New', Courier, monospace;
+            font-weight: 400;
+            font-size: 30px;
+            line-height: 1.55;
+            color: var(--blue);
+            white-space: pre;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* The instructions box only shows in the browser preview. It is
+           hidden when you take the node screenshot. */
+        .help {
+            position: fixed;
+            top: 12px;
+            left: 12px;
+            right: 12px;
+            background: #1a1a1a;
+            color: #f5f5f5;
+            padding: 16px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.55;
+            font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+            z-index: 100;
+        }
+
+        .help b { color: #fff; }
+        .help kbd {
+            background: #333;
+            border-radius: 3px;
+            padding: 1px 6px;
+            font-size: 12px;
+        }
+        .help code {
+            background: #333;
+            color: #ffd370;
+            padding: 1px 6px;
+            border-radius: 3px;
+            font-size: 13px;
+        }
+
+        @media print {
+            .help { display: none; }
+            html, body { background: transparent; padding: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="help">
+        <b>Save as <code>assets/og-image.png</code> at exactly 1200&times;630:</b><br>
+        1. Press <kbd>F12</kbd> to open DevTools.<br>
+        2. Press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> (or <kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> on Mac) to open the command palette.<br>
+        3. Type <code>capture node screenshot</code> and press Enter.<br>
+        4. Click the cream canvas below. Chrome saves it at its real CSS size (1200&times;630). Move the file to <code>assets/og-image.png</code>. Done.
+    </div>
+
+    <div class="og-canvas" id="og-canvas">
+        <div class="og-text">
+            <div class="og-name">Ahmed Alawi Radhi</div>
+            <div class="og-tagline">data scientist<span class="dot">&middot;</span>Abu Dhabi</div>
+        </div>
+        <pre class="og-chart">|--&rarr;|
+|---&rarr;|
+|---------&rarr;|
+|----&rarr;||
+|------------&rarr;|</pre>
+    </div>
+</body>
+</html>

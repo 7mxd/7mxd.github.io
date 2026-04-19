@@ -22,7 +22,6 @@ collections:
         fields:
           - { name: "name", label: "Full Name", widget: "string" }
           - { name: "title", label: "Professional Title", widget: "string" }
-          - { name: "photo", label: "Profile Photo", widget: "image" }
           - name: "contact"
             label: "Contact Information"
             widget: "object"
@@ -106,7 +105,7 @@ collections:
                 label: "Projects"
                 widget: "object"
                 fields:
-                  - { name: "enabled", label: "Show Projects Section", widget: "boolean", default: false }
+                  - { name: "enabled", label: "Show Projects Section", widget: "boolean", default: true }
 
   # Education - list in single file
   - name: "education"
@@ -173,8 +172,28 @@ collections:
             summary: "{{fields.title}}"
             fields:
               - { name: "title", label: "Project Title", widget: "string" }
+              - name: "status"
+                label: "Status badge (optional)"
+                widget: "select"
+                required: false
+                options:
+                  - { label: "(none)", value: "" }
+                  - { label: "in progress", value: "in-progress" }
+                  - { label: "shipped", value: "shipped" }
+                  - { label: "research", value: "research" }
+                hint: "Shown as a small pill next to the project title."
               - { name: "description", label: "Brief Description", widget: "text" }
               - { name: "image", label: "Project Image (optional)", widget: "image", required: false }
+              - name: "chartCaption"
+                label: "Chart caption (optional)"
+                widget: "text"
+                required: false
+                hint: "One short sentence above the ASCII chart. Plain language for non-experts."
+              - name: "chart"
+                label: "ASCII chart (optional)"
+                widget: "text"
+                required: false
+                hint: "Multi-line ASCII chart. Use the block character █ for bars. Each █ run is auto-styled in the accent color."
               - name: "links"
                 label: "Links"
                 widget: "object"
@@ -214,14 +233,14 @@ collections:
                 label: "Display Type"
                 widget: "select"
                 options:
-                  - { label: "Simple List", value: "list" }
-                  - { label: "Tags", value: "tags" }
-                  - { label: "Proficiency Bars", value: "proficiency" }
+                  - { label: "Simple List (dot-separated line)", value: "list" }
+                  - { label: "Tags (pill row)", value: "tags" }
+                  - { label: "Languages (name, native script, level)", value: "languages" }
+                hint: "Use Languages for the spoken-languages list. Tags for tools/stack. Simple List for short comma lists."
               - name: "items"
                 label: "Skills"
                 widget: "list"
                 summary: "{{fields.name}}"
                 fields:
-                  - { name: "name", label: "Skill Name", widget: "string" }
-                  - { name: "level", label: "Proficiency (0-100)", widget: "number", required: false, value_type: "int", min: 0, max: 100, hint: "Only for proficiency type" }
-                  - { name: "label", label: "Level Label", widget: "string", required: false, hint: "Only for proficiency type (e.g., Native, Fluent)" }
+                  - { name: "name", label: "Name", widget: "string", hint: "For Tags and Simple List, the skill or tool. For Languages, the language in English (e.g. Arabic)." }
+                  - { name: "level", label: "Level (Languages only)", widget: "string", required: false, hint: "Plain word, no scale. Examples: native, fluent, beginner." }
