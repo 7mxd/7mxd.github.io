@@ -7,7 +7,8 @@
       "startDate": "2018-08",
       "endDate": "2023-05",
       "displayDate": "Aug 2018 - May 2023",
-      "grade": "CGPA: 3.30"
+      "grade": "CGPA: 3.30",
+      "blocks": []
     },
     {
       "institution": "Al Nahda National Schools",
@@ -16,7 +17,8 @@
       "startDate": "2015",
       "endDate": "2018",
       "displayDate": "2015 - 2018",
-      "grade": "Grade: 95.9"
+      "grade": "Grade: 95.9",
+      "blocks": []
     }
   ]
 }

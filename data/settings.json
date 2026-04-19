@@ -17,5 +17,11 @@
     "experience": { "enabled": true },
     "skills": { "enabled": true },
     "education": { "enabled": true }
+  },
+  "statuses": {
+    "in-progress": { "label": "in progress", "glyph": "\u25CF", "tone": "active" },
+    "research":    { "label": "research",    "glyph": "\u00A7", "tone": "scholarly" },
+    "shipped":     { "label": "shipped",     "glyph": "\u2713", "tone": "neutral" },
+    "archived":    { "label": "archived",    "glyph": "\u2014", "tone": "muted" }
   }
 }

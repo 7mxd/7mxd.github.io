@@ -785,39 +785,41 @@ body {
     border: 1px solid transparent;
 }
 
-.project-status--in-progress {
+/* Status pill tones. Driven by data/settings.json statuses registry +
+   renderStatusBadge() in script.js. Adding a new status only needs a
+   JSON entry and (rarely) a new tone class here. */
+.project-status-glyph {
+    display: inline-block;
+    margin-right: 0.15rem;
+    font-weight: 700;
+}
+
+.project-status--tone-active {
     background: color-mix(in oklch, var(--secondary) 12%, transparent);
     color: var(--secondary);
     border-color: color-mix(in oklch, var(--secondary) 35%, transparent);
 }
 
-.project-status--in-progress::before {
-    content: "● ";
-    color: var(--secondary);
-    margin-right: 0.25rem;
-}
-
-.project-status--research {
+.project-status--tone-scholarly {
     background: color-mix(in oklch, var(--primary) 6%, transparent);
     color: var(--primary);
     border-color: color-mix(in oklch, var(--primary) 25%, transparent);
 }
 
-.project-status--research::before {
-    content: "§ ";
-    color: var(--primary);
-    margin-right: 0.25rem;
-    font-weight: 700;
+/* Neutral and muted both use the default gray pill (inherited from
+   .project-status base) but muted dims further. */
+.project-status--tone-neutral {
+    /* inherits gray base */
 }
 
-/* Shipped uses the default neutral gray pill, no extra tint, since it
-   is the resolved/done state and shouldn't compete for attention with
-   active (in-progress) or research projects. */
-.project-status--shipped::before {
-    content: "✓ ";
-    color: var(--gray-500);
-    margin-right: 0.25rem;
-    font-weight: 700;
+.project-status--tone-muted {
+    opacity: 0.65;
+}
+
+.project-status--tone-warning {
+    background: color-mix(in oklch, oklch(70% 0.15 60) 14%, transparent);
+    color: oklch(45% 0.15 60);
+    border-color: color-mix(in oklch, oklch(70% 0.15 60) 40%, transparent);
 }
 
 .project-image {
@@ -900,6 +902,183 @@ body {
 
 .project-chart-bar {
     color: var(--secondary);
+}
+
+/* ========================================
+   Content blocks (data/blocks-registry.json)
+   Each block type below corresponds to a renderer in script.js. Add a
+   new block: register in JSON, add renderer in JS, style here.
+   ======================================== */
+
+/* image block: figure with optional caption, used in projects */
+.block-image {
+    margin: 1rem 0 1.25rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.block-image img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    border: 1px solid var(--gray-200);
+    display: block;
+}
+
+.block-image figcaption {
+    font-family: var(--font-body);
+    font-style: italic;
+    font-size: 0.8rem;
+    color: var(--gray-500);
+    line-height: 1.5;
+}
+
+/* code block: monospace, preserved whitespace, paper-tinted background */
+.block-code {
+    font-family: var(--font-heading);
+    font-size: 0.85rem;
+    line-height: 1.55;
+    background: var(--gray-100);
+    border: 1px dotted var(--gray-300);
+    border-radius: 0.5rem;
+    padding: 0.9rem 1rem;
+    margin: 1rem 0 1.25rem 0;
+    overflow-x: auto;
+    color: var(--primary);
+    tab-size: 4;
+}
+
+.block-code code {
+    font-family: inherit;
+    background: transparent;
+    padding: 0;
+}
+
+/* callout block: an inset note, tip, or warning */
+.block-callout {
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    padding: 0.75rem 1rem;
+    margin: 1rem 0 1.25rem 0;
+    border-left: 3px solid var(--gray-300);
+    color: var(--gray-500);
+    background: color-mix(in oklch, var(--gray-100) 60%, transparent);
+    border-radius: 0 0.4rem 0.4rem 0;
+}
+
+.block-callout--note    { border-left-color: var(--gray-400); }
+.block-callout--tip     { border-left-color: var(--secondary); color: var(--primary); }
+.block-callout--warning { border-left-color: oklch(60% 0.15 60); color: var(--primary); }
+
+/* html block: raw HTML escape hatch (single-author trust). */
+.block-html {
+    margin: 1rem 0 1.25rem 0;
+}
+
+/* metric block: small label/value pair, used in experience or projects */
+.block-metric {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    padding: 0.3rem 0.6rem;
+    margin: 0.25rem 0.5rem 0.25rem 0;
+    background: var(--gray-100);
+    border-radius: 0.35rem;
+    font-family: var(--font-heading);
+    font-size: 0.85rem;
+}
+
+.block-metric-label {
+    color: var(--gray-500);
+}
+
+.block-metric-value {
+    color: var(--primary);
+    font-weight: 700;
+}
+
+/* linked-artifact block: a small inline link to a paper, talk, demo */
+.block-linked-artifact {
+    display: inline-block;
+    margin: 0.25rem 0.5rem 0.25rem 0;
+    padding: 0.25rem 0.55rem;
+    border-radius: 0.35rem;
+    background: var(--gray-100);
+    font-family: var(--font-heading);
+    font-size: 0.85rem;
+    color: var(--secondary);
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition: border-color var(--dur-slow) var(--ease);
+}
+
+.block-linked-artifact::before {
+    content: "\2192  ";
+    color: var(--secondary);
+    margin-right: 0.1rem;
+}
+
+.block-linked-artifact:hover {
+    border-color: color-mix(in oklch, var(--secondary) 35%, transparent);
+}
+
+/* coursework block: a labelled list of courses */
+.block-coursework {
+    font-family: var(--font-heading);
+    font-size: 0.85rem;
+    line-height: 1.7;
+    color: var(--primary);
+    margin-top: 0.5rem;
+}
+
+.block-coursework-label {
+    color: var(--gray-500);
+    margin-right: 0.4rem;
+}
+
+.block-coursework-item:not(:last-child)::after {
+    content: " \00B7 ";
+    color: var(--gray-400);
+}
+
+/* thesis block: small inline label + linked title */
+.block-thesis {
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    color: var(--primary);
+    margin-top: 0.5rem;
+}
+
+.block-thesis-label {
+    font-family: var(--font-heading);
+    color: var(--gray-500);
+    margin-right: 0.4rem;
+    font-size: 0.85rem;
+}
+
+.block-thesis a {
+    color: var(--secondary);
+}
+
+/* honor block: a single-line note about an award or recognition */
+.block-honor {
+    font-family: var(--font-body);
+    font-style: italic;
+    font-size: 0.95rem;
+    color: var(--gray-500);
+    margin-top: 0.5rem;
+}
+
+/* education-blocks: container for any blocks attached to an entry */
+.education-blocks {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px dotted var(--gray-200);
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
 }
 
 .summary-text {

@@ -14,12 +14,12 @@
           "startDate": "2024-09",
           "endDate": "Present",
           "displayDate": "09/2024 - Present",
-          "responsibilities": [
-            "Built and maintained ETL pipelines in Python and Pandas against NoSQL stores, and shipped them as git-versioned microservices.",
-            "Built automated pipelines for data wrangling, fuzzy matching, anomaly detection, and exception handling. Outputs are structured and scheduled with Docker.",
-            "Built interactive dashboards and proof-of-concept reports in Power BI and Tableau.",
-            "Designed entity-relationship (ER) diagrams and wrote technical documentation for several project use cases.",
-            "Fixed client-side issues with data availability and freshness, and routed the root causes back to the internal teams that owned them."
+          "blocks": [
+            { "type": "responsibility", "content": "Built and maintained ETL pipelines in Python and Pandas against NoSQL stores, and shipped them as git-versioned microservices." },
+            { "type": "responsibility", "content": "Built automated pipelines for data wrangling, fuzzy matching, anomaly detection, and exception handling. Outputs are structured and scheduled with Docker." },
+            { "type": "responsibility", "content": "Built interactive dashboards and proof-of-concept reports in Power BI and Tableau." },
+            { "type": "responsibility", "content": "Designed entity-relationship (ER) diagrams and wrote technical documentation for several project use cases." },
+            { "type": "responsibility", "content": "Fixed client-side issues with data availability and freshness, and routed the root causes back to the internal teams that owned them." }
           ]
         },
         {
@@ -27,10 +27,10 @@
           "startDate": "2024-03",
           "endDate": "2024-09",
           "displayDate": "03/2024 - 09/2024",
-          "responsibilities": [
-            "Built and tested a Flask REST API against MongoDB using Postman and Swagger UI.",
-            "Earned the Dataiku Core Designer and ML Practitioner certifications and applied both on production data case studies.",
-            "Shipped a dashboard end to end with the UI and development teams, from wireframe to deployed product."
+          "blocks": [
+            { "type": "responsibility", "content": "Built and tested a Flask REST API against MongoDB using Postman and Swagger UI." },
+            { "type": "responsibility", "content": "Earned the Dataiku Core Designer and ML Practitioner certifications and applied both on production data case studies." },
+            { "type": "responsibility", "content": "Shipped a dashboard end to end with the UI and development teams, from wireframe to deployed product." }
           ]
         }
       ]
@@ -45,9 +45,9 @@
           "startDate": "2022-07",
           "endDate": "2022-09",
           "displayDate": "07/2022 - 09/2022",
-          "responsibilities": [
-            "Completed an eight-week rotation in Data Analytics and Business Intelligence, learning how health insurance data models are structured.",
-            "Ran analyses on medical claims data for business intelligence case studies."
+          "blocks": [
+            { "type": "responsibility", "content": "Completed an eight-week rotation in Data Analytics and Business Intelligence, learning how health insurance data models are structured." },
+            { "type": "responsibility", "content": "Ran analyses on medical claims data for business intelligence case studies." }
           ]
         }
       ]

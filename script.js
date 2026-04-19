@@ -40,6 +40,124 @@ const ICONS = {
 let siteData = {};
 
 /**
+ * Escape user-controlled strings before placing them in HTML.
+ * Used by every renderer that interpolates content from data/*.json.
+ */
+function escapeHtml(s) {
+    return String(s ?? '').replace(/[&<>"']/g, (c) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+}
+
+/**
+ * Block renderers, keyed by `block.type` from data/blocks-registry.json.
+ * Each renderer takes a block object and returns an HTML string.
+ *
+ * To add a new block type:
+ *   1. Add an entry to data/blocks-registry.json (declares scope + fields)
+ *   2. Add a renderer here (returns the HTML)
+ *   3. Add CSS in style.css for the new element
+ *
+ * Trust model: content is single-author (admin only). The `html` block is
+ * deliberately a raw HTML escape hatch; everything else escapes user input.
+ */
+const BLOCK_RENDERERS = {
+    description: (b) => `<p class="project-description">${escapeHtml(b.content)}</p>`,
+
+    'ascii-chart': (b) => `<figure class="project-chart-figure">
+        ${b.caption ? `<figcaption class="project-chart-caption">${escapeHtml(b.caption)}</figcaption>` : ''}
+        <pre class="project-chart" aria-label="Benchmark chart">${
+            escapeHtml(b.chart || '').replace(/([\u2580-\u2588]+)/g, '<span class="project-chart-bar">$1</span>')
+        }</pre>
+    </figure>`,
+
+    image: (b) => `<figure class="block-image">
+        <img src="${escapeHtml(b.src)}" alt="${escapeHtml(b.alt || '')}" loading="lazy">
+        ${b.caption ? `<figcaption>${escapeHtml(b.caption)}</figcaption>` : ''}
+    </figure>`,
+
+    code: (b) => `<pre class="block-code"${b.language ? ` data-language="${escapeHtml(b.language)}"` : ''}><code>${escapeHtml(b.content)}</code></pre>`,
+
+    callout: (b) => {
+        const tone = (b.tone || 'note').replace(/[^a-z0-9-]/gi, '');
+        return `<div class="block-callout block-callout--${tone}">${escapeHtml(b.content)}</div>`;
+    },
+
+    html: (b) => `<div class="block-html">${b.content || ''}</div>`,
+
+    responsibility: (b) => `<li>${escapeHtml(b.content)}</li>`,
+
+    metric: (b) => `<div class="block-metric"><span class="block-metric-label">${escapeHtml(b.label)}</span><span class="block-metric-value">${escapeHtml(b.value)}</span></div>`,
+
+    'linked-artifact': (b) => `<a href="${escapeHtml(b.url)}" target="_blank" rel="noopener noreferrer" class="block-linked-artifact">${escapeHtml(b.label || b.url)}</a>`,
+
+    coursework: (b) => `<div class="block-coursework"><span class="block-coursework-label">coursework:</span> ${
+        (b.items || []).map(i => `<span class="block-coursework-item">${escapeHtml(i)}</span>`).join('')
+    }</div>`,
+
+    thesis: (b) => `<p class="block-thesis"><span class="block-thesis-label">thesis:</span> ${
+        b.link ? `<a href="${escapeHtml(b.link)}" target="_blank" rel="noopener noreferrer">${escapeHtml(b.title)}</a>` : escapeHtml(b.title)
+    }</p>`,
+
+    honor: (b) => `<p class="block-honor">${escapeHtml(b.content)}</p>`
+};
+
+/**
+ * Some block types render as list items and need a parent wrapper. Define
+ * the wrapper here so consecutive same-type blocks group cleanly into one
+ * <ul>/<dl> instead of each being a stranded <li>.
+ */
+const LIST_BLOCK_WRAPPERS = {
+    responsibility: { tag: 'ul', class: 'role-description' }
+};
+
+/**
+ * Dispatch an array of blocks to their renderers, grouping consecutive
+ * list-item blocks into the appropriate wrapper element.
+ */
+function renderBlocks(blocks) {
+    if (!Array.isArray(blocks) || !blocks.length) return '';
+    const out = [];
+    let i = 0;
+    while (i < blocks.length) {
+        const block = blocks[i];
+        const renderer = BLOCK_RENDERERS[block?.type];
+        if (!renderer) { i++; continue; }
+        const wrapper = LIST_BLOCK_WRAPPERS[block.type];
+        if (wrapper) {
+            const group = [];
+            while (i < blocks.length && blocks[i].type === block.type) {
+                group.push(blocks[i]);
+                i++;
+            }
+            out.push(`<${wrapper.tag} class="${wrapper.class}">${group.map(renderer).join('')}</${wrapper.tag}>`);
+        } else {
+            out.push(renderer(block));
+            i++;
+        }
+    }
+    return out.join('');
+}
+
+/**
+ * Render a project status badge using the registry from settings.statuses.
+ * Each registry entry declares its glyph and tone; tones map to CSS classes.
+ * Adding a new status is a JSON edit, no CSS or JS change required.
+ */
+function renderStatusBadge(statusKey, statusesRegistry) {
+    if (!statusKey || !statusesRegistry) return '';
+    const config = statusesRegistry[statusKey];
+    if (!config) return '';
+    const tone = (config.tone || 'neutral').replace(/[^a-z0-9-]/gi, '');
+    const safeKey = statusKey.replace(/[^a-z0-9-]/gi, '');
+    const label = escapeHtml(config.label || statusKey);
+    const glyph = config.glyph
+        ? `<span class="project-status-glyph" aria-hidden="true">${escapeHtml(config.glyph)}</span> `
+        : '';
+    return `<span class="project-status project-status--tone-${tone}" data-status="${safeKey}">${glyph}${label}</span>`;
+}
+
+/**
  * Fetch JSON data from a file
  */
 async function fetchData(filename) {
@@ -150,21 +268,25 @@ function renderEducation(education) {
         return;
     }
 
-    container.innerHTML = education.items.map(item => `
+    container.innerHTML = education.items.map(item => {
+        const blocksHtml = renderBlocks(item.blocks);
+        return `
         <div class="education-card">
             <div class="education-content">
                 <div class="institution-header">
-                    <img src="${item.logo}" alt="${item.institution}" class="institution-logo" loading="lazy">
-                    <div class="institution">${item.institution}</div>
+                    <img src="${escapeHtml(item.logo)}" alt="${escapeHtml(item.institution)}" class="institution-logo" loading="lazy">
+                    <div class="institution">${escapeHtml(item.institution)}</div>
                 </div>
-                <h3>${item.degree}</h3>
+                <h3>${escapeHtml(item.degree)}</h3>
                 <div class="education-details">
-                    <span class="experience-date" data-start="${item.startDate}" data-end="${item.endDate}">${item.displayDate}</span>
-                    <span class="grade">${item.grade}</span>
+                    <span class="experience-date" data-start="${escapeHtml(item.startDate)}" data-end="${escapeHtml(item.endDate)}">${escapeHtml(item.displayDate)}</span>
+                    <span class="grade">${escapeHtml(item.grade)}</span>
                 </div>
+                ${blocksHtml ? `<div class="education-blocks">${blocksHtml}</div>` : ''}
             </div>
         </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 /**
@@ -188,11 +310,9 @@ function renderExperience(experience) {
         const rolesHtml = company.roles.map(role => `
             <div class="role-item">
                 <div class="role-content">
-                    <h4>${role.title}</h4>
-                    <span class="experience-date" data-start="${role.startDate}" data-end="${role.endDate}">${role.displayDate}</span>
-                    <ul class="role-description">
-                        ${role.responsibilities.map(r => `<li>${r}</li>`).join('')}
-                    </ul>
+                    <h4>${escapeHtml(role.title)}</h4>
+                    <span class="experience-date" data-start="${escapeHtml(role.startDate)}" data-end="${escapeHtml(role.endDate)}">${escapeHtml(role.displayDate)}</span>
+                    ${renderBlocks(role.blocks)}
                 </div>
             </div>
         `).join('');
@@ -224,10 +344,6 @@ function renderSkills(skills) {
         hideParentSection(container);
         return;
     }
-
-    const escapeHtml = (s) => String(s).replace(/[&<>"']/g, (c) => ({
-        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-    }[c]));
 
     container.innerHTML = skills.categories.map(category => {
         let contentHtml = '';
@@ -297,7 +413,7 @@ const PROJECT_LINK_ICONS = {
 /**
  * Render the projects section
  */
-function renderProjects(projects) {
+function renderProjects(projects, statusesRegistry) {
     const container = document.getElementById('projects-grid');
     if (!container) return;
     if (!projects || !projects.items || !projects.items.length) {
@@ -328,39 +444,26 @@ function renderProjects(projects) {
         }
 
         const tagsHtml = project.tags && project.tags.length
-            ? `<div class="project-tags">${project.tags.map(tag => `<span class="project-tag">${tag}</span>`).join('')}</div>`
+            ? `<div class="project-tags">${project.tags.map(tag => `<span class="project-tag">${escapeHtml(tag)}</span>`).join('')}</div>`
             : '';
 
         const imageHtml = project.image
-            ? `<div class="project-image"><img src="${project.image}" alt="${project.title}" loading="lazy"></div>`
+            ? `<div class="project-image"><img src="${escapeHtml(project.image)}" alt="${escapeHtml(project.title)}" loading="lazy"></div>`
             : '';
 
-        const ALLOWED_STATUSES = ['in-progress', 'shipped', 'research'];
-        const safeStatus = ALLOWED_STATUSES.includes(project.status) ? project.status : null;
-        const statusLabel = safeStatus ? safeStatus.replace('-', ' ') : '';
-        const statusHtml = safeStatus
-            ? `<span class="project-status project-status--${safeStatus}">${statusLabel}</span>`
-            : '';
+        const statusHtml = renderStatusBadge(project.status, statusesRegistry);
 
-        const chartHtml = project.chart
-            ? `<figure class="project-chart-figure">
-                  ${project.chartCaption ? `<figcaption class="project-chart-caption">${project.chartCaption}</figcaption>` : ''}
-                  <pre class="project-chart" aria-label="Benchmark chart">${
-                      project.chart.replace(/([\u2580-\u2588]+)/g, '<span class="project-chart-bar">$1</span>')
-                  }</pre>
-              </figure>`
-            : '';
+        const blocksHtml = renderBlocks(project.blocks);
 
         return `
             <article class="project-card">
                 ${imageHtml}
                 <div class="project-card-content">
                     <div class="project-card-header">
-                        <h3>${project.title}</h3>
+                        <h3>${escapeHtml(project.title)}</h3>
                         ${statusHtml}
                     </div>
-                    <p class="project-description">${project.description}</p>
-                    ${chartHtml}
+                    ${blocksHtml}
                     ${tagsHtml}
                     ${linksHtml.length ? `<div class="project-links">${linksHtml.join('')}</div>` : ''}
                 </div>
@@ -845,7 +948,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderEducation(siteData.education);
         renderExperience(siteData.experience);
         renderSkills(siteData.skills);
-        renderProjects(siteData.projects);
+        renderProjects(siteData.projects, siteData.settings?.statuses);
         updateCVLinks(siteData.settings);
         applySectionVisibility(siteData.settings);
 

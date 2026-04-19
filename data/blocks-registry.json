@@ -1,0 +1,107 @@
+{
+  "_comment": "Source of truth for content blocks. Each entry declares which sections can use the block (scope) and what fields it accepts. The site renderer dispatches on type; the admin UI builds its forms from this same file. To add a new block type: add an entry here, write a renderer in script.js, add CSS in style.css.",
+
+  "description": {
+    "scope": ["project"],
+    "label": "Description",
+    "fields": [
+      { "name": "content", "type": "text", "label": "Description", "required": true }
+    ]
+  },
+
+  "ascii-chart": {
+    "scope": ["project"],
+    "label": "ASCII chart",
+    "fields": [
+      { "name": "caption", "type": "text", "label": "Caption (optional)", "required": false },
+      { "name": "chart", "type": "code", "label": "Chart (use \u2587 for bar segments)", "required": true }
+    ]
+  },
+
+  "image": {
+    "scope": ["project", "experience", "education"],
+    "label": "Image",
+    "fields": [
+      { "name": "src", "type": "image", "label": "Image", "required": true },
+      { "name": "alt", "type": "string", "label": "Alt text", "required": true },
+      { "name": "caption", "type": "string", "label": "Caption (optional)", "required": false }
+    ]
+  },
+
+  "code": {
+    "scope": ["project"],
+    "label": "Code snippet",
+    "fields": [
+      { "name": "language", "type": "string", "label": "Language (e.g. python)", "required": false },
+      { "name": "content", "type": "code", "label": "Code", "required": true }
+    ]
+  },
+
+  "callout": {
+    "scope": ["project"],
+    "label": "Callout",
+    "fields": [
+      { "name": "tone", "type": "select", "options": ["note", "tip", "warning"], "label": "Tone", "required": true },
+      { "name": "content", "type": "text", "label": "Content", "required": true }
+    ]
+  },
+
+  "html": {
+    "scope": ["project"],
+    "label": "Raw HTML (advanced)",
+    "fields": [
+      { "name": "content", "type": "code", "label": "Raw HTML", "required": true }
+    ]
+  },
+
+  "responsibility": {
+    "scope": ["experience"],
+    "label": "Responsibility / bullet",
+    "fields": [
+      { "name": "content", "type": "text", "label": "Bullet text", "required": true }
+    ]
+  },
+
+  "metric": {
+    "scope": ["experience", "project"],
+    "label": "Metric / number",
+    "fields": [
+      { "name": "label", "type": "string", "label": "Label", "required": true },
+      { "name": "value", "type": "string", "label": "Value", "required": true }
+    ]
+  },
+
+  "linked-artifact": {
+    "scope": ["experience", "project", "education"],
+    "label": "Linked artifact (paper, talk, etc.)",
+    "fields": [
+      { "name": "label", "type": "string", "label": "Label", "required": true },
+      { "name": "url", "type": "url", "label": "URL", "required": true }
+    ]
+  },
+
+  "coursework": {
+    "scope": ["education"],
+    "label": "Coursework list",
+    "fields": [
+      { "name": "items", "type": "list", "label": "Course names", "required": true }
+    ]
+  },
+
+  "thesis": {
+    "scope": ["education"],
+    "label": "Thesis",
+    "fields": [
+      { "name": "title", "type": "string", "label": "Thesis title", "required": true },
+      { "name": "link", "type": "url", "label": "Link (optional)", "required": false }
+    ]
+  },
+
+  "honor": {
+    "scope": ["education", "experience"],
+    "label": "Honor / award",
+    "fields": [
+      { "name": "content", "type": "text", "label": "Content", "required": true }
+    ]
+  }
+}
