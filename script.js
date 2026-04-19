@@ -81,7 +81,7 @@ function renderProfile(profile) {
     container.innerHTML = `
         <span class="header-preamble" aria-hidden="true">$ cat ~/about.md</span>
         <h1>${profile.name}</h1>
-        <p class="subtitle">${profile.title}</p>
+        <p class="subtitle">${profile.title}<span class="live-cursor" aria-hidden="true">_</span></p>
         <div class="contact-info" role="list" aria-label="Contact information">
             <a href="mailto:${profile.contact.email}" class="contact-item" role="listitem" aria-label="Email: ${profile.contact.email}">
                 ${ICONS.email}
@@ -107,7 +107,6 @@ function renderProfile(profile) {
                 ${ICONS.location}
                 <span>${profile.contact.location}</span>
             </span>
-            <span class="live-cursor" aria-hidden="true">_</span>
         </div>
     `;
 }
@@ -347,7 +346,7 @@ function renderProjects(projects) {
             ? `<figure class="project-chart-figure">
                   ${project.chartCaption ? `<figcaption class="project-chart-caption">${project.chartCaption}</figcaption>` : ''}
                   <pre class="project-chart" aria-label="Benchmark chart">${
-                      project.chart.replace(/(\u2588+)/g, '<span class="project-chart-bar">$1</span>')
+                      project.chart.replace(/([\u2580-\u2588]+)/g, '<span class="project-chart-bar">$1</span>')
                   }</pre>
               </figure>`
             : '';
