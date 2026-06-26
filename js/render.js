@@ -1,4 +1,4 @@
-import { renderBlock, renderBlocks } from './blocks.js';
+import { renderBlocks } from './blocks.js';
 import { escapeHtml } from './util.js';
 
 const enabled = (model, name) => model.settings?.sections?.[name]?.enabled !== false;
@@ -20,7 +20,7 @@ export function renderExperience(model) {
       return `<div class="role"><h4 class="role-title">${escapeHtml(r.title)}</h4>
         <p class="role-date">${escapeHtml(r.displayDate || '')}</p>${list}${renderBlocks(other)}</div>`;
     }).join('');
-    return `<article class="exp" data-cluster="${escapeHtml(e.cluster)}">
+    return `<article class="exp" data-cluster="${escapeHtml(e.cluster || '')}">
       <header class="exp-head"><h3 class="exp-company">${escapeHtml(e.company)}</h3>
       <span class="exp-loc">${escapeHtml(e.location || '')}</span></header>
       ${tagRow(e.tags)}${roles}</article>`;
@@ -38,7 +38,7 @@ export function renderProjects(model) {
       if (typeof v === 'string' && v) return [`<a href="${escapeHtml(v)}" target="_blank" rel="noopener">${escapeHtml(k)}</a>`];
       return [];
     }).join('');
-    return `<article class="project" id="project-${i}" data-cluster="${escapeHtml(p.cluster)}">
+    return `<article class="project" id="project-${i}" data-cluster="${escapeHtml(p.cluster || '')}">
       <header class="project-head"><h3 class="project-title">${escapeHtml(p.title)}</h3>${pill}</header>
       ${tagRow(p.tags)}<div class="project-body">${renderBlocks(p.blocks)}</div>
       <div class="project-links">${links}</div></article>`;
@@ -59,7 +59,7 @@ export function renderSkills(model) {
 
 export function renderEducation(model) {
   if (!enabled(model, 'education')) return '';
-  return (model.education || []).map((d) => `<article class="edu" data-cluster="${escapeHtml(d.cluster)}">
+  return (model.education || []).map((d) => `<article class="edu" data-cluster="${escapeHtml(d.cluster || '')}">
     <h3 class="edu-inst">${escapeHtml(d.institution)}</h3>
     <p class="edu-degree">${escapeHtml(d.degree)}</p>
     <p class="edu-meta">${escapeHtml(d.displayDate||'')} · ${escapeHtml(d.grade||'')}</p>
