@@ -82,7 +82,8 @@ export function mountSections(model, root = document) {
   const map = { summary:renderSummary, experience:renderExperience, projects:renderProjects,
                 skills:renderSkills, education:renderEducation, contact:renderContact };
   for (const [id, fn] of Object.entries(map)) {
-    const el = root.getElementById ? root.getElementById(id) : root.querySelector(`#${id}`);
-    if (el) el.innerHTML = fn(model);
+    const host = (root.getElementById ? root.getElementById(id) : root.querySelector(`#${id}`));
+    const target = host?.querySelector('.section-body') || host;
+    if (target) target.innerHTML = fn(model);
   }
 }
