@@ -39,74 +39,49 @@
   <link rel="stylesheet" href="css/base.css" />
   <link rel="stylesheet" href="css/sections.css" />
   <link rel="stylesheet" href="css/graph.css" />
+  <link rel="stylesheet" href="css/scene.css" />
   <link rel="stylesheet" href="css/print.css" media="print" />
 </head>
-<body>
-  <a class="skip-link" href="#summary">Skip to content</a>
-
+<body data-mode="read">
+  <a class="skip-link" href="#read">Skip to content</a>
   <header class="site-nav">
     <a class="nav-logo" href="#top">AR</a>
-    <nav aria-label="Sections">
-      <a href="#summary">summary</a>
-      <a href="#experience">experience</a>
-      <a href="#projects">projects</a>
-      <a href="#skills">skills</a>
-      <a href="#education">education</a>
-      <a href="#contact">contact</a>
-    </nav>
-    <button data-theme-toggle aria-label="Toggle light and dark theme">&#x25D0;</button>
+    <div class="nav-actions">
+      <button data-mode-toggle aria-pressed="false">Explore</button>
+      <button data-theme-toggle aria-label="Toggle light and dark theme">◐</button>
+    </div>
   </header>
 
-  <main id="top">
-    <section id="hero" class="hero" aria-label="Introduction">
-      <canvas id="graph-canvas" aria-hidden="true"></canvas>
-      <div class="hero-content">
-        <h1 id="hero-name">Ahmed Alawi Radhi</h1>
-        <p id="hero-title">Data scientist. Applied mathematician. I ship the modeling and the system around it.</p>
-        <div class="hero-actions">
-          <a class="btn" href="assets/ahmed_radhi_cv_2025.pdf" download>Download CV</a>
-          <a class="btn" href="#contact">Contact</a>
-        </div>
+  <div id="explore" aria-hidden="true">
+    <canvas id="scene-canvas"></canvas>
+    <div id="hero-overlay">
+      <h1 id="hero-name">Ahmed Alawi Radhi</h1>
+      <p id="hero-title">Data scientist. Applied mathematician. I ship the modeling and the system around it.</p>
+      <div class="hero-actions">
+        <a class="btn" href="assets/ahmed_radhi_cv_2025.pdf" download>Download CV</a>
+        <a class="btn" href="#contact" data-goto-read>Contact</a>
       </div>
-      <p class="sr-only">Interactive map of Ahmed's work across three areas: Mathematics, Data Science, and Engineering &amp; Products. The same information is available as readable sections below.</p>
-    </section>
+      <p class="hero-hint">drag to explore · click a node</p>
+    </div>
+    <aside id="panel" hidden aria-label="Details">
+      <button id="panel-close" aria-label="Close details">×</button>
+      <div id="panel-body"></div>
+    </aside>
+    <p class="sr-only">Interactive 3D network of Ahmed's work across Mathematics, Data Science, and Engineering. The same information is available in the readable view.</p>
+  </div>
 
-    <section id="summary" aria-label="Summary">
-      <h2 class="section-title">Summary</h2>
-      <div class="section-body"></div>
-    </section>
-
-    <section id="experience" aria-label="Experience">
-      <h2 class="section-title">Experience</h2>
-      <div class="section-body"></div>
-    </section>
-
-    <section id="projects" aria-label="Projects">
-      <h2 class="section-title">Projects</h2>
-      <div class="section-body"></div>
-    </section>
-
-    <section id="skills" aria-label="Skills">
-      <h2 class="section-title">Skills</h2>
-      <div class="section-body"></div>
-    </section>
-
-    <section id="education" aria-label="Education">
-      <h2 class="section-title">Education</h2>
-      <div class="section-body"></div>
-    </section>
-
-    <section id="contact" aria-label="Contact">
-      <h2 class="section-title">Contact</h2>
-      <div class="section-body"></div>
-    </section>
+  <main id="read">
+    <section id="hero-read" class="hero-read"><h1>Ahmed Alawi Radhi</h1><p>Data scientist. Applied mathematician.</p>
+      <div class="hero-actions"><a class="btn" href="assets/ahmed_radhi_cv_2025.pdf" download>Download CV</a></div></section>
+    <section id="summary" aria-label="Summary"><h2 class="section-title">Summary</h2><div class="section-body"></div></section>
+    <section id="experience" aria-label="Experience"><h2 class="section-title">Experience</h2><div class="section-body"></div></section>
+    <section id="projects" aria-label="Projects"><h2 class="section-title">Projects</h2><div class="section-body"></div></section>
+    <section id="skills" aria-label="Skills"><h2 class="section-title">Skills</h2><div class="section-body"></div></section>
+    <section id="education" aria-label="Education"><h2 class="section-title">Education</h2><div class="section-body"></div></section>
+    <section id="contact" aria-label="Contact"><h2 class="section-title">Contact</h2><div class="section-body"></div></section>
   </main>
 
-  <noscript>
-    <p>This site renders with JavaScript. View the CV directly:
-    <a href="assets/ahmed_radhi_cv_2025.pdf">Ahmed Radhi CV (PDF)</a>.</p>
-  </noscript>
-
+  <noscript><p>This site needs JavaScript. View the CV: <a href="assets/ahmed_radhi_cv_2025.pdf">Ahmed Radhi CV (PDF)</a>.</p></noscript>
   <script type="module" src="js/main.js"></script>
 </body>
 </html>

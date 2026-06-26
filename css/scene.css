@@ -1,0 +1,26 @@
+#explore { position: fixed; inset: 0; z-index: 1; }
+#scene-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; background: radial-gradient(circle at 50% 40%, #11151c 0%, #0a0d12 70%); }
+#hero-overlay { position: absolute; left: 0; right: 0; top: 18vh; text-align: center; pointer-events: none; padding: 0 1rem; }
+#hero-overlay #hero-name { font-family: var(--font-mono); font-size: clamp(1.8rem, 6vw, 4rem); color: #f3f4f6; margin: 0; text-shadow: 0 2px 30px rgba(0,0,0,.6); }
+#hero-overlay #hero-title { color: #c4c9d0; max-width: 40ch; margin: .7rem auto 1.2rem; }
+.hero-actions { display: flex; gap: .7rem; justify-content: center; flex-wrap: wrap; pointer-events: auto; }
+.hero-hint { color: #8b9099; font-family: var(--font-mono); font-size: .75rem; margin-top: 1.4rem; }
+#panel { position: absolute; top: 0; right: 0; height: 100%; width: min(420px, 92vw); overflow-y: auto;
+  background: color-mix(in srgb, #0d1117 88%, transparent); backdrop-filter: blur(10px);
+  border-left: 1px solid #232a33; color: #e6e8eb; padding: 3rem 1.5rem 2rem; z-index: 3; }
+#panel-close { position: absolute; top: .6rem; right: .8rem; background: none; border: 0; color: #c4c9d0; font-size: 1.6rem; cursor: pointer; }
+.panel-title { font-family: var(--font-mono); margin: 0 0 .4rem; }
+.panel-links { display: flex; gap: 1rem; flex-wrap: wrap; font-family: var(--font-mono); font-size: .85rem; margin-top: 1rem; }
+.site-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 5; display: flex; align-items: center; padding: .6rem 1rem; }
+.site-nav .nav-actions { margin-left: auto; display: flex; gap: .6rem; }
+.nav-logo { font-family: var(--font-mono); font-weight: 700; color: #e6e8eb; text-decoration: none; }
+[data-mode-toggle], [data-theme-toggle] { font-family: var(--font-mono); font-size: .85rem; padding: .35rem .7rem; border: 1px solid #2a313b; border-radius: 8px; background: rgba(13,17,23,.6); color: #e6e8eb; cursor: pointer; }
+
+/* mode visibility */
+body[data-mode="read"] #explore { display: none; }
+body[data-mode="read"] .site-nav { position: sticky; background: color-mix(in srgb, var(--bg) 88%, transparent); border-bottom: 1px solid var(--line); }
+body[data-mode="read"] .nav-logo, body[data-mode="read"] [data-mode-toggle], body[data-mode="read"] [data-theme-toggle] { color: var(--ink); background: var(--surface); border-color: var(--line); }
+body[data-mode="explore"] #read { display: none; }
+#read { max-width: 72rem; margin: 0 auto; padding: 0 var(--space); }
+.hero-read { padding: 4rem 0 2rem; }
+@media (prefers-reduced-motion: reduce) { #hero-overlay { transition: none; } }
