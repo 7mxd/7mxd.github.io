@@ -9,11 +9,6 @@ export async function createWorld(canvas, model, { reducedMotion = false, lowPow
   const { createInteraction } = await import('./interaction.js');
 
   const graph = deriveGraph(model);
-  // optional: thin tool nodes on low-power
-  if (lowPower) {
-    const keep = new Set(graph.nodes.filter(n => n.kind==='entity').map(n=>n.id));
-    graph.edges.forEach(e => { keep.add(e.source); keep.add(e.target); });
-  }
   const layout = computeLayout(graph, { seed: 7 });
   const palette = model.settings?.graph?.clusters
     ? { math: model.settings.graph.clusters.math.color, data: model.settings.graph.clusters.data.color, engineering: model.settings.graph.clusters.engineering.color }

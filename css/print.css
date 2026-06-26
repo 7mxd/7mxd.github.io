@@ -1,5 +1,5 @@
 @media print {
-  .site-nav, [data-theme-toggle], #graph-canvas, .skip-link, .hero-actions, .graph-tooltip { display: none !important; }
+  .site-nav, [data-theme-toggle], .skip-link, .hero-actions, .graph-tooltip { display: none !important; }
   #explore, .site-nav { display: none !important; }
   body[data-mode] #read { display: block !important; }
   html { background: #fff; }

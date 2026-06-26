@@ -8,19 +8,20 @@ A personal portfolio website showcasing my background in Applied Mathematics, St
 
 ## Structure
 
-- `index.html` — shell (nav, hero canvas, section containers).
-- `css/` — `tokens.css` (themes/palette), `base.css`, `sections.css`, `graph.css`, `print.css`.
-- `js/` — ES modules: `main.js` (entry), `data.js`, `graph-model.js`, `force.js`, `graph-view.js`, `render.js`, `blocks.js`, `theme.js`, `motion.js`, `a11y.js`, `util.js`.
-- `data/` — content JSON + `blocks-registry.json` (block schema, shared by site and admin).
-- `test/` — Node built-in unit tests for pure logic.
+- `index.html` — two-mode shell (Explore 3D / Read résumé).
+- `js/` — ES modules: `main.js` (orchestration), `data.js`, `graph-model.js`, `blocks.js`, `render.js` (sections + `renderPanel`), `theme.js`, `motion.js`, `a11y.js`, `capabilities.js`, `util.js`, and `scene/` (`engine`, `nodes`, `edges`, `interaction`, `layout`, `world`) — the Three.js living network.
+- `css/` — `tokens.css`, `base.css`, `sections.css` (Read view), `scene.css` (Explore), `print.css`.
+- `data/` — content JSON + `blocks-registry.json`. `admin/` — custom content manager.
+- `test/` — Node unit tests for pure logic.
 
 ## Running locally
 
-    python -m http.server 8000   # then visit http://localhost:8000
+    python -m http.server 8000   # then http://localhost:8000
 
-## Tests
+## Notes
 
-    npm test   # node --test test/  (dev-only, nothing ships)
+- Three.js (r160) loads from a CDN only in Explore mode; Read mode is dependency-free.
+- `npm test` runs the dev-only unit suite (`node --test`).
 
 ## Admin (content manager)
 

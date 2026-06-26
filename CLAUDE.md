@@ -30,24 +30,23 @@ python -m http.server 8000
 
 ## Design Context
 
-Static site at [7mxd.github.io](https://7mxd.github.io). Source of truth for design decisions.
+Static site at [7mxd.github.io](https://7mxd.github.io).
 
 ### Identity
 
-**Interactive "data world."** Ahmed is an applied mathematician and data scientist who ships production systems. The site's hero is a computed network graph of his work — three clusters (Mathematics, Data Science, Engineering & Products) wired together by the tools and methods (notably AI agents) that connect them. The graph is derived from content, not authored. Below it is a full, readable page.
+**Living network.** The site is an explorable 3D network (Three.js/WebGL) — a neural form (neurons grouped into three regions: Mathematics, Data Science, Engineering & Products) with data/signals flowing along its synapses. It is *derived from* `data/*.json`, so it is a real, editable résumé, not decoration. Two modes share one data source: **Explore** (the 3D world; click a node for a detail panel) and **Read / CV** (the full linear résumé, the fallback + accessibility + print path).
 
 ### Principles
 
-1. **Made of data.** The signature visual is generated from real content (shared tags → edges). Never fake the data.
-2. **Wow, then substance.** The network grabs attention; the readable sections below carry the depth. No information lives only in the canvas.
-3. **Adaptive, both themes first-class.** Light and dark each get a real design pass.
-4. **Motion with respect.** Animation is core but every motion is gated by `prefers-reduced-motion`.
-5. **Every word earns its place.** No filler superlatives.
+1. **The network is the experience, and it's made of real data** (shared tags/clusters → nodes/edges). Never fake it.
+2. **Immersive by default, scannable on demand.** Explore wows; Read serves recruiters; both always reachable.
+3. **Robust everywhere.** No WebGL / low-power / reduced-motion gracefully use Read (calm Explore under reduced-motion).
+4. **Dark-first 3D; adaptive Read.** Region palette: Mathematics `#6c5ce7`, Data `#d68a1e`, Engineering `#1d9bb8`.
 
 ### Constraints
 
-- **A11y:** WCAG AA. Keep skip link, reduced-motion, high-contrast, keyboard detection, SR announcements, focus management. Canvas is `aria-hidden` with a text equivalent.
-- **Performance:** CSS + JS < 150KB uncompressed. No build step, no runtime dependencies. Lazy-load below-the-fold images. Freeze/pause the simulation when idle/offscreen.
-- **Confidentiality:** Only HiSalon is named among Join-Future products (name + role + general stack). No internal/security/infra specifics.
-- **Printable:** `css/print.css` must keep producing a clean document.
-- **Cluster palette:** Mathematics indigo `#6c5ce7`, Data amber `#d68a1e`, Engineering cyan `#1d9bb8` (tunable in `data/settings.json` `graph.clusters`).
+- **Three.js** is an accepted dependency, pinned and loaded from a CDN (`esm.sh/three@0.160.0`) as an ES module, **lazy-loaded only in Explore**. No bundler. Read mode loads no WebGL.
+- **A11y:** WCAG AA. Canvas `aria-hidden`; DOM (panels + Read view) is the source of truth. Keep skip link, reduced-motion handling, keyboard detection, focus management, SR announcements, `prefers-contrast`.
+- **Data-driven:** all content from `data/*.json` + `blocks-registry.json`; the custom admin at `/admin/` edits it. No résumé content hard-coded.
+- **Confidentiality:** only HiSalon is named among Join-Future products.
+- **Printable:** Read view prints cleanly; Explore hidden in print.

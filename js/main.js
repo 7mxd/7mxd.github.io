@@ -57,7 +57,7 @@ async function start() {
     });
     $('panel-close')?.addEventListener('click', () => { closePanel(); });
     document.querySelectorAll('[data-goto-read]').forEach(el => el.addEventListener('click', () => setMode('read', true)));
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePanel(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !document.getElementById('panel').hidden) closePanel(); });
     setMode(chooseInitialMode(caps), false);
   } catch (err) {
     console.error('Failed to load portfolio data', err);
