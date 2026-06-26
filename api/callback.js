@@ -42,7 +42,7 @@ export default async function handler(req, res) {
       return res.status(400).send('No access token received');
     }
 
-    // Return HTML that posts the token back to Decap CMS using the expected format
+    // Return HTML that posts the token back using the new format
     const html = `<!DOCTYPE html>
 <html>
 <head>
@@ -52,29 +52,9 @@ export default async function handler(req, res) {
 <body>
   <p>Authorizing with GitHub...</p>
   <script>
-    (function() {
-      function sendMessage(message) {
-        if (window.opener) {
-          window.opener.postMessage(message, "*");
-        }
-      }
-
-      // Decap CMS expects this exact message format
-      var data = { token: "${accessToken}", provider: "github" };
-
-      // First, tell the parent we're authorizing
-      sendMessage("authorizing:github");
-
-      // Then send the success message with token
-      // Decap CMS expects: "authorization:github:success:" followed by JSON
-      var successMessage = "authorization:github:success:" + JSON.stringify(data);
-      sendMessage(successMessage);
-
-      // Close this window after a short delay
-      setTimeout(function() {
-        window.close();
-      }, 1000);
-    })();
+    var data = { type: "oauth:success", token: "${accessToken}", provider: "github" };
+    if (window.opener) window.opener.postMessage(data, "*");
+    setTimeout(function(){ window.close(); }, 500);
   </script>
   <p>If this window doesn't close automatically, you can close it manually.</p>
 </body>
