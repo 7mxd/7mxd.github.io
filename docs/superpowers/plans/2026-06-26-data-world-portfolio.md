@@ -101,7 +101,7 @@ IDs: entities `proj:<i>`, `exp:<i>`, `edu:<i>`; tools `tool:<slug>`. Tool nodes 
   "name": "7mxd-portfolio",
   "private": true,
   "type": "module",
-  "scripts": { "test": "node --test test/" }
+  "scripts": { "test": "node --test" }
 }
 ```
 
