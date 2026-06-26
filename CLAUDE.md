@@ -1,10 +1,10 @@
 # Ahmed Alawi Radhi, Portfolio (7mxd.github.io)
 
-Static personal portfolio hosted on GitHub Pages. Pure HTML/CSS/JS, no framework, no build step. Content lives in `data/*.json` and is rendered client-side by `script.js`.
+Static personal portfolio hosted on GitHub Pages. Pure HTML/CSS/JS, no framework, no build step. Content lives in `data/*.json` and is rendered client-side by ES modules in `js/` (entry point `js/main.js`).
 
 ## Stack
 
-- HTML / CSS / Vanilla JS (ES2020+, runs directly from `script.js`)
+- HTML / CSS / Vanilla JS (ES2020+, runs directly from `js/` ES modules, no bundler)
 - Data in `data/`: `profile.json`, `summary.json`, `education.json`, `experience.json`, `skills.json`, `projects.json`, `settings.json`
 - Images and logos in `assets/`
 - Hosted on GitHub Pages with custom CNAME. A lightweight admin UI lives under `admin/`.

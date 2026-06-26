@@ -1,5 +1,5 @@
 {
-  "_comment": "Source of truth for content blocks. Each entry declares which sections can use the block (scope) and what fields it accepts. The site renderer dispatches on type; the admin UI builds its forms from this same file. To add a new block type: add an entry here, write a renderer in script.js, add CSS in style.css.",
+  "_comment": "Source of truth for content blocks. Each entry declares which sections can use the block (scope) and what fields it accepts. The site renderer dispatches on type; the admin UI builds its forms from this same file. To add a new block type: add an entry here, write a renderer in js/blocks.js, add CSS in css/sections.css.",
 
   "description": {
     "scope": ["project"],
