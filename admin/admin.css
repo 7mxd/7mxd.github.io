@@ -1,0 +1,30 @@
+* { box-sizing: border-box; }
+body { margin:0; font-family: var(--font-sans, system-ui); background: var(--bg, #f7f6f3); color: var(--ink, #171614); }
+.btn { font-family: var(--font-mono, monospace); font-size:.9rem; padding:.5rem 1rem; border:1px solid var(--line,#ddd); border-radius:8px; background:var(--surface,#fff); color:var(--ink,#171614); cursor:pointer; }
+.btn:hover { border-color: var(--accent,#1d9bb8); color: var(--accent,#1d9bb8); }
+.btn.ghost { background:none; }
+.err { color:#b3261e; min-height:1.2em; }
+#login { min-height:100vh; display:grid; place-items:center; }
+.login-card { max-width:28rem; text-align:center; padding:2rem; border:1px solid var(--line,#ddd); border-radius:12px; background:var(--surface,#fff); }
+#topbar { display:flex; align-items:center; gap:1rem; padding:.6rem 1rem; border-bottom:1px solid var(--line,#ddd); position:sticky; top:0; background:var(--bg); z-index:5; }
+#topbar .spacer { flex:1; }
+.brand { font-family:var(--font-mono,monospace); font-weight:700; }
+.who { color:var(--muted,#666); font-size:.85rem; }
+.save-status { font-size:.85rem; color:var(--muted,#666); }
+.save-status[data-state="ok"] { color:#1a7f37; }
+.save-status[data-state="error"] { color:#b3261e; }
+.layout { display:grid; grid-template-columns: 14rem 1fr; min-height: calc(100vh - 49px); }
+#collections { border-right:1px solid var(--line,#ddd); padding:1rem .5rem; display:flex; flex-direction:column; gap:.25rem; }
+#collections button { text-align:left; padding:.5rem .75rem; border:0; background:none; border-radius:8px; cursor:pointer; font:inherit; color:var(--ink); }
+#collections button[aria-current="true"] { background:var(--surface,#fff); border:1px solid var(--line,#ddd); }
+#panel { padding:1.5rem; max-width:48rem; }
+.field { margin-bottom:1rem; display:flex; flex-direction:column; gap:.3rem; }
+.field > label { font-size:.85rem; color:var(--muted,#666); font-family:var(--font-mono,monospace); }
+.field input[type=text], .field input:not([type]), .field textarea, .field select { width:100%; padding:.5rem; border:1px solid var(--line,#ddd); border-radius:8px; background:var(--surface,#fff); color:var(--ink); font:inherit; }
+.field textarea { min-height:6rem; resize:vertical; }
+fieldset { border:1px solid var(--line,#ddd); border-radius:10px; margin:0 0 1rem; padding:1rem; }
+legend { font-family:var(--font-mono,monospace); font-size:.8rem; color:var(--muted,#666); padding:0 .4rem; }
+.list-item { border:1px dashed var(--line,#ddd); border-radius:10px; padding:1rem; margin-bottom:.75rem; position:relative; }
+.row-controls { display:flex; gap:.4rem; margin-bottom:.5rem; }
+.thumb { max-width:120px; max-height:80px; border:1px solid var(--line,#ddd); border-radius:6px; display:block; }
+@media (max-width:700px){ .layout{ grid-template-columns:1fr; } #collections{ flex-direction:row; flex-wrap:wrap; border-right:0; border-bottom:1px solid var(--line,#ddd);} }

@@ -1,12 +1,38 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" data-theme="light">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex" />
-  <title>Content Manager | Ahmed's Portfolio</title>
+  <title>Content Manager · Ahmed's Portfolio</title>
+  <link rel="stylesheet" href="../css/tokens.css" />
+  <link rel="stylesheet" href="admin.css" />
 </head>
 <body>
-  <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+  <section id="login" hidden>
+    <div class="login-card">
+      <h1>Content Manager</h1>
+      <p>Edit your portfolio content. Changes commit to <code>main</code> and publish your site.</p>
+      <button id="signin" class="btn">Sign in with GitHub</button>
+      <p id="login-error" class="err" role="alert"></p>
+    </div>
+  </section>
+
+  <section id="app" hidden>
+    <header id="topbar">
+      <span class="brand">Content Manager</span>
+      <span id="who" class="who"></span>
+      <span class="spacer"></span>
+      <span id="save-status" class="save-status" aria-live="polite"></span>
+      <button id="save" class="btn">Save</button>
+      <button id="signout" class="btn ghost">Sign out</button>
+    </header>
+    <div class="layout">
+      <nav id="collections" aria-label="Collections"></nav>
+      <main id="panel"></main>
+    </div>
+  </section>
+
+  <script type="module" src="app.js"></script>
 </body>
 </html>
