@@ -36,9 +36,13 @@ export function createEngine(canvas, { reducedMotion = false } = {}) {
     renderer.render(scene, camera);
     raf = requestAnimationFrame(tick);
   }
-  function start() { if (!running) { running = true; clock.start(); raf = requestAnimationFrame(tick); } }
-  function stop() { running = false; if (raf) cancelAnimationFrame(raf), raf = null; }
-  document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); else if (running === false && !document.hidden) {/* caller decides */} });
+  function start() { if (!running) { running = true; clock.start(); if (!document.hidden && raf == null) raf = requestAnimationFrame(tick); } }
+  function stop() { running = false; if (raf) { cancelAnimationFrame(raf); raf = null; } }
+  function onVisibility() {
+    if (document.hidden) { if (raf) { cancelAnimationFrame(raf); raf = null; } }
+    else if (running && raf == null) { raf = requestAnimationFrame(tick); }
+  }
+  document.addEventListener('visibilitychange', onVisibility);
 
   function focusOn(p, distance = 90) {
     const target = new THREE.Vector3(p.x, p.y, p.z);
@@ -50,6 +54,7 @@ export function createEngine(canvas, { reducedMotion = false } = {}) {
 
   function dispose() {
     stop(); window.removeEventListener('resize', resize);
+    document.removeEventListener('visibilitychange', onVisibility);
     controls.dispose(); renderer.dispose();
   }
   return { THREE, scene, camera, renderer, controls, addFrame: (fn)=>frameCbs.push(fn), start, stop, dispose, focusOn, resetView };
