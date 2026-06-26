@@ -1,6 +1,16 @@
 {
   "items": [
     {
+      "title": "HiSalon",
+      "status": "in-progress",
+      "cluster": "engineering",
+      "tags": ["TypeScript", "Flutter", "PostgreSQL", "AWS", "Supabase"],
+      "links": {},
+      "blocks": [
+        { "type": "description", "content": "A production salon-management platform built with the Join-Future team. I work across the stack \u2014 TypeScript services, a Flutter client, and a production PostgreSQL backend on AWS. My focus has been making it reliable and safe to run in production." }
+      ]
+    },
+    {
       "title": "Stmnt: AI-powered bank statement analyzer",
       "status": "in-progress",
       "cluster": "engineering",
@@ -14,6 +24,19 @@
           "type": "description",
           "content": "A Flutter iOS app that reads a bank statement PDF and turns it into spending analytics, forecasts, and recurring-subscription detection. The app runs a multi-stage AI pipeline on top of OpenRouter: extract, parse, normalize, convert currency, categorize, detect recurring charges, detect reversals, and remove duplicates (both at the file level using SHA-256 and at the transaction level). It uses 159 keyword rules across 17 categories, normalizes 100+ merchant brands, and supports 35+ currencies. Reports can be shared with other users through encrypted Supabase storage. Stmnt is live on the App Store and I ship updates to it every week."
         }
+      ]
+    },
+    {
+      "title": "Wafa",
+      "status": "shipped",
+      "cluster": "engineering",
+      "tags": ["Next.js", "TypeScript", "Supabase", "PostgreSQL", "Row-Level Security", "Claude / AI agents", "OpenRouter", "Tailwind CSS"],
+      "links": {
+        "webapp": "https://wafa.7mxd.me",
+        "github": "https://github.com/7mxd/Wafa"
+      },
+      "blocks": [
+        { "type": "description", "content": "A take-home for Mal (an AI-native, Sharia-compliant fintech): a deployed qard-hasan (interest-free) loan-tracking app for friends. One clean flow \u2014 a borrower requests a loan, the lender approves, counters, or declines, and it is tracked to settled, with every transition written to an immutable audit timeline both sides can see. A record of agreement, not a payment processor: no money moves through it, which keeps it genuinely shippable and clear of payments/regulatory scope. Built with Next.js and Supabase (Postgres + Row-Level Security), with two light server-side AI touches via Claude on OpenRouter." }
       ]
     },
     {
@@ -38,46 +61,6 @@
           "chart": "competition winner (NN, 1993)  \u2587\u2587\u2587\u2587\u2587\u2587\u2587 0.028\nmy iterative KRLS              \u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587 0.042\ncompetition 2nd place          \u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587 0.080"
         }
       ]
-    },
-    {
-      "title": "HiSalon",
-      "status": "in-progress",
-      "cluster": "engineering",
-      "tags": ["TypeScript", "Flutter", "PostgreSQL", "AWS", "Supabase"],
-      "links": {},
-      "blocks": [
-        { "type": "description", "content": "A production salon-management platform built with the Join-Future team. I work across the stack \u2014 TypeScript services, a Flutter client, and a production PostgreSQL backend on AWS. My focus has been making it reliable and safe to run in production." }
-      ]
-    },
-    {
-      "title": "Wafa",
-      "status": "in-progress",
-      "cluster": "engineering",
-      "tags": ["TypeScript", "Supabase"],
-      "links": { "github": "https://github.com/7mxd/Wafa" },
-      "blocks": [
-        { "type": "description", "content": "Interest-free (qard hasan) loan tracking between friends \u2014 a record of agreement, not a payment processor. Built in TypeScript." }
-      ]
-    },
-    {
-      "title": "GCC Currency",
-      "status": "shipped",
-      "cluster": "engineering",
-      "tags": ["TypeScript"],
-      "links": { "github": "https://github.com/7mxd/gcc_currency" },
-      "blocks": [
-        { "type": "description", "content": "A small utility around GCC currency data." }
-      ]
-    },
-    {
-      "title": "Other production systems at Join-Future",
-      "status": "in-progress",
-      "cluster": "engineering",
-      "tags": ["TypeScript", "Claude / AI agents"],
-      "blocks": [
-        { "type": "description", "content": "Additional production systems with the Join-Future team across payments and AI platforms. Details under wraps." }
-      ],
-      "links": {}
     }
   ]
 }
