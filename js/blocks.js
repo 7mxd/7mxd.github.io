@@ -1,4 +1,4 @@
-import { escapeHtml, formatList } from './util.js';
+import { escapeHtml } from './util.js';
 
 const renderers = {
   description: (b) => `<p class="block-desc">${escapeHtml(b.content)}</p>`,
@@ -12,13 +12,13 @@ const renderers = {
   },
   image: (b) => {
     const cap = b.caption ? `<figcaption>${escapeHtml(b.caption)}</figcaption>` : '';
-    return `<figure class="block-image"><img loading="lazy" src="${escapeHtml(b.src)}" alt="${escapeHtml(b.alt)}">${cap}</figure>`;
+    return `<figure class="block-image"><img loading="lazy" src="${escapeHtml(b.src)}" alt="${escapeHtml(b.alt || '')}">${cap}</figure>`;
   },
   code: (b) => {
     const lang = b.language ? ` data-lang="${escapeHtml(b.language)}"` : '';
     return `<pre class="block-code"${lang}><code>${escapeHtml(b.content)}</code></pre>`;
   },
-  callout: (b) => `<aside class="block-callout" data-tone="${escapeHtml(b.tone)}">${escapeHtml(b.content)}</aside>`,
+  callout: (b) => `<aside class="block-callout"${b.tone ? ` data-tone="${escapeHtml(b.tone)}"` : ''}>${escapeHtml(b.content)}</aside>`,
   html: (b) => b.content || '',
   'linked-artifact': (b) =>
     `<a class="block-artifact" href="${escapeHtml(b.url)}" target="_blank" rel="noopener">${escapeHtml(b.label)}</a>`,

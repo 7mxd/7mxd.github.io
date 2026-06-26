@@ -7,15 +7,13 @@ import { initGraph } from './graph-view.js';
 
 async function start() {
   const a11y = initA11y();
-  initTheme({ announce: a11y.announce });
   try {
     const model = await loadData();
+    initTheme({ announce: a11y.announce, defaultTheme: model.settings?.theme });
     document.title = model.settings?.siteTitle || document.title;
     mountSections(model);
     initMotion();
     initGraph(model, document.getElementById('graph-canvas'));
-    window.__model = model; // consumed by graph init in a later task
-    document.dispatchEvent(new CustomEvent('model:ready', { detail: model }));
   } catch (err) {
     console.error('Failed to load portfolio data', err);
     document.getElementById('summary')?.insertAdjacentHTML('afterbegin',

@@ -4,10 +4,10 @@ export function chooseTheme(stored, prefersDark) {
 }
 export function nextTheme(cur) { return cur === 'dark' ? 'light' : 'dark'; }
 
-export function initTheme({ announce = () => {} } = {}) {
+export function initTheme({ announce = () => {}, defaultTheme = 'auto' } = {}) {
   const root = document.documentElement;
   const mql = window.matchMedia('(prefers-color-scheme: dark)');
-  let theme = chooseTheme(localStorage.getItem('theme'), mql.matches);
+  let theme = chooseTheme(localStorage.getItem('theme') || defaultTheme, mql.matches);
   const apply = (t) => { root.setAttribute('data-theme', t); };
   apply(theme);
   const btn = document.querySelector('[data-theme-toggle]');

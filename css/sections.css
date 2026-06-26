@@ -44,7 +44,9 @@
 [data-cluster="data"] .exp-company, [data-cluster="data"] .project-title { border-bottom: 2px solid var(--cluster-data); }
 [data-cluster="engineering"] .project-title { border-bottom: 2px solid var(--cluster-engineering); }
 @media (max-width: 600px) {
-  .site-nav nav { display: none; }
+  .site-nav { flex-wrap: wrap; row-gap: .4rem; }
+  .site-nav nav { width: 100%; order: 3; justify-content: center; gap: .75rem; flex-wrap: wrap; }
+  .site-nav nav a { font-size: .8rem; }
   #hero-name { font-size: clamp(1.5rem, 9vw, 2.4rem); max-width: 92vw; }
   .hero-content { padding-left: 1rem; padding-right: 1rem; }
 }

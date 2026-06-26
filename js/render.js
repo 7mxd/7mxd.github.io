@@ -67,6 +67,7 @@ export function renderEducation(model) {
 }
 
 export function renderContact(model) {
+  if (!enabled(model, 'contact')) return '';
   const c = model.profile?.contact || {};
   const cv = model.settings?.cv;
   const links = [];
