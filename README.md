@@ -22,6 +22,10 @@ A personal portfolio website showcasing my background in Applied Mathematics, St
 
     npm test   # node --test test/  (dev-only, nothing ships)
 
+## Admin (content manager)
+
+A custom, no-build admin lives at `/admin/`. Sign in with GitHub (you must have write access to this repo); it reads and writes `data/*.json` and uploads images to `assets/` via the GitHub Contents API, committing directly to `main` (which redeploys the site). The OAuth token is held in `sessionStorage` for the session only. Block editing is generated from `data/blocks-registry.json`.
+
 ## License
 
 This repository is for personal use.
