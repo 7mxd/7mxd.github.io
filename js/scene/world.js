@@ -9,12 +9,20 @@ export async function createWorld(canvas, model, { reducedMotion = false, lowPow
   const { createInteraction } = await import('./interaction.js');
 
   const graph = deriveGraph(model);
-  const layout = computeLayout(graph, { seed: 7 });
+  const layout = computeLayout(graph, {
+    seed: 7,
+    radius: 150,
+    regionCenters: {
+      math:        { x: -200, y: -30, z: 0 },
+      data:        { x:  200, y: -30, z: -60 },
+      engineering: { x:    0, y: -50, z: 180 }
+    }
+  });
   const palette = model.settings?.graph?.clusters
     ? { math: model.settings.graph.clusters.math.color, data: model.settings.graph.clusters.data.color, engineering: model.settings.graph.clusters.engineering.color }
     : { math:'#6c5ce7', data:'#d68a1e', engineering:'#1d9bb8' };
 
-  const engine = createEngine(canvas, { reducedMotion });
+  const engine = createEngine(canvas, { reducedMotion, lowQuality: lowPower });
   const nodes = buildNodes(THREE, engine, graph, layout, palette);
   const edges = buildEdges(THREE, engine, graph, layout, { reducedMotion });
   const interaction = createInteraction(THREE, engine, nodes, graph, { onSelectEntity });

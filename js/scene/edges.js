@@ -10,14 +10,14 @@ export function buildEdges(THREE, engine, graph, layout, { reducedMotion = false
   }
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-  const lines = new THREE.LineSegments(geo, new THREE.LineBasicMaterial({ color: 0x6a7079, transparent: true, opacity: 0.22 }));
+  const lines = new THREE.LineSegments(geo, new THREE.LineBasicMaterial({ color: 0x6a7079, transparent: true, opacity: 0.12 }));
   group.add(lines);
 
   // flowing pulses: one small glowing point per edge travelling a->b repeatedly
   const pulseGeo = new THREE.BufferGeometry();
   const pulsePos = new Float32Array(segments.length * 3);
   pulseGeo.setAttribute('position', new THREE.BufferAttribute(pulsePos, 3));
-  const pulses = new THREE.Points(pulseGeo, new THREE.PointsMaterial({ color: 0xbfe9f5, size: 4.5, transparent: true, opacity: 0.9, sizeAttenuation: true }));
+  const pulses = new THREE.Points(pulseGeo, new THREE.PointsMaterial({ color: 0xbfe9f5, size: 6, transparent: true, opacity: 0.95, sizeAttenuation: true, blending: THREE.AdditiveBlending }));
   group.add(pulses);
   engine.scene.add(group);
 
