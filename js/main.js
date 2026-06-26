@@ -7,9 +7,11 @@ import { initGraph } from './graph-view.js';
 
 async function start() {
   const a11y = initA11y();
+  // Apply theme immediately (before data fetch) to avoid a flash of the wrong theme.
+  // settings.theme defaults to 'auto', so localStorage + prefers-color-scheme are authoritative here.
+  initTheme({ announce: a11y.announce, defaultTheme: 'auto' });
   try {
     const model = await loadData();
-    initTheme({ announce: a11y.announce, defaultTheme: model.settings?.theme });
     document.title = model.settings?.siteTitle || document.title;
     mountSections(model);
     initMotion();
