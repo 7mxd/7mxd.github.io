@@ -79,6 +79,45 @@ export function renderContact(model) {
     <div class="contact-links">${links.join('')}</div>`;
 }
 
+export function renderPanel(item, kind, statuses = {}) {
+  const tagRow = (tags) => (tags && tags.length)
+    ? `<ul class="tag-row">${tags.map(t=>`<li class="tag">${escapeHtml(t)}</li>`).join('')}</ul>` : '';
+  if (kind === 'projects') {
+    const st = statuses[item.status];
+    const pill = st ? `<span class="status-pill" data-tone="${escapeHtml(st.tone)}">${escapeHtml(st.glyph)} ${escapeHtml(st.label)}</span>` : '';
+    const links = Object.entries(item.links || {}).flatMap(([k, v]) => {
+      if (k === 'extra' && Array.isArray(v)) return v.map(x => `<a href="${escapeHtml(x.url)}" target="_blank" rel="noopener">${escapeHtml(x.label)}</a>`);
+      if (typeof v === 'string' && v) return [`<a href="${escapeHtml(v)}" target="_blank" rel="noopener">${escapeHtml(k)}</a>`];
+      return [];
+    }).join('');
+    return `<article class="panel-item" data-cluster="${escapeHtml(item.cluster||'')}">
+      <header class="panel-head"><h2 class="panel-title">${escapeHtml(item.title)}</h2>${pill}</header>
+      ${tagRow(item.tags)}<div class="panel-body">${renderBlocks(item.blocks)}</div>
+      <div class="panel-links">${links}</div></article>`;
+  }
+  if (kind === 'experience') {
+    const roles = (item.roles || []).map((r) => {
+      const resps = (r.blocks||[]).filter(b => b.type==='responsibility');
+      const other = (r.blocks||[]).filter(b => b.type!=='responsibility');
+      const list = resps.length ? `<ul class="resp-list">${renderBlocks(resps)}</ul>` : '';
+      return `<div class="role"><h3 class="role-title">${escapeHtml(r.title)}</h3>
+        <p class="role-date">${escapeHtml(r.displayDate||'')}</p>${list}${renderBlocks(other)}</div>`;
+    }).join('');
+    return `<article class="panel-item" data-cluster="${escapeHtml(item.cluster||'')}">
+      <header class="panel-head"><h2 class="panel-title">${escapeHtml(item.company)}</h2>
+      <span class="exp-loc">${escapeHtml(item.location||'')}</span></header>
+      ${tagRow(item.tags)}${roles}</article>`;
+  }
+  if (kind === 'education') {
+    return `<article class="panel-item" data-cluster="${escapeHtml(item.cluster||'')}">
+      <header class="panel-head"><h2 class="panel-title">${escapeHtml(item.institution)}</h2></header>
+      <p class="edu-degree">${escapeHtml(item.degree||'')}</p>
+      <p class="edu-meta">${escapeHtml(item.displayDate||'')} · ${escapeHtml(item.grade||'')}</p>
+      ${renderBlocks(item.blocks)}</article>`;
+  }
+  return '';
+}
+
 export function mountSections(model, root = document) {
   const map = { summary:renderSummary, experience:renderExperience, projects:renderProjects,
                 skills:renderSkills, education:renderEducation, contact:renderContact };
