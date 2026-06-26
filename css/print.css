@@ -1,0 +1,12 @@
+@media print {
+  .site-nav, [data-theme-toggle], #graph-canvas, .skip-link, .hero-actions, .graph-tooltip { display: none !important; }
+  html { background: #fff; }
+  body { color: #000; background: #fff; font-size: 11pt; }
+  .hero { min-height: auto; padding: 0 0 1rem; }
+  .hero-content { background: none; text-align: left; }
+  #hero-name { font-size: 20pt; }
+  main { max-width: none; padding: 0; }
+  section { padding: .6rem 0; border-top: 1px solid #ccc; break-inside: avoid; }
+  a { color: #000; text-decoration: underline; }
+  .exp, .project, .edu, .skill-cat, .summary-text { opacity: 1 !important; transform: none !important; }
+}
