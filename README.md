@@ -6,26 +6,28 @@ A personal portfolio website showcasing my background in Applied Mathematics, St
 
 **[7mxd.github.io](https://7mxd.github.io)**
 
-## Structure
+## Features
 
-- `index.html` — two-mode shell (Explore 3D / Read résumé).
-- `js/` — ES modules: `main.js` (orchestration), `data.js`, `graph-model.js`, `blocks.js`, `render.js` (sections + `renderPanel`), `theme.js`, `motion.js`, `a11y.js`, `capabilities.js`, `util.js`, and `scene/` (`engine`, `nodes`, `edges`, `interaction`, `layout`, `world`) — the Three.js living network.
-- `css/` — `tokens.css`, `base.css`, `sections.css` (Read view), `scene.css` (Explore), `print.css`.
-- `data/` — content JSON + `blocks-registry.json`. `admin/` — custom content manager.
-- `test/` — Node unit tests for pure logic.
+- Clean, responsive design that works on desktop and mobile
+- Dark mode support
+- Downloadable CV
+- Sections for education, work experience, and skills
+- Built-in content management system for easy updates
 
-## Running locally
+## About This Project
 
-    python -m http.server 8000   # then http://localhost:8000
+This is a static portfolio website hosted on GitHub Pages. The site displays professional information including:
 
-## Notes
+- Professional summary
+- Education history
+- Work experience
+- Technical skills
 
-- Three.js (r160) loads from a CDN only in Explore mode; Read mode is dependency-free.
-- `npm test` runs the dev-only unit suite (`node --test`).
+## Technology
 
-## Admin (content manager)
-
-A custom, no-build admin lives at `/admin/`. Sign in with GitHub (you must have write access to this repo); it reads and writes `data/*.json` and uploads images to `assets/` via the GitHub Contents API, committing directly to `main` (which redeploys the site). The OAuth token is held in `sessionStorage` for the session only. Block editing is generated from `data/blocks-registry.json`.
+- Pure HTML, CSS, and JavaScript (no frameworks)
+- Content stored in JSON files
+- Hosted for free on GitHub Pages
 
 ## License
 

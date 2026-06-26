@@ -1,10 +1,10 @@
 # Ahmed Alawi Radhi, Portfolio (7mxd.github.io)
 
-Static personal portfolio hosted on GitHub Pages. Pure HTML/CSS/JS, no framework, no build step. Content lives in `data/*.json` and is rendered client-side by ES modules in `js/` (entry point `js/main.js`).
+Static personal portfolio hosted on GitHub Pages. Pure HTML/CSS/JS, no framework, no build step. Content lives in `data/*.json` and is rendered client-side by `script.js`.
 
 ## Stack
 
-- HTML / CSS / Vanilla JS (ES2020+, runs directly from `js/` ES modules, no bundler)
+- HTML / CSS / Vanilla JS (ES2020+, runs directly from `script.js`)
 - Data in `data/`: `profile.json`, `summary.json`, `education.json`, `experience.json`, `skills.json`, `projects.json`, `settings.json`
 - Images and logos in `assets/`
 - Hosted on GitHub Pages with custom CNAME. A lightweight admin UI lives under `admin/`.
@@ -30,23 +30,54 @@ python -m http.server 8000
 
 ## Design Context
 
-Static site at [7mxd.github.io](https://7mxd.github.io).
+Static site at [7mxd.github.io](https://7mxd.github.io). The sections below are the source of truth for all design decisions. Every impeccable-family skill (`/bolder`, `/typeset`, `/colorize`, etc.) should read these before acting.
 
-### Identity
+### Users
 
-**Living network.** The site is an explorable 3D network (Three.js/WebGL) — a neural form (neurons grouped into three regions: Mathematics, Data Science, Engineering & Products) with data/signals flowing along its synapses. It is *derived from* `data/*.json`, so it is a real, editable résumé, not decoration. Two modes share one data source: **Explore** (the 3D world; click a node for a detail panel) and **Read / CV** (the full linear résumé, the fallback + accessibility + print path).
+The site serves four overlapping audiences simultaneously, so the design must work at every depth of attention:
 
-### Principles
+- **Recruiter, ~30-second scan.** Needs to learn who Ahmed is, what role he wants, and one concrete piece of evidence without scrolling past the fold twice.
+- **Hiring manager, 2-5 minute read.** Evaluating fit for a Data Scientist / Quantitative Developer / Data Analyst role. Wants depth: methodology, tools, outcomes, taste.
+- **Peer or collaborator.** Curious about craft, approach, and personality. Weird-in-a-good-way is welcome.
+- **Ahmed's durable personal site.** Anyone who looks him up over the next 2-3 years. Should age well; timeless over trendy.
 
-1. **The network is the experience, and it's made of real data** (shared tags/clusters → nodes/edges). Never fake it.
-2. **Immersive by default, scannable on demand.** Explore wows; Read serves recruiters; both always reachable.
-3. **Robust everywhere.** No WebGL / low-power / reduced-motion gracefully use Read (calm Explore under reduced-motion).
-4. **Dark-first 3D; adaptive Read.** Region palette: Mathematics `#6c5ce7`, Data `#d68a1e`, Engineering `#1d9bb8`.
+**Implication**: information hierarchy must be legible in 3 seconds, but reward the reader who stays. No content is duplicated across depth levels.
+
+### Brand Personality
+
+**Experimental · unexpected · playful.** Ahmed is a data scientist who builds ETL pipelines, writes Python, and has a bachelor's in Applied Mathematics & Statistics from Khalifa University. The portfolio should not look like every other data-science portfolio, it should look like *his*.
+
+Tone: dry humor, technical confidence, no corporate polish. Reads like a well-loved lab notebook or a technical journal with a sense of humor, not a LinkedIn page.
+
+### Aesthetic Direction
+
+**Terminal / data-product, reinterpreted as light-first and warm.** The metaphor is a *printed* terminal output, Knuth's *The TeXbook*, Tufte's quantitative reports, a line-printer dump from a 1970s mainframe, a scientist's field journal kept in LaTeX. Command-line vocabulary shapes the information architecture, but the execution is archival, legible, and human.
+
+Concretely:
+
+- **Typography is monospace-forward, but not monospace-only.** A distinctive monospace for structural elements (section headers, prompts, labels, metadata) paired with a warm serif or humanist sans for body. Body text in monospace is fatiguing, avoid.
+- **Light-first palette, warm and paper-like.** Off-white / cream / bone background. Dark mode is supported but not the hero. Accents are *earthy* (ochre, rust, burgundy, olive, ink). **Not** teal (#1a8fa8), cyan, neon green, or electric blue.
+- **Dense information, generous margins.** Like a well-typeset book: lots of content, breathing room around it. Avoid card-grid-everywhere. Layouts vary per section.
+- **Command-line motifs in the IA, not the decoration.** Section headers can be prompts (`$ ls experience/`, `> whoami`). Do not plaster ASCII art. The terminal is a *frame*, not a costume.
+- **Unexpected small moments.** An ASCII chart where a bar graph would be. A blinking cursor in one specific place. A command-log footer. Nothing decorative, every quirk says something.
+
+References: The TeXbook, *Practical Common Lisp* online edition, Tufte's books, the MIT Press monospace tradition, lab notebooks.
+
+Anti-references: Matrix-style green-on-black, hacker-movie terminals, cyberpunk glow, data-science-teal dashboards, Notion-template portfolios, centered-avatar-3-column-cards portfolios.
+
+### Design Principles
+
+1. **Terminal as metaphor, not costume.** Command-line vocabulary shapes IA and copy; execution is warm, printed, legible. A reader who's never used a terminal should still find it beautiful.
+2. **Density earns trust.** Lots of signal, tight composition, no filler. If a card can be a line, make it a line.
+3. **Dry humor, no performance.** Unexpected choices live in copy, structure, and typography, never in emoji, bounce animations, or glow effects.
+4. **Every word earns its place.** No "highly motivated," no "strong passion," no "meaningful projects." If it could appear on any portfolio, it does not appear on this one.
+5. **Light-first, dark-respectful.** Design looks best in light mode. Dark mode is supported properly but is not where aesthetic decisions are made.
 
 ### Constraints
 
-- **Three.js** is an accepted dependency, pinned and loaded from a CDN (`esm.sh/three@0.160.0`) as an ES module, **lazy-loaded only in Explore**. No bundler. Read mode loads no WebGL.
-- **A11y:** WCAG AA. Canvas `aria-hidden`; DOM (panels + Read view) is the source of truth. Keep skip link, reduced-motion handling, keyboard detection, focus management, SR announcements, `prefers-contrast`.
-- **Data-driven:** all content from `data/*.json` + `blocks-registry.json`; the custom admin at `/admin/` edits it. No résumé content hard-coded.
-- **Confidentiality:** only HiSalon is named among Join-Future products.
-- **Printable:** Read view prints cleanly; Explore hidden in print.
+- **A11y**: WCAG AA minimum. Keep existing foundations intact.
+- **Performance**: Keep CSS + JS under ~80KB uncompressed total. Lazy-load below-the-fold images.
+- **Printable**: Existing print stylesheet must continue to work.
+- **Banned palette**: `#1a8fa8` (current teal), pure cyan, neon green, purple-to-blue gradients.
+- **Banned typography**: Montserrat (current), Inter (current), anything from the reflex-fonts list in `impeccable/SKILL.md`.
+- **Banned patterns**: gradient text, side-stripe `border-left: 4px solid` dividers, card-grid-for-everything, centered-circular-avatar hero, language-proficiency-as-percentage, staggered fade-ins on every grid.
