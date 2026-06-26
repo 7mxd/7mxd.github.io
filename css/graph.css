@@ -1,0 +1,7 @@
+.graph-tooltip {
+  position: fixed; z-index: 30; pointer-events: none; padding: .3rem .6rem;
+  background: var(--ink); color: var(--bg); font-family: var(--font-mono); font-size: .78rem;
+  border-radius: 6px; opacity: 0; transition: opacity .12s; white-space: nowrap;
+}
+.graph-tooltip[data-show="true"] { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .graph-tooltip { transition: none; } }
