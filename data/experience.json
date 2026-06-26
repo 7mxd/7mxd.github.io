@@ -2,6 +2,8 @@
   "items": [
     {
       "company": "Saal.ai",
+      "cluster": "data",
+      "tags": ["Python", "Pandas", "MongoDB", "Docker", "Power BI", "Tableau", "Dataiku", "Flask", "Claude / AI agents"],
       "logo": {
         "default": "assets/SAAL_LIGHT.png",
         "light": "assets/SAAL_LIGHT.png",
@@ -37,6 +39,8 @@
     },
     {
       "company": "Daman National Health Insurance Company",
+      "cluster": "data",
+      "tags": ["SQL", "Business Intelligence"],
       "logo": { "default": "assets/Daman_Logo.png" },
       "location": "Abu Dhabi, UAE",
       "roles": [

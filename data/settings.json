@@ -23,5 +23,13 @@
     "research":    { "label": "research",    "glyph": "\u00A7", "tone": "scholarly" },
     "shipped":     { "label": "shipped",     "glyph": "\u2713", "tone": "neutral" },
     "archived":    { "label": "archived",    "glyph": "\u2014", "tone": "muted" }
+  },
+  "theme": "auto",
+  "graph": {
+    "clusters": {
+      "math":        { "label": "Mathematics",            "color": "#6c5ce7" },
+      "data":        { "label": "Data Science",           "color": "#d68a1e" },
+      "engineering": { "label": "Engineering & Products",  "color": "#1d9bb8" }
+    }
   }
 }

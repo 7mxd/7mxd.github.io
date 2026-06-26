@@ -2,6 +2,7 @@
   "items": [
     {
       "institution": "Khalifa University",
+      "cluster": "math",
       "logo": "assets/Khalifa_University_Logo.png",
       "degree": "BSc in Applied Mathematics and Statistics",
       "startDate": "2018-08",
@@ -12,6 +13,7 @@
     },
     {
       "institution": "Al Nahda National Schools",
+      "cluster": "math",
       "logo": "assets/Al_Nahda_Logo.png",
       "degree": "High School Diploma",
       "startDate": "2015",

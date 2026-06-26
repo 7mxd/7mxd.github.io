@@ -3,7 +3,8 @@
     {
       "title": "Stmnt: AI-powered bank statement analyzer",
       "status": "in-progress",
-      "tags": ["Flutter", "Dart", "OpenRouter", "Supabase", "TypeScript", "iOS", "Xcode Cloud"],
+      "cluster": "engineering",
+      "tags": ["Flutter", "Dart", "OpenRouter", "Supabase", "TypeScript", "iOS", "Xcode Cloud", "Claude / AI agents"],
       "links": {
         "ios": "https://apps.apple.com/app/stmnt/id6760298169",
         "webapp": "https://stmnt.7mxd.me"
@@ -18,6 +19,7 @@
     {
       "title": "On a Generalization of Kernel RLS to Nonlinear State-Space Systems",
       "status": "research",
+      "cluster": "math",
       "tags": ["MATLAB", "Kernel Methods", "Time-Series", "State-Space", "RKHS", "Signal Processing"],
       "links": {
         "github": "https://github.com/7mxd/Senior-Research-Project-2022-2023",
@@ -36,6 +38,46 @@
           "chart": "competition winner (NN, 1993)  \u2587\u2587\u2587\u2587\u2587\u2587\u2587 0.028\nmy iterative KRLS              \u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587 0.042\ncompetition 2nd place          \u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587 0.080"
         }
       ]
+    },
+    {
+      "title": "HiSalon",
+      "status": "in-progress",
+      "cluster": "engineering",
+      "tags": ["TypeScript", "Flutter", "PostgreSQL", "AWS", "Supabase"],
+      "links": {},
+      "blocks": [
+        { "type": "description", "content": "A production salon-management platform built with the Join-Future team. I work across the stack \u2014 TypeScript services, a Flutter client, and a production PostgreSQL backend on AWS. My focus has been making it reliable and safe to run in production." }
+      ]
+    },
+    {
+      "title": "Wafa",
+      "status": "in-progress",
+      "cluster": "engineering",
+      "tags": ["TypeScript", "Supabase"],
+      "links": { "github": "https://github.com/7mxd/Wafa" },
+      "blocks": [
+        { "type": "description", "content": "Interest-free (qard hasan) loan tracking between friends \u2014 a record of agreement, not a payment processor. Built in TypeScript." }
+      ]
+    },
+    {
+      "title": "GCC Currency",
+      "status": "shipped",
+      "cluster": "engineering",
+      "tags": ["TypeScript"],
+      "links": { "github": "https://github.com/7mxd/gcc_currency" },
+      "blocks": [
+        { "type": "description", "content": "A small utility around GCC currency data." }
+      ]
+    },
+    {
+      "title": "Other production systems at Join-Future",
+      "status": "in-progress",
+      "cluster": "engineering",
+      "tags": ["TypeScript", "Claude / AI agents"],
+      "blocks": [
+        { "type": "description", "content": "Additional production systems with the Join-Future team across payments and AI platforms. Details under wraps." }
+      ],
+      "links": {}
     }
   ]
 }
