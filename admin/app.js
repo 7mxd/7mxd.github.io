@@ -24,6 +24,7 @@ async function boot() {
   try { registry = (await client.getFile('data/blocks-registry.json')).content; registry = JSON.parse(registry); }
   catch (e) { $('login-error').textContent = 'Failed to load registry: '+e.message; return showLogin(); }
   showApp();
+  $('panel').addEventListener('input', () => { dirty = true; });
   buildSidebar();
   selectCollection(COLLECTIONS[0].name);
 }
@@ -44,8 +45,8 @@ async function selectCollection(name) {
     model = buildFormModel(current, data);
     const ctx = { registry, client, renderBlocks, attachImageField };
     renderForm($('panel'), current, model, ctx);
-    $('panel').addEventListener('input', () => { dirty=true; }, { once:true });
     setStatus('');
+    dirty = false;
   } catch (e) { setStatus('Load failed: '+e.message, 'error'); }
 }
 
