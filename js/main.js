@@ -40,7 +40,7 @@ function openPanel(node) {
   $('panel-body').innerHTML = renderPanel(item, kindMap[section], model.settings?.statuses || {});
   const panel = $('panel'); panel.hidden = false; $('panel-close').focus();
 }
-function closePanel() { const p = $('panel'); if (p) { p.hidden = true; world && world.resetView && world.resetView(); } }
+function closePanel() { const p = $('panel'); if (p) { p.hidden = true; world && world.resetView && world.resetView(); document.querySelector('[data-mode-toggle]')?.focus(); } }
 
 async function start() {
   a11y = initA11y();

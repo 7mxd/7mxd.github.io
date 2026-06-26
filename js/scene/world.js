@@ -18,7 +18,7 @@ export async function createWorld(canvas, model, { reducedMotion = false, lowPow
   const nodes = buildNodes(THREE, engine, graph, layout, palette);
   const edges = buildEdges(THREE, engine, graph, layout, { reducedMotion });
   const interaction = createInteraction(THREE, engine, nodes, graph, { onSelectEntity });
-  engine.addFrame((t) => { nodes.update(t); edges.update(t); });
+  engine.addFrame((t) => { if (!reducedMotion) nodes.update(t); edges.update(t); });
   engine.start();
 
   function focusEntity(id) { const e = nodes.byId.get(id); if (e) engine.focusOn(e.position, 90); }
