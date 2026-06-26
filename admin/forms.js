@@ -12,7 +12,7 @@ function fieldEl(field, model, ctx) {
     const fs = document.createElement('fieldset'); const lg=document.createElement('legend'); lg.textContent=field.label; fs.appendChild(lg);
     const host = document.createElement('div'); fs.appendChild(host);
     model[field.name] = Array.isArray(model[field.name]) ? model[field.name] : [];
-    ctx.renderBlocks(host, model[field.name], field.scope, ctx.registry);
+    ctx.renderBlocks(host, model[field.name], field.scope, ctx.registry, ctx);
     return fs;
   }
   const lab = document.createElement('label'); lab.textContent = field.label + (field.required?' *':''); lab.htmlFor = id; wrap.appendChild(lab);
@@ -44,7 +44,7 @@ function listEl(field, model, ctx) {
     model[field.name].forEach((item, i) => {
       const box = document.createElement('div'); box.className='list-item';
       const ctrls = document.createElement('div'); ctrls.className='row-controls';
-      const mk=(t,fn)=>{const b=document.createElement('button');b.type='button';b.className='btn ghost';b.textContent=t;b.onclick=()=>{fn();rerender();};return b;};
+      const mk=(t,fn)=>{const b=document.createElement('button');b.type='button';b.className='btn ghost';b.textContent=t;b.onclick=()=>{fn();rerender();host.dispatchEvent(new Event('input',{bubbles:true}));};return b;};
       ctrls.append(mk('↑',()=>{if(i>0)[model[field.name][i-1],model[field.name][i]]=[model[field.name][i],model[field.name][i-1]];}),
                    mk('↓',()=>{if(i<model[field.name].length-1)[model[field.name][i+1],model[field.name][i]]=[model[field.name][i],model[field.name][i+1]];}),
                    mk('Remove',()=>model[field.name].splice(i,1)));
@@ -59,7 +59,7 @@ function listEl(field, model, ctx) {
   };
   rerender();
   const add = document.createElement('button'); add.type='button'; add.className='btn'; add.textContent='+ Add';
-  add.onclick = () => { model[field.name].push(field.itemField ? '' : {}); rerender(); };
+  add.onclick = () => { model[field.name].push(field.itemField ? '' : {}); rerender(); host.dispatchEvent(new Event('input', { bubbles: true })); };
   fs.append(host, add);
   return fs;
 }

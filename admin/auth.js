@@ -17,10 +17,18 @@ export function signIn() {
   return new Promise((resolve, reject) => {
     const popup = window.open(`${OAUTH_BASE}/auth`, 'oauth', 'width=600,height=700');
     if (!popup) return reject(new Error('Popup blocked'));
+    const poll = setInterval(() => {
+      if (popup.closed) {
+        clearInterval(poll);
+        window.removeEventListener('message', onMessage);
+        reject(new Error('Sign-in cancelled'));
+      }
+    }, 500);
     function onMessage(e) {
       if (e.origin !== OAUTH_BASE) return;
       const d = e.data;
-      if (d && d.type === 'oauth:success' && d.token) {
+      if (d && d.type === 'oauth:success' && d.token && d.provider === 'github') {
+        clearInterval(poll);
         window.removeEventListener('message', onMessage);
         setToken(d.token);
         resolve(d.token);

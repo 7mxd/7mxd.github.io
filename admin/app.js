@@ -24,6 +24,12 @@ async function boot() {
   try { registry = (await client.getFile('data/blocks-registry.json')).content; registry = JSON.parse(registry); }
   catch (e) { $('login-error').textContent = 'Failed to load registry: '+e.message; return showLogin(); }
   showApp();
+  (async () => {
+    try {
+      const r = await fetch('https://api.github.com/user', { headers: { Authorization: 'Bearer ' + getToken(), Accept: 'application/vnd.github+json' } });
+      if (r.ok) { const u = await r.json(); document.getElementById('who').textContent = u.login ? '@' + u.login : ''; }
+    } catch(_) {}
+  })();
   $('panel').addEventListener('input', () => { dirty = true; });
   buildSidebar();
   selectCollection(COLLECTIONS[0].name);

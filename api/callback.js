@@ -53,7 +53,7 @@ export default async function handler(req, res) {
   <p>Authorizing with GitHub...</p>
   <script>
     var data = { type: "oauth:success", token: "${accessToken}", provider: "github" };
-    if (window.opener) window.opener.postMessage(data, "*");
+    if (window.opener) window.opener.postMessage(data, "https://7mxd.github.io");
     setTimeout(function(){ window.close(); }, 500);
   </script>
   <p>If this window doesn't close automatically, you can close it manually.</p>
