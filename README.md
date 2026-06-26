@@ -6,28 +6,21 @@ A personal portfolio website showcasing my background in Applied Mathematics, St
 
 **[7mxd.github.io](https://7mxd.github.io)**
 
-## Features
+## Structure
 
-- Clean, responsive design that works on desktop and mobile
-- Dark mode support
-- Downloadable CV
-- Sections for education, work experience, and skills
-- Built-in content management system for easy updates
+- `index.html` — shell (nav, hero canvas, section containers).
+- `css/` — `tokens.css` (themes/palette), `base.css`, `sections.css`, `graph.css`, `print.css`.
+- `js/` — ES modules: `main.js` (entry), `data.js`, `graph-model.js`, `force.js`, `graph-view.js`, `render.js`, `blocks.js`, `theme.js`, `motion.js`, `a11y.js`, `util.js`.
+- `data/` — content JSON + `blocks-registry.json` (block schema, shared by site and admin).
+- `test/` — Node built-in unit tests for pure logic.
 
-## About This Project
+## Running locally
 
-This is a static portfolio website hosted on GitHub Pages. The site displays professional information including:
+    python -m http.server 8000   # then visit http://localhost:8000
 
-- Professional summary
-- Education history
-- Work experience
-- Technical skills
+## Tests
 
-## Technology
-
-- Pure HTML, CSS, and JavaScript (no frameworks)
-- Content stored in JSON files
-- Hosted for free on GitHub Pages
+    npm test   # node --test test/  (dev-only, nothing ships)
 
 ## License
 
