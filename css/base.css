@@ -31,3 +31,8 @@ section { padding: clamp(3rem, 8vh, 6rem) 0; border-top: 1px solid var(--line); 
 }
 .btn:hover { border-color: var(--accent); color: var(--accent); }
 @media (prefers-contrast: more) { :root { --muted: var(--ink); --line: var(--ink); } }
+.exp, .project, .edu, .skill-cat, .summary-text { opacity: 1; }
+@media (prefers-reduced-motion: no-preference) {
+  .exp, .project, .edu, .skill-cat, .summary-text { opacity: 0; transform: translateY(12px); transition: opacity .5s, transform .5s; }
+  .in-view { opacity: 1 !important; transform: none !important; }
+}

@@ -2,6 +2,7 @@ import { loadData } from './data.js';
 import { mountSections } from './render.js';
 import { initTheme } from './theme.js';
 import { initA11y } from './a11y.js';
+import { initMotion } from './motion.js';
 
 async function start() {
   const a11y = initA11y();
@@ -10,6 +11,7 @@ async function start() {
     const model = await loadData();
     document.title = model.settings?.siteTitle || document.title;
     mountSections(model);
+    initMotion();
     window.__model = model; // consumed by graph init in a later task
     document.dispatchEvent(new CustomEvent('model:ready', { detail: model }));
   } catch (err) {
