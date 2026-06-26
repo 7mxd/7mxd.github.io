@@ -14,6 +14,7 @@ export function initGraph(model, canvas) {
 
   let W = 0, H = 0, dpr = Math.min(2, window.devicePixelRatio || 1);
   function resize() {
+    dpr = Math.min(2, window.devicePixelRatio || 1);
     const r = canvas.getBoundingClientRect();
     W = r.width; H = r.height;
     canvas.width = Math.floor(W * dpr); canvas.height = Math.floor(H * dpr);
@@ -61,7 +62,7 @@ export function initGraph(model, canvas) {
   function loop() {
     const e = sim.step();
     draw();
-    if (e < 0.05) { frozen = true; return; }
+    if (e < 0.05) { frozen = true; raf = null; return; }
     raf = requestAnimationFrame(loop);
   }
   function startLoop() { if (!frozen && raf == null) raf = requestAnimationFrame(loop); }
