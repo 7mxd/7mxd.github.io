@@ -108,6 +108,13 @@
 
 .nav-menu-toggle { display: none; }
 
+/* The toggle is a sibling of .nav-links in the markup so it survives the mobile
+   drawer collapse. Above 46rem it is reordered back to the right of the CV
+   button, which keeps the bar reading mark ... links, CV, theme. */
+.nav-mark { order: 1; }
+.nav-links { order: 2; }
+.theme-toggle { order: 3; margin-left: var(--space-3); }
+
 main {
   max-width: var(--measure-wide);
   margin: 0 auto;
@@ -144,12 +151,18 @@ main {
 
 /* Below 46rem the navigation collapses behind a toggle. */
 @media (max-width: 46rem) {
+  /* Theme first, then hamburger, then the drawer on its own line. A preference
+     control that costs two taps because it sits inside a drawer is a control
+     people stop using. */
+  .theme-toggle { order: 2; margin-left: auto; }
+  .nav-menu-toggle { order: 3; margin-left: var(--space-2); }
+  .nav-links { order: 4; }
+
   .nav-menu-toggle {
     display: inline-flex;
     flex-direction: column;
     justify-content: center;
     gap: 4px;
-    margin-left: auto;
     width: 2.25rem; height: 2.25rem;
     padding: 0;
     background: none;

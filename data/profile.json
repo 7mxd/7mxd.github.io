@@ -2,7 +2,7 @@
   "name": "Ahmed Alawi Radhi",
   "nameArabic": "أحمد علوي رضي",
   "role": "Data scientist in Abu Dhabi",
-  "tagline": "I build data pipelines and audit systems that read ERP data and flag what does not add up.",
+  "tagline": "I build data pipelines and the analysis that runs on top of them: matching, anomaly detection, and dashboards people actually use.",
   "pills": [
     {
       "label": "Data Science · ETL"

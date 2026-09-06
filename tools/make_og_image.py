@@ -14,7 +14,7 @@ MUTED = (88, 91, 107)
 
 SIZE = (1200, 630)
 SUBTITLE = "Data scientist in Abu Dhabi"
-DETAIL = "Data pipelines, audit systems, applied statistics"
+DETAIL = "Data pipelines, analysis, applied statistics"
 
 WORDMARK_WIDTH = 380
 GAP_WORDMARK_TO_SUBTITLE = 40

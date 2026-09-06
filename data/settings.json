@@ -6,22 +6,49 @@
   "siteTitle": "Ahmed Alawi Radhi, Data Scientist",
   "meta": {
     "title": "Ahmed Alawi Radhi, Data Scientist",
-    "description": "Data scientist in Abu Dhabi building data pipelines and audit systems. Applied Mathematics and Statistics, Khalifa University.",
+    "description": "Data scientist in Abu Dhabi building data pipelines and the analysis that runs on them. Applied Mathematics and Statistics, Khalifa University.",
     "url": "https://7mxd.github.io/"
   },
   "nav": [
-    { "id": "about", "label": "About" },
-    { "id": "path", "label": "Path" },
-    { "id": "work", "label": "Work" },
-    { "id": "skills", "label": "Skills" },
-    { "id": "contact", "label": "Contact" }
+    {
+      "id": "about",
+      "label": "About"
+    },
+    {
+      "id": "path",
+      "label": "Path"
+    },
+    {
+      "id": "work",
+      "label": "Work"
+    },
+    {
+      "id": "skills",
+      "label": "Skills"
+    },
+    {
+      "id": "contact",
+      "label": "Contact"
+    }
   ],
   "sections": {
-    "about": { "enabled": true },
-    "path": { "enabled": true },
-    "numbers": { "enabled": true },
-    "work": { "enabled": true },
-    "skills": { "enabled": true },
-    "contact": { "enabled": true }
+    "about": {
+      "enabled": true
+    },
+    "path": {
+      "enabled": true
+    },
+    "numbers": {
+      "enabled": true
+    },
+    "work": {
+      "enabled": true
+    },
+    "skills": {
+      "enabled": true
+    },
+    "contact": {
+      "enabled": true
+    }
   }
 }

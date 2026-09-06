@@ -38,13 +38,22 @@
   --rule-width: 1px;
   --focus-width: 2px;
 
-  /* Light is the default and the primary theme. */
+  /* Light is the default and the primary theme.
+
+     The accent is blue at hue ~218-224, which is the family the logo's own ink
+     navy #1c1f32 (hue 232) already sits in — so it is still derived from the
+     artwork rather than being a generic tech blue, and it is nowhere near the
+     banned teals at hue 191. Worth knowing, since it was a deliberate trade:
+     the earlier terracotta was the less predictable choice for a data
+     scientist's page, and blue is the first colour anyone would guess for one.
+     What buys it back is that this blue is his, and the warm skin tones in the
+     logo now read as a deliberate contrast against it rather than as a match. */
   --ground: #fafaf9;
   --ground-raised: #ffffff;
   --ink: #1c1f32;
   --ink-muted: #585b6b;
-  --accent: #a85a32;
-  --accent-strong: #8f4a2c;
+  --accent: #2959ae;
+  --accent-strong: #21488c;
   --rule: #e2e2df;
   /* Behind a third-party organisation mark that ships in one colourway only.
      On the light ground it is not needed, so it is not drawn; in dark mode the
@@ -59,8 +68,8 @@
   --ground-raised: #1c1f2a;
   --ink: #e9e7e2;
   --ink-muted: #9a9aa6;
-  --accent: #e7ad87;
-  --accent-strong: #f3cbb0;
+  --accent: #90b2df;
+  --accent-strong: #a8c3e6;
   --rule: #2a2d3a;
   --logo-ground: #eceae5;
 }
