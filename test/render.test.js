@@ -263,9 +263,22 @@ test('sizes is per-context, not one constant for every gallery', () => {
   assert.ok(new Set(all).size >= 4, `expected several distinct sizes hints, got ${JSON.stringify([...new Set(all)])}`);
 });
 
-test('the preloaded hero portrait href matches profile.portrait.src exactly', () => {
+test('the preload offers the browser exactly the candidates the <img> does', () => {
+  // Without imagesrcset/imagesizes the preload names one file and the rendered
+  // image picks another, so the browser downloads BOTH variants of the portrait
+  // — 199KB of them, on the LCP path, for a 176 CSS pixel mark. The three
+  // attributes below must therefore mirror what renderHero emits, character for
+  // character; if you change one, change the other.
   const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
-  const preload = html.match(/<link rel="preload" as="image" href="([^"]*)"/);
+  const preload = html.match(/<link rel="preload" as="image"[^>]*>/);
   assert.ok(preload, 'no preload link found for the hero portrait');
-  assert.equal(preload[1], DATA.profile.portrait.src);
+  const attr = (name) => (preload[0].match(new RegExp(`\\b${name}="([^"]*)"`)) || [])[1];
+
+  const { sections } = renderFixture();
+  const rendered = imageHints(sections.get('hero').innerHTML)[0];
+  assert.ok(rendered && rendered.src === DATA.profile.portrait.src, 'the hero portrait did not render');
+
+  assert.equal(attr('href'), rendered.src, 'href is the no-imagesrcset fallback');
+  assert.equal(attr('imagesrcset'), rendered.srcset);
+  assert.equal(attr('imagesizes'), rendered.sizes);
 });
