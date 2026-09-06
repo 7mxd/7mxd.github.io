@@ -76,7 +76,7 @@ function fromProjects(projects) {
     out.push(entry({
       id: item.id, kind: 'project', sortDate: item.startDate, year, order: item.order,
       title: item.title, org: item.org, dateRange: item.displayDate,
-      images: item.images, blocks: item.blocks, workRef: item.id,
+      workRef: item.id,
     }));
   }
   return out;

@@ -20,7 +20,7 @@ export function imageMarkup(image, sizes) {
     ? ` srcset="${escapeHtml(image.srcSmall)} 800w, ${escapeHtml(image.src)} 1600w" sizes="${escapeHtml(sizes)}"`
     : '';
   return `<figure class="figure">
-<img src="${escapeHtml(image.src)}"${srcset} alt="${escapeHtml(image.alt)}" width="${image.width}" height="${image.height}" loading="lazy" decoding="async">
+<img src="${escapeHtml(image.src)}"${srcset} alt="${escapeHtml(image.alt)}" width="${Number(image.width) || 0}" height="${Number(image.height) || 0}" loading="lazy" decoding="async">
 ${caption}</figure>`;
 }
 
@@ -57,7 +57,7 @@ const RENDERERS = {
   html: (b) => String(b.content ?? ''),
 
   image: (b) => imageMarkup(
-    { src: b.src, srcSmall: b.srcSmall || b.src, alt: b.alt, caption: b.caption || '', width: b.width || 0, height: b.height || 0 },
+    { src: b.src, srcSmall: b.srcSmall || b.src, alt: b.alt, caption: b.caption || '', width: Number(b.width) || 0, height: Number(b.height) || 0 },
     '(min-width: 40rem) 46rem, 100vw',
   ),
 

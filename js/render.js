@@ -22,8 +22,11 @@ function renderHero(doc, profile) {
     profile.contact.github ? `<a href="${escapeHtml(profile.contact.github.url)}">${escapeHtml(profile.contact.github.label)}</a>` : '',
   ].filter(Boolean).join('');
 
+  const portraitSrcset = profile.portrait && profile.portrait.srcSmall && profile.portrait.srcSmall !== profile.portrait.src
+    ? ` srcset="${escapeHtml(profile.portrait.srcSmall)} 800w, ${escapeHtml(profile.portrait.src)} 1600w" sizes="(min-width: 46rem) 15rem, 40vw"`
+    : '';
   const portrait = profile.portrait
-    ? `<img class="hero-portrait" src="${escapeHtml(profile.portrait.src)}" srcset="${escapeHtml(profile.portrait.srcSmall)} 800w, ${escapeHtml(profile.portrait.src)} 1600w" sizes="(min-width: 46rem) 15rem, 40vw" alt="${escapeHtml(profile.portrait.alt)}" width="${profile.portrait.width}" height="${profile.portrait.height}" fetchpriority="high" decoding="async">`
+    ? `<img class="hero-portrait" src="${escapeHtml(profile.portrait.src)}"${portraitSrcset} alt="${escapeHtml(profile.portrait.alt)}" width="${Number(profile.portrait.width) || 0}" height="${Number(profile.portrait.height) || 0}" fetchpriority="high" decoding="async">`
     : '';
 
   doc.getElementById('hero').innerHTML = `
