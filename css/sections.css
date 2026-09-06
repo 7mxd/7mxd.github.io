@@ -86,6 +86,37 @@
   color: var(--ink-muted);
 }
 
+/* The organisation mark: a small anchor at the head of the meta row, sized to
+   the row's own line box so it sits with the text rather than above it. A fixed
+   square means it reserves its space before it loads, so no explicit intrinsic
+   dimensions are needed on the element. */
+.entry-logo {
+  flex: none;
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.375rem;
+  height: 1.375rem;
+  margin-right: calc(var(--space-3) * -1 + var(--space-2));
+}
+.entry-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+/* A mark that ships in one colourway only. All three here are dark ink, so on
+   the dark ground they need something to sit on; --logo-ground is transparent
+   in light mode, where they need nothing. */
+.entry-logo.is-plated {
+  padding: 2px;
+  border-radius: 2px;
+  background: var(--logo-ground);
+}
+.entry-logo-dark { display: none; }
+[data-theme="dark"] .entry-logo-light { display: none; }
+[data-theme="dark"] .entry-logo-dark { display: block; }
+
 /* The organisation reads slightly stronger than the date range beside it,
    so "Saal.ai" and "Sep 2024 — Present" don't just run together as one
    grey clause. Shared by the Selected Work meta row below. */

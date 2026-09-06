@@ -88,6 +88,15 @@ function allSectionHtml(sections) {
   return SECTION_IDS.map((id) => sections.get(id).innerHTML).join('\n');
 }
 
+/** Organisation marks are a different kind of image from the photographs: they
+ *  are decorative (the org's name is right beside them as text), they repeat
+ *  legitimately across entries, and they sit in a fixed-size chip so they need
+ *  no intrinsic dimensions. Strip them before auditing the photographs, and
+ *  test them on their own terms below. */
+function withoutOrgLogos(html) {
+  return html.replace(/<span class="entry-logo[^"]*">.*?<\/span>/gs, '');
+}
+
 test('every section renders non-empty HTML', () => {
   const { sections } = renderFixture();
   for (const id of SECTION_IDS) {
@@ -101,9 +110,9 @@ test('exactly 15 timeline entries render', () => {
   assert.equal(entries.length, 15);
 });
 
-test('no image src appears more than once across the whole page', () => {
+test('no photograph appears more than once across the whole page', () => {
   const { sections } = renderFixture();
-  const html = allSectionHtml(sections);
+  const html = withoutOrgLogos(allSectionHtml(sections));
   const srcs = [...html.matchAll(/<img\b[^>]*\bsrc="([^"]*)"/g)].map((m) => m[1]);
   assert.ok(srcs.length > 0, 'no images rendered at all');
   const seen = new Set();
@@ -140,9 +149,9 @@ test('the Saal.ai role\'s read-more link targets #work-saal-audit-platform', () 
   assert.match(entryHtml, /<a href="#work-saal-audit-platform">Read more about this work<\/a>/);
 });
 
-test('every rendered img carries non-empty alt, width, height and decoding', () => {
+test('every rendered photograph carries non-empty alt, width, height and decoding', () => {
   const { sections } = renderFixture();
-  const html = allSectionHtml(sections);
+  const html = withoutOrgLogos(allSectionHtml(sections));
   const imgs = html.match(/<img\b[^>]*>/g) || [];
   assert.ok(imgs.length > 0, 'no images rendered at all');
   for (const tag of imgs) {
@@ -154,6 +163,43 @@ test('every rendered img carries non-empty alt, width, height and decoding', () 
     assert.ok(height && Number(height[1]) > 0, `missing/bad height: ${tag}`);
     assert.match(tag, /\bdecoding="async"/, `missing decoding: ${tag}`);
   }
+});
+
+// js/timeline.js has always composed `orgLogo` onto every entry from the
+// company and institution logos, and no renderer read it, so not one
+// organisation mark rendered. The spec says twice that the Saal.ai mark is what
+// carries the photograph-less 2024-2026 stretch of the timeline.
+test('the Saal.ai mark renders on its roles, in both themes', () => {
+  const { sections } = renderFixture();
+  const html = sections.get('path').innerHTML;
+  const logos = [...html.matchAll(/<span class="entry-logo[^"]*">.*?<\/span>/gs)].map((m) => m[0]);
+  assert.ok(logos.length > 0, 'no organisation mark rendered at all');
+
+  const saal = logos.filter((l) => l.includes('SAAL'));
+  assert.equal(saal.length, 2, 'both Saal.ai roles carry the mark');
+  for (const mark of saal) {
+    assert.match(mark, /class="entry-logo-light" src="assets\/SAAL_LIGHT\.png"/);
+    assert.match(mark, /class="entry-logo-dark" src="assets\/SAAL_DARK\.png"/);
+    assert.equal(/is-plated/.test(mark), false, 'a two-variant mark needs no plate');
+  }
+
+  // The Khalifa, Daman and Al Nahda marks ship in one dark-ink colourway, so
+  // they get the light chip that keeps them legible on the dark ground.
+  const single = logos.filter((l) => !l.includes('SAAL'));
+  assert.ok(single.length >= 3, `expected the single-colourway marks, got ${single.length}`);
+  for (const mark of single) assert.match(mark, /class="entry-logo is-plated"/);
+});
+
+test('organisation marks are decorative and lazy, since the org name is already text', () => {
+  const { sections } = renderFixture();
+  const marks = sections.get('path').innerHTML.match(/<span class="entry-logo[^"]*">.*?<\/span>/gs) || [];
+  for (const tag of marks.flatMap((m) => m.match(/<img\b[^>]*>/g) || [])) {
+    assert.match(tag, /\balt=""/, `an organisation mark would be announced twice: ${tag}`);
+    assert.match(tag, /\bloading="lazy"/);
+    assert.match(tag, /\bdecoding="async"/);
+  }
+  // The mark must precede the name it belongs to, not trail it.
+  assert.match(sections.get('path').innerHTML, /<span class="entry-logo[^"]*">.*?<\/span><span class="entry-org">/s);
 });
 
 test('a project timeline entry carries no images or blocks, only title/org/dateRange/workRef', () => {

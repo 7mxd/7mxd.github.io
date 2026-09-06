@@ -40,8 +40,12 @@ main { max-width: none; padding: 0; }
 .entry { break-inside: avoid; }
 .entries { gap: 0.35cm; }
 
-/* Photographs are dropped in print; only the portrait survives. */
-.gallery { display: none !important; }
+/* Photographs are dropped in print; only the portrait survives. Organisation
+   marks go with them: they are decorative, the organisation's name is already
+   set as text beside them, and a dark-ink mark prints as a smudge that costs
+   toner and buys nothing. */
+.gallery,
+.entry-logo { display: none !important; }
 
 .work + .work { margin-top: 0.5cm; padding-top: 0.5cm; }
 

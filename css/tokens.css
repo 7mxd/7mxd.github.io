@@ -46,6 +46,12 @@
   --accent: #a85a32;
   --accent-strong: #8f4a2c;
   --rule: #e2e2df;
+  /* Behind a third-party organisation mark that ships in one colourway only.
+     On the light ground it is not needed, so it is not drawn; in dark mode the
+     three marks here are all dark ink (Khalifa royal blue, Daman navy, Al Nahda
+     green) and would otherwise sit at under 2:1 against #15171f. Never carries
+     text, so it is exempt from the AA check the way --rule is. */
+  --logo-ground: transparent;
 }
 
 [data-theme="dark"] {
@@ -56,6 +62,7 @@
   --accent: #e7ad87;
   --accent-strong: #f3cbb0;
   --rule: #2a2d3a;
+  --logo-ground: #eceae5;
 }
 
 /* The page is rendered by JavaScript, so js/theme.js always sets

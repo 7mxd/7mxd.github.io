@@ -103,12 +103,41 @@ function renderAbout(doc, summary) {
     `${heading('about', 'About')}<p class="prose">${escapeHtml(summary.content)}</p>`;
 }
 
+/** The organisation's mark, as a small anchor ahead of its name in the meta
+ *  row. It matters most for the 2024-2026 stretch: two years of career with no
+ *  photograph available and none possible (the work is client audit software),
+ *  which the spec says the Saal.ai mark carries.
+ *
+ *  Decorative, so alt is empty: the organisation's name sits immediately after
+ *  it as real text, and a screen reader repeating "Saal.ai logo, Saal.ai" is
+ *  worse than silence. The chip is a fixed square, so the mark reserves its own
+ *  space and nothing shifts when it loads.
+ *
+ *  Two <img> elements rather than <picture>, because the theme is a data-theme
+ *  attribute the visitor can toggle, not the OS preference a media condition
+ *  would see. Marks with no dark variant (the three third-party logos, all dark
+ *  ink) get a light chip behind them instead. */
+function orgLogoMarkup(logo) {
+  if (!logo) return '';
+  if (logo.light && logo.dark) {
+    return `<span class="entry-logo">`
+      + `<img class="entry-logo-light" src="${escapeHtml(logo.light)}" alt="" loading="lazy" decoding="async">`
+      + `<img class="entry-logo-dark" src="${escapeHtml(logo.dark)}" alt="" loading="lazy" decoding="async">`
+      + `</span>`;
+  }
+  const only = logo.default || logo.light || logo.dark;
+  if (!only) return '';
+  return `<span class="entry-logo is-plated"><img src="${escapeHtml(only)}" alt="" loading="lazy" decoding="async"></span>`;
+}
+
 function entryMarkup(entry) {
   const bullets = entry.bullets.length
     ? `<ul class="entry-bullets">${entry.bullets.map((b) => `<li>${escapeHtml(b)}</li>`).join('')}</ul>`
     : '';
   const note = entry.note ? `<p class="entry-note">${escapeHtml(entry.note)}</p>` : '';
-  const org = entry.org ? `<span class="entry-org">${escapeHtml(entry.org)}</span>` : '';
+  const org = entry.org
+    ? `${orgLogoMarkup(entry.orgLogo)}<span class="entry-org">${escapeHtml(entry.org)}</span>`
+    : '';
   const dates = entry.dateRange ? `<span class="entry-dates">${escapeHtml(entry.dateRange)}</span>` : '';
   let more = '';
   if (entry.workRef) {
