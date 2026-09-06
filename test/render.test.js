@@ -205,6 +205,64 @@ test('the image block renderer neutralises a quote-breakout payload in width and
   assert.match(html, /height="0"/);
 });
 
+/** Pull every rendered <img> tag's src, srcset and sizes out of one section. */
+function imageHints(html) {
+  return [...html.matchAll(/<img\b[^>]*>/g)].map((m) => ({
+    tag: m[0],
+    src: (m[0].match(/\bsrc="([^"]*)"/) || [])[1],
+    srcset: (m[0].match(/\bsrcset="([^"]*)"/) || [])[1],
+    sizes: (m[0].match(/\bsizes="([^"]*)"/) || [])[1],
+  }));
+}
+
+test('srcset w descriptors are the real file widths, per photograph', () => {
+  const { sections } = renderFixture();
+  const byName = new Map(
+    [...imageHints(allSectionHtml(sections))].map((i) => [i.src.split('/').pop(), i]),
+  );
+  // Six of the nine photographs are portrait-orientation, so their derivatives
+  // are narrower than the 800/1600 in their filenames.
+  const expected = {
+    'portrait-formal-1600.jpg': 'assets/photos/derived/portrait-formal-800.jpg 622w, assets/photos/derived/portrait-formal-1600.jpg 827w',
+    'stmnt-01-spending-by-category-1600.jpg': 'assets/photos/derived/stmnt-01-spending-by-category-800.jpg 369w, assets/photos/derived/stmnt-01-spending-by-category-1600.jpg 738w',
+    'volunteering-meal-packing-1600.jpg': 'assets/photos/derived/volunteering-meal-packing-800.jpg 478w, assets/photos/derived/volunteering-meal-packing-1600.jpg 630w',
+    'graduation-ceremony-certificate-1600.jpg': 'assets/photos/derived/graduation-ceremony-certificate-800.jpg 800w, assets/photos/derived/graduation-ceremony-certificate-1600.jpg 1600w',
+  };
+  for (const [name, srcset] of Object.entries(expected)) {
+    assert.ok(byName.has(name), `${name} did not render`);
+    assert.equal(byName.get(name).srcset, srcset);
+  }
+  // Nothing anywhere may still claim the old blanket 800w/1600w pair.
+  const wrong = [...byName.values()].filter(
+    (i) => i.srcset && /800w, [^"]*1600w$/.test(i.srcset) && !i.src.includes('graduation-ceremony') && !i.src.includes('honors-day'),
+  );
+  assert.deepEqual(wrong.map((i) => i.src), []);
+});
+
+test('sizes is per-context, not one constant for every gallery', () => {
+  const { sections } = renderFixture();
+  const hint = (html, name) => imageHints(html).find((i) => i.src.includes(name));
+
+  // A Selected Work screenshot: .work .gallery caps the image at 26rem tall,
+  // and 738/1600 of 416px is 192px, so the slot width is a fixed number.
+  assert.equal(hint(sections.get('work').innerHTML, 'stmnt-01').sizes, '192px');
+  // A lone portrait milestone photograph, capped at 30rem tall.
+  assert.equal(hint(sections.get('path').innerHTML, 'volunteering-meal-packing').sizes, '287px');
+  // A landscape photograph in one half of the education pair.
+  assert.equal(
+    hint(sections.get('path').innerHTML, 'graduation-ceremony').sizes,
+    '(min-width: 40rem) 18rem, calc(100vw - 2.5rem)',
+  );
+  // The odd third photograph, which spans both columns.
+  assert.equal(
+    hint(sections.get('path').innerHTML, 'egaming').sizes,
+    '(min-width: 40rem) 37rem, calc(100vw - 2.5rem)',
+  );
+  // No two galleries share a single blanket value any more.
+  const all = imageHints(allSectionHtml(sections)).map((i) => i.sizes).filter(Boolean);
+  assert.ok(new Set(all).size >= 4, `expected several distinct sizes hints, got ${JSON.stringify([...new Set(all)])}`);
+});
+
 test('the preloaded hero portrait href matches profile.portrait.src exactly', () => {
   const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
   const preload = html.match(/<link rel="preload" as="image" href="([^"]*)"/);

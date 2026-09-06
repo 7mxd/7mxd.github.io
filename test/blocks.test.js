@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { escapeHtml, renderBlock, renderBlocks, imageMarkup } from '../js/blocks.js';
+import { escapeHtml, renderBlock, renderBlocks, imageMarkup, srcsetAttr } from '../js/blocks.js';
 
 test('escapeHtml neutralises angle brackets, quotes, and ampersands', () => {
   assert.equal(escapeHtml('<script>"x"&\'y\''), '&lt;script&gt;&quot;x&quot;&amp;&#39;y&#39;');
@@ -65,7 +65,7 @@ test('renderBlocks joins several blocks and tolerates an empty list', () => {
 test('imageMarkup emits a figure with srcset, dimensions, and lazy loading', () => {
   const html = imageMarkup({
     src: 'a-1600.jpg', srcSmall: 'a-800.jpg', alt: 'A descriptive alt string',
-    caption: 'A caption', width: 1600, height: 1067,
+    caption: 'A caption', width: 1600, height: 1067, widthSmall: 800,
   }, '(min-width: 40rem) 46rem, 100vw');
   assert.match(html, /<figure/);
   assert.match(html, /srcset="a-800\.jpg 800w, a-1600\.jpg 1600w"/);
@@ -73,6 +73,26 @@ test('imageMarkup emits a figure with srcset, dimensions, and lazy loading', () 
   assert.match(html, /height="1067"/);
   assert.match(html, /loading="lazy"/);
   assert.match(html, /<figcaption>A caption<\/figcaption>/);
+});
+
+// tools/process_photos.py caps the LONG edge, so a portrait derivative named
+// -800 can be 369 wide. Naming it 800w told the browser it had more than twice
+// the pixels it has, which is how a photograph ends up rendered soft.
+test('srcset descriptors are the files\' real widths, not the numbers in their names', () => {
+  const html = imageMarkup({
+    src: 'tall-1600.jpg', srcSmall: 'tall-800.jpg', alt: 'A tall screenshot',
+    caption: '', width: 738, height: 1600, widthSmall: 369,
+  }, '192px');
+  assert.match(html, /srcset="tall-800\.jpg 369w, tall-1600\.jpg 738w"/);
+  assert.match(html, /sizes="192px"/);
+});
+
+test('srcsetAttr says nothing rather than guessing when a width is missing', () => {
+  const image = { src: 'a-1600.jpg', srcSmall: 'a-800.jpg', alt: 'x', width: 1600, height: 1067 };
+  assert.equal(srcsetAttr(image), '', 'no widthSmall — a plain src beats an invented descriptor');
+  assert.equal(srcsetAttr({ ...image, widthSmall: 800, width: 0 }), '');
+  assert.equal(srcsetAttr({ ...image, srcSmall: 'a-1600.jpg', widthSmall: 1600 }), '', 'one variant is not a set');
+  assert.equal(/srcset/.test(imageMarkup(image, '100vw')), false);
 });
 
 test('imageMarkup omits the caption element when there is no caption', () => {

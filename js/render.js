@@ -1,17 +1,71 @@
-import { escapeHtml, renderBlocks, imageMarkup } from './blocks.js';
+import { escapeHtml, renderBlocks, imageMarkup, srcsetAttr } from './blocks.js';
 
-const WIDE_SIZES = '(min-width: 46rem) 46rem, 100vw';
+/** How wide a gallery image actually renders, per context and per slot.
+ *
+ *  These are measured, not guessed. A single `sizes` constant of 46rem was
+ *  wrong for every gallery on the page: `main` is 46rem wide but border-box,
+ *  so its gutters eat into that, and a timeline entry loses a further 4.5rem
+ *  year column plus its gap. Measured in headless Chrome at 390, 768 and 1280:
+ *
+ *    entry, one column       547px at 1280, 578px at 768   -> 37rem covers it
+ *    entry, half of a pair   268px at 1280, 283px at 768   -> 18rem
+ *    Selected Work column    193px (the height cap binds, see below)
+ *
+ *  `capPx` is the CSS max-height on the image. For a portrait photograph that
+ *  cap binds before the slot width does, which pins the rendered width to a
+ *  fixed number — no media query needed, and no viewport at which it is wrong.
+ *  css/sections.css caps .gallery.is-single at 30rem and .work .gallery at
+ *  26rem; a slot with no cap carries 0. */
+const GALLERY_SLOTS = {
+  entry: {
+    single: { sizes: '(min-width: 40rem) 37rem, calc(100vw - 2.5rem)', maxPx: 592, capPx: 480 },
+    full:   { sizes: '(min-width: 40rem) 37rem, calc(100vw - 2.5rem)', maxPx: 592, capPx: 0 },
+    column: { sizes: '(min-width: 40rem) 18rem, calc(100vw - 2.5rem)', maxPx: 288, capPx: 0 },
+  },
+  work: {
+    single: { sizes: '(min-width: 40rem) 42rem, calc(100vw - 2.5rem)', maxPx: 674, capPx: 416 },
+    full:   { sizes: '(min-width: 40rem) 13rem, 45vw', maxPx: 208, capPx: 416 },
+    column: { sizes: '(min-width: 40rem) 13rem, 45vw', maxPx: 208, capPx: 416 },
+  },
+};
+
+/** The hero portrait is 11rem wide, 8rem below the 40rem breakpoint. */
+const PORTRAIT_SIZES = '(max-width: 40rem) 8rem, 11rem';
 
 function heading(id, text) {
   return `<h2 class="section-heading" id="${id}-heading">${escapeHtml(text)}</h2>`;
 }
 
+/** In a timeline gallery an odd trailing image spans both columns rather than
+ *  sitting alone in one (`:last-child:nth-child(odd)` in css/sections.css). A
+ *  Selected Work gallery overrides that back to a single column. */
+function slotFor(context, index, count) {
+  const slots = GALLERY_SLOTS[context];
+  if (count === 1) return slots.single;
+  const spans = context === 'entry' && count % 2 === 1 && index === count - 1;
+  return spans ? slots.full : slots.column;
+}
+
+/** Where a max-height cap binds, the rendered width is a fixed number derived
+ *  from the photograph's own aspect ratio, so say that instead of a viewport
+ *  expression the browser would have to over-read. */
+export function sizesFor(slot, image) {
+  const aspect = image.width && image.height ? image.width / image.height : 0;
+  if (slot.capPx && aspect) {
+    const capped = Math.round(slot.capPx * aspect);
+    if (capped < slot.maxPx) return `${capped}px`;
+  }
+  return slot.sizes;
+}
+
 /** One to three images. A lone trailing image spans the measure rather than
  *  sitting in a half column. */
-function gallery(images) {
+function gallery(images, context) {
   if (!images || images.length === 0) return '';
   const modifier = images.length === 1 ? 'is-single' : 'is-grid';
-  const figures = images.map((img) => imageMarkup(img, WIDE_SIZES)).join('');
+  const figures = images
+    .map((img, i) => imageMarkup(img, sizesFor(slotFor(context, i, images.length), img)))
+    .join('');
   return `<div class="gallery ${modifier}" data-count="${images.length}">${figures}</div>`;
 }
 
@@ -22,8 +76,12 @@ function renderHero(doc, profile) {
     profile.contact.github ? `<a href="${escapeHtml(profile.contact.github.url)}">${escapeHtml(profile.contact.github.label)}</a>` : '',
   ].filter(Boolean).join('');
 
-  const portraitSrcset = profile.portrait && profile.portrait.srcSmall && profile.portrait.srcSmall !== profile.portrait.src
-    ? ` srcset="${escapeHtml(profile.portrait.srcSmall)} 800w, ${escapeHtml(profile.portrait.src)} 1600w" sizes="(min-width: 46rem) 15rem, 40vw"`
+  // index.html preloads this image and must offer the browser the identical
+  // candidate list, or it downloads one file for the preload and a different
+  // one for the <img>. test/render.test.js pins the two together.
+  const portraitCandidates = profile.portrait ? srcsetAttr(profile.portrait) : '';
+  const portraitSrcset = portraitCandidates
+    ? ` srcset="${portraitCandidates}" sizes="${PORTRAIT_SIZES}"`
     : '';
   const portrait = profile.portrait
     ? `<img class="hero-portrait" src="${escapeHtml(profile.portrait.src)}"${portraitSrcset} alt="${escapeHtml(profile.portrait.alt)}" width="${Number(profile.portrait.width) || 0}" height="${Number(profile.portrait.height) || 0}" fetchpriority="high" decoding="async">`
@@ -62,7 +120,7 @@ function entryMarkup(entry) {
   return `<li class="entry is-${escapeHtml(entry.kind)}">
 <h3 class="entry-title">${escapeHtml(entry.title)}</h3>
 <p class="entry-meta">${org}${dates}</p>
-${note}${renderBlocks(entry.blocks)}${bullets}${more}${gallery(entry.images)}
+${note}${renderBlocks(entry.blocks)}${bullets}${more}${gallery(entry.images, 'entry')}
 </li>`;
 }
 
@@ -111,7 +169,7 @@ function workMarkup(project) {
 <h3 class="work-title">${escapeHtml(project.title)}</h3>
 <p class="work-meta">${org}${dates}</p>
 ${renderBlocks(project.blocks)}
-${gallery(project.images)}
+${gallery(project.images, 'work')}
 ${tags}${linkRow}
 </article>`;
 }

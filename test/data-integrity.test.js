@@ -77,6 +77,21 @@ test('declared dimensions match the real file, so Task 8 does not lay out a lie'
   }
 });
 
+// The srcset `w` descriptor is the browser's only measure of how much
+// resolution a candidate actually has. tools/process_photos.py caps the LONG
+// edge, so six of the nine photographs have a small variant far narrower than
+// the 800 in its filename — 369 for the Stmnt captures, 478 for the volunteer
+// photograph, 622 for the portrait. Declaring 800 for all of them told the
+// browser they were higher-resolution than they are.
+test('every image declares widthSmall, and it matches the small file on disk', () => {
+  for (const img of everyImage()) {
+    assert.equal(typeof img.widthSmall, 'number', `widthSmall missing for ${img.src}`);
+    const { width } = jpegSize(readFileSync(repoFile(img.srcSmall)));
+    assert.equal(img.widthSmall, width, `declared widthSmall ${img.widthSmall} is not ${width} for ${img.srcSmall}`);
+    assert.ok(img.widthSmall < img.width, `${img.srcSmall} is not smaller than ${img.src}`);
+  }
+});
+
 test('the CV path in settings resolves', () => {
   assert.ok(existsSync(repoFile(settings.cv.path)), `missing ${settings.cv.path}`);
   assert.match(settings.cv.path, /2026/, 'settings still points at the old CV');

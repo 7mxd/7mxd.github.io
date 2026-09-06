@@ -29,6 +29,13 @@ export function normalizeImage(img) {
     caption: img.caption || '',
     width: Number(img.width) || 0,
     height: Number(img.height) || 0,
+    // The small derivative's own width, which is NOT 800 for most of these
+    // photographs: tools/process_photos.py caps the long edge, so a portrait
+    // derivative comes out far narrower than the number in its filename (the
+    // Stmnt captures are 369 and 738 wide). js/blocks.js needs the real value
+    // for its srcset `w` descriptors; a wrong one makes the browser choose a
+    // file too small for the slot and the photograph renders soft.
+    widthSmall: Number(img.widthSmall) || 0,
   };
 }
 
