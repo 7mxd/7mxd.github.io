@@ -136,9 +136,15 @@ Single column. Content measure roughly 34rem for prose, widening to about 46rem
 for timeline entries that carry photographs. Generous outer margins that grow
 with the viewport. No cards. No repeated grid of equal boxes.
 
-Photographs sit inline within timeline entries, full measure width, with a
-caption beneath in the metadata face. Where two photographs belong to one
-moment, they sit side by side above 40rem and stack below it.
+Photographs sit inline within timeline entries with a caption beneath in the
+metadata face. A single photograph runs the full measure. Two or more sit at
+most two per row above 40rem, and an odd final photograph spans the full
+measure rather than sitting alone in a half column. Everything stacks below
+40rem.
+
+The Khalifa University education entry is the case that exercises this: it
+carries the two graduation photographs and the e-gaming competition photograph,
+so it renders as a pair followed by a full-measure image.
 
 ### Motion
 
@@ -440,7 +446,7 @@ Eight photographs and three app screenshots are staged. Nine assets will be used
 | `graduation-campus-certificate.jpg` | 2023, graduation |
 | `honors-day-ceremony.jpg` | 2023, Golden Key |
 | `volunteering-meal-packing.jpg` | 2023, Feed and Reap, cropped closer |
-| `egaming-competition-demo.jpg` | Sustainability E-gaming Competition, year pending |
+| `egaming-competition-demo.jpg` | 2023, on the Khalifa University education entry |
 | `stmnt/01-spending-by-category.png` | Selected Work, Stmnt |
 | `stmnt/04-recurring-subscriptions.png` | Selected Work, Stmnt |
 | `stmnt/05-smart-forecast.png` | Selected Work, Stmnt |
@@ -547,12 +553,12 @@ accepted and is the first item of the admin revamp that follows.
 
 ## 15. Open items
 
-1. Year for the Sustainability E-gaming Competition. Ahmed's role is confirmed:
-   he presented the team's project. Without a year the entry cannot be placed on
-   the timeline, so this is the one genuinely blocking item, and it blocks a
-   single entry rather than the build.
+None. Everything needed to build is settled.
 
-Resolved since the first draft: the campus graduation photograph is redacted;
-the Stmnt screenshots are staged; the Saal.ai photograph gap is confirmed
-permanent and absorbed into the design; and the experience-truncation question
-is answered by the Selected Work promotion in section 8.
+Resolved during review: the campus graduation photograph is redacted; the Stmnt
+screenshots are staged and their marketing frames will be cropped away; the
+Saal.ai photograph gap is confirmed permanent and absorbed into the design; the
+experience-truncation question is answered by the Selected Work promotion in
+section 8; and the e-gaming photograph becomes an image on the Khalifa
+University education entry rather than a standalone milestone, which removes the
+need for a date.
