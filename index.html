@@ -7,14 +7,19 @@
 <!-- Set the theme before first paint so the page never flashes the wrong ground. -->
 <script>
 (function () {
-  try {
-    var stored = localStorage.getItem('theme');
-    var dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    document.documentElement.setAttribute('data-theme',
-      stored === 'light' || stored === 'dark' ? stored : (dark ? 'dark' : 'light'));
-  } catch (e) {
-    document.documentElement.setAttribute('data-theme', 'light');
+  var stored = null;
+  try { stored = localStorage.getItem('theme'); } catch (e) { stored = null; }
+  var theme = 'light';
+  if (stored === 'light' || stored === 'dark') {
+    theme = stored;
+  } else {
+    try {
+      theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    } catch (e) {
+      theme = 'light';
+    }
   }
+  document.documentElement.setAttribute('data-theme', theme);
 })();
 </script>
 
@@ -25,7 +30,7 @@
 <meta property="og:type" content="website">
 <meta property="og:locale" content="en_US">
 <meta property="og:title" content="Ahmed Alawi Radhi, Data Scientist">
-<meta property="og:description" content="Data scientist in Abu Dhabi. Procurement audit systems and data pipelines at Saal.ai.">
+<meta property="og:description" content="Data scientist in Abu Dhabi. Procurement audit systems and data pipelines at Saal.ai. Applied mathematics and statistics, Khalifa University.">
 <meta property="og:image" content="https://7mxd.github.io/assets/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -33,7 +38,7 @@
 <meta property="og:site_name" content="Ahmed Alawi Radhi">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Ahmed Alawi Radhi, Data Scientist">
-<meta name="twitter:description" content="Data scientist in Abu Dhabi. Procurement audit systems and data pipelines at Saal.ai.">
+<meta name="twitter:description" content="Data scientist in Abu Dhabi. Procurement audit systems and data pipelines at Saal.ai. Applied mathematics and statistics, Khalifa University.">
 <meta name="twitter:image" content="https://7mxd.github.io/assets/og-image.png">
 
 <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
@@ -111,7 +116,7 @@
 </main>
 
 <footer class="site-footer">
-  <p>&copy; <span data-footer-year></span> Ahmed Alawi Radhi</p>
+  <p>&copy; <span data-footer-year></span> <span data-footer-name></span></p>
 </footer>
 
 <noscript>
