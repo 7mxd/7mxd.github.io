@@ -50,6 +50,17 @@ Unchanged from the existing brief and still governing:
 No content is duplicated across depth levels. The timeline entry is one line;
 the Selected Work entry is the depth.
 
+**Amended after review.** This rule was once enforced so literally that a figure
+appearing in the numbers strip was forbidden from the prose, which forced "28 of
+its 38 exception checks" down to "the majority" and destroyed the specificity
+that made the claim worth reading. That was the rule eating the thing it was
+meant to protect. Its target is the same *claim told twice at the same depth*,
+so a reader who scrolls is never re-reading what they already scanned. A summary
+index restating a figure it summarises is not that, and the reference site does
+exactly this with its own headline numbers. What remains forbidden, and is
+tested, is a figure appearing in both the timeline prose and the Selected Work
+prose.
+
 ## 2. Goals and non-goals
 
 ### Goals

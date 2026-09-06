@@ -5,7 +5,9 @@
       "institution": "Khalifa University",
       "degree": "BSc in Applied Mathematics and Statistics",
       "location": "Abu Dhabi, UAE",
-      "logo": { "default": "assets/Khalifa_University_Logo.png" },
+      "logo": {
+        "default": "assets/logos/khalifa-university.png"
+      },
       "startDate": "2018-08",
       "endDate": "2023-05",
       "displayDate": "2018 — 2023",
@@ -45,7 +47,9 @@
       "institution": "Al Nahda National Schools",
       "degree": "High School Diploma",
       "location": "Abu Dhabi, UAE",
-      "logo": { "default": "assets/Al_Nahda_Logo.png" },
+      "logo": {
+        "default": "assets/logos/al-nahda.png"
+      },
       "startDate": "2015",
       "endDate": "2018",
       "displayDate": "2015 — 2018",

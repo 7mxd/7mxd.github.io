@@ -2,7 +2,25 @@
   "name": "Ahmed Alawi Radhi",
   "nameArabic": "أحمد علوي رضي",
   "role": "Data scientist in Abu Dhabi",
-  "tagline": "I build data pipelines and audit systems. Applied mathematics and statistics, Khalifa University.",
+  "tagline": "I build data pipelines and the analysis that runs on top of them: matching, anomaly detection, and dashboards people actually use.",
+  "pills": [
+    {
+      "label": "Data Science · ETL"
+    },
+    {
+      "label": "Applied Mathematics · Khalifa University"
+    },
+    {
+      "label": "Abu Dhabi · UAE"
+    },
+    {
+      "label": "Python · Pandas · MongoDB"
+    },
+    {
+      "label": "علوم البيانات",
+      "lang": "ar"
+    }
+  ],
   "location": "Abu Dhabi, United Arab Emirates",
   "portrait": {
     "src": "assets/photos/derived/portrait-formal-1600.jpg",
@@ -14,7 +32,13 @@
   },
   "contact": {
     "email": "AhmedARadhi00@gmail.com",
-    "linkedin": { "url": "https://www.linkedin.com/in/ahmedaradhi/", "label": "LinkedIn" },
-    "github": { "url": "https://github.com/7mxd", "label": "GitHub" }
+    "linkedin": {
+      "url": "https://www.linkedin.com/in/ahmedaradhi/",
+      "label": "LinkedIn"
+    },
+    "github": {
+      "url": "https://github.com/7mxd",
+      "label": "GitHub"
+    }
   }
 }

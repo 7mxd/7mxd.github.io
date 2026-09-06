@@ -51,6 +51,11 @@ export const COLLECTIONS = [
     { name:'nameArabic', label:'Arabic name', type:'string', required:true },
     { name:'role', label:'Role line', type:'string', required:true },
     { name:'tagline', label:'Tagline', type:'text' },
+    // Rendered as the pill row under the tagline. `lang` is optional and only
+    // meaningful as 'ar', which switches the pill to the Arabic face and RTL.
+    { name:'pills', label:'Topic pills', type:'list', fields:[
+      { name:'label', label:'Label', type:'string', required:true },
+      { name:'lang', label:'Language (ar for Arabic)', type:'string' } ] },
     { name:'location', label:'Location', type:'string' },
     { name:'portrait', label:'Hero portrait', type:'object', fields: imageFields },
     { name:'contact', label:'Contact', type:'object', fields:[
