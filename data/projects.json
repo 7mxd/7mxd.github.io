@@ -11,11 +11,11 @@
       "blocks": [
         {
           "type": "description",
-          "content": "A platform that ingests Microsoft Dynamics 365 ERP data from Azure Blob Storage and audits it across procure-to-pay, vendor master data, and user access rights. I was its primary developer and authored 28 of its 38 exception checks."
+          "content": "A platform that ingests Microsoft Dynamics 365 ERP data from Azure Blob Storage and audits it across procure-to-pay, vendor master data, and user access rights. I was its primary developer and wrote most of the exception logic it runs."
         },
         {
           "type": "description",
-          "content": "I designed the Delegation of Authority control set: six checks that trace ERP workflow records to flag purchases approved by the wrong person, or at fewer levels than company spending limits require. I built four further controls over payments and vendor master data, extending the platform from the ERP to treasury payment exports."
+          "content": "I designed the Delegation of Authority control set, which traces ERP workflow records to flag purchases approved by the wrong person, or approved at fewer levels than company spending limits require. I also built controls over payments and vendor master data, extending the platform from the ERP to treasury payment exports."
         },
         {
           "type": "description",
@@ -80,7 +80,7 @@
         },
         {
           "type": "description",
-          "content": "The pipeline pulls transactions out of unstructured PDF text, then categorises them, removes duplicates at both the file and transaction level, and flags unusual spending across more than 35 currencies. Extraction runs through OpenRouter with Gemini as the primary model and a GPT model as a fallback, so a single provider outage or rate limit does not fail the import."
+          "content": "The pipeline pulls transactions out of unstructured PDF text, then categorises them, removes duplicates at both the file and transaction level, normalises the currencies a statement mixes, and flags unusual spending. Extraction runs through OpenRouter with Gemini as the primary model and a GPT model as a fallback, so a single provider outage or rate limit does not fail the import."
         },
         {
           "type": "description",
