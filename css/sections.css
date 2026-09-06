@@ -1,17 +1,30 @@
 /* Hero */
 
+/* Top-aligned, not bottom-aligned. The text column is taller than the portrait,
+   so bottom-aligning pushed the portrait below the name and left a hole beside
+   it. Aligning the tops reads as one block. */
 .hero {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-end;
+  align-items: flex-start;
   gap: var(--space-8);
   padding-block: var(--space-16) var(--space-12);
 }
 
+/* A circle, cropped to the face rather than centred on the frame: the source is
+   a 827x1063 portrait, so a square crop centred at 50% 50% would cut the chin.
+   The double ring is one element: a band of the raised surface, then a hairline.
+   No wrapper, no extra markup. */
 .hero-portrait {
   width: 11rem;
-  border-radius: 2px;
+  height: 11rem;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: 50% 18%;
   filter: saturate(0.96);
+  box-shadow: 0 0 0 5px var(--ground-raised), 0 0 0 6px var(--rule);
+  /* The rings sit outside the box, so keep them off the section edge. */
+  margin: 6px;
 }
 
 .hero-text { flex: 1 1 20rem; }
@@ -42,6 +55,32 @@
   font-size: var(--text-lg);
 }
 
+/* Topic pills: the thirty-second scan, before anyone reads a sentence. They
+   state facts without tense, which is why the degree lives here and not in the
+   tagline. Outlined rather than filled, so they read as labels on the page
+   rather than as buttons. */
+.hero-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: var(--space-6) 0 var(--space-4);
+}
+.hero-pills li {
+  font-family: var(--font-meta);
+  font-size: var(--text-xs);
+  line-height: 1.4;
+  color: var(--ink-muted);
+  background: var(--ground-raised);
+  border: var(--rule-width) solid var(--rule);
+  border-radius: 999px;
+  padding: 0.3em 0.75em;
+}
+.hero-pills li[lang="ar"] {
+  font-family: var(--font-arabic);
+  font-size: var(--text-sm);
+  padding-block: 0.15em;
+}
+
 .hero-links {
   display: flex;
   flex-wrap: wrap;
@@ -52,21 +91,51 @@
 
 /* Timeline */
 
+/* One continuous rail behind every year badge. Drawn on the wrapper rather than
+   per group, because a line that restarts at each boundary reads as a stack of
+   lists rather than one chronology. It stops short at both ends so the first
+   and last badges terminate it instead of it running off into the rules above
+   and below. */
+.timeline {
+  position: relative;
+  --rail: 3.25rem;
+}
+.timeline::before {
+  content: "";
+  position: absolute;
+  top: var(--space-8);
+  bottom: var(--space-8);
+  left: calc(var(--rail) / 2);
+  width: var(--rule-width);
+  background: var(--rule);
+}
+
 .year-group {
   display: grid;
-  grid-template-columns: 4.5rem 1fr;
+  grid-template-columns: var(--rail) 1fr;
   gap: var(--space-6);
   padding-block: var(--space-8);
 }
-.year-group + .year-group { border-top: var(--rule-width) solid var(--rule); }
 
+/* The badge sits on the rail and hides the line behind it, which is what makes
+   the year read as a station on the line rather than a label beside it. Its
+   background must therefore be the page ground, not transparent. */
 .year-label {
+  position: relative;
+  z-index: 1;
+  width: var(--rail);
+  height: var(--rail);
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: var(--rule-width) solid var(--rule);
+  background: var(--ground);
   font-family: var(--font-meta);
-  font-size: var(--text-sm);
+  font-size: var(--text-xs);
   font-weight: 600;
-  color: var(--ink-muted);
+  letter-spacing: 0.01em;
+  color: var(--accent);
   font-variant-numeric: tabular-nums;
-  padding-top: 0.25em;
 }
 
 .entries { display: grid; gap: var(--space-8); }
@@ -441,8 +510,13 @@
 
 /* Narrow screens: the year column stacks above its entries. */
 @media (max-width: 40rem) {
-  .year-group { grid-template-columns: 1fr; gap: var(--space-4); }
+  /* The rail survives the phone. Stacking the year above its entries was what
+     made the timeline read as an undifferentiated list on mobile, which is the
+     surface most readers actually arrive on. It only narrows. */
+  .timeline { --rail: 2.75rem; }
+  .year-group { gap: var(--space-4); }
+
   .hero { align-items: flex-start; }
-  .hero-portrait { width: 8rem; }
+  .hero-portrait { width: 8rem; height: 8rem; }
   .contact-row { grid-template-columns: 5rem 1fr; }
 }

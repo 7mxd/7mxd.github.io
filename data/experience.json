@@ -17,7 +17,7 @@
           "displayDate": "Sep 2024 — Sep 2026",
           "workRef": "saal-audit-platform",
           "bullets": [
-            "Primary developer of a procurement audit platform that ingests Microsoft Dynamics 365 ERP data from Azure Blob Storage, and author of the majority of its exception checks.",
+            "Primary developer of a procurement audit platform that ingests Microsoft Dynamics 365 ERP data from Azure Blob Storage, authoring 28 of its 38 exception checks.",
             "Applied NLP-based matching within the pipeline, combining fuzzy and Levenshtein similarity with a cross-encoder transformer model to flag near-duplicate line item descriptions.",
             "Developed ETL pipelines in a microservices architecture using Python, Pandas, and MongoDB, and built interactive Power BI and Tableau dashboards for proof-of-concept projects."
           ]
@@ -40,7 +40,9 @@
     {
       "company": "Daman, National Health Insurance Company",
       "location": "Abu Dhabi, UAE",
-      "logo": { "default": "assets/Daman_Logo.png" },
+      "logo": {
+        "default": "assets/Daman_Logo.png"
+      },
       "roles": [
         {
           "id": "daman-analyst-intern",

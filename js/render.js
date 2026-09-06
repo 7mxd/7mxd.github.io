@@ -87,6 +87,16 @@ function renderHero(doc, profile) {
     ? `<img class="hero-portrait" src="${escapeHtml(profile.portrait.src)}"${portraitSrcset} alt="${escapeHtml(profile.portrait.alt)}" width="${Number(profile.portrait.width) || 0}" height="${Number(profile.portrait.height) || 0}" fetchpriority="high" decoding="async">`
     : '';
 
+  // Pills place a scanner in three seconds without asking them to read a
+  // sentence. They carry no tense, which is why the university belongs here
+  // rather than in the tagline: he graduated in 2023.
+  const pills = (profile.pills ?? []).length
+    ? `<ul class="hero-pills">${profile.pills.map((p) => {
+        const attrs = p.lang === 'ar' ? ' lang="ar" dir="rtl"' : '';
+        return `<li${attrs}>${escapeHtml(p.label)}</li>`;
+      }).join('')}</ul>`
+    : '';
+
   doc.getElementById('hero').innerHTML = `
 ${portrait}
 <div class="hero-text">
@@ -94,6 +104,7 @@ ${portrait}
   <p class="hero-name-ar" lang="ar" dir="rtl">${escapeHtml(profile.nameArabic)}</p>
   <p class="hero-role">${escapeHtml(profile.role)}</p>
   <p class="hero-tagline">${escapeHtml(profile.tagline)}</p>
+  ${pills}
   <p class="hero-links">${links}</p>
 </div>`;
 }
@@ -164,7 +175,12 @@ function renderPath(doc, timeline) {
     ? `<p class="section-note">${timeline[0].year} to ${timeline[timeline.length - 1].year}</p>`
     : '';
 
-  doc.getElementById('path').innerHTML = `${heading('path', 'The path so far')}${span}${groups}`;
+  // The wrapper exists so a single continuous rail can be drawn behind every
+  // year badge (css/sections.css .timeline::before). Drawing it per group would
+  // break the line at each boundary, which is the thing that makes a timeline
+  // read as one chronology rather than a stack of lists.
+  doc.getElementById('path').innerHTML =
+    `${heading('path', 'The path so far')}${span}<div class="timeline">${groups}</div>`;
 }
 
 function renderNumbers(doc, metrics) {

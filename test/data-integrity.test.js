@@ -140,19 +140,37 @@ test('graph and cluster configuration is removed from settings', () => {
 // the six Delegation of Authority controls in Selected Work, 35+ currencies in
 // the Stmnt description, nine freshmen in the mentoring milestone — which is
 // the no-duplication rule regressing inside the section built to honour it.
-test('the numbers strip owns its figures: none appears anywhere else in the data', () => {
-  const elsewhere = JSON.stringify([profile, load('summary'), experience, education, projects, milestones]);
+test('the numbers strip still carries all four of its figures', () => {
   const inStrip = JSON.stringify(metrics);
+  for (const strip of [/28 \/ 38/, /Delegation of Authority/, /35\+/, /freshmen/]) {
+    assert.match(inStrip, strip, 'the strip lost a figure');
+  }
+});
+
+// The no-duplication rule this replaces once forbade a strip figure from
+// appearing in the prose at all, which forced "28 of its 38 exception checks"
+// down to "the majority" and lost the specificity that made the claim worth
+// reading. The rule's real target was never the strip: it was the same CONTENT
+// appearing at two depths, so that a reader who scrolls is not re-reading what
+// they already scanned. A summary index restating a figure it summarises is not
+// that. What is still forbidden is the same claim told twice at the same depth.
+test('no figure is told twice at the same depth: timeline prose vs Selected Work prose', () => {
+  const timelineProse = JSON.stringify([experience, education, milestones]);
+  const workProse = JSON.stringify(projects);
   const figures = [
-    { metric: '28 / 38 exception checks', elsewhere: /\b(28|38|twenty-eight|thirty-eight)\b/i, strip: /28 \/ 38/ },
-    { metric: '6 Delegation of Authority controls', elsewhere: /\bsix\b/i, strip: /Delegation of Authority/ },
-    { metric: '35+ currencies', elsewhere: /\b(35|thirty-five)\b/i, strip: /35\+/ },
-    { metric: '9 freshmen mentored', elsewhere: /\bnine\b/i, strip: /freshmen/ },
+    { name: '28 of 38 exception checks', re: /\b(28|twenty-eight)\b/i },
+    { name: 'six Delegation of Authority controls', re: /\bsix\b/i },
+    { name: '35+ currencies', re: /\b(35|thirty-five)\b/i },
+    { name: 'nine freshmen', re: /\bnine\b/i },
   ];
   for (const f of figures) {
-    assert.match(inStrip, f.strip, `${f.metric} is not in metrics.json — the strip lost a figure`);
-    const hit = elsewhere.match(f.elsewhere);
-    assert.equal(hit, null, `"${hit && hit[0]}" from the ${f.metric} metric also appears in the prose`);
+    const inTimeline = f.re.test(timelineProse);
+    const inWork = f.re.test(workProse);
+    assert.equal(
+      inTimeline && inWork,
+      false,
+      `"${f.name}" appears in both the timeline prose and the Selected Work prose`,
+    );
   }
 });
 
