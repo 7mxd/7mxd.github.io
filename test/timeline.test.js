@@ -106,6 +106,25 @@ test('entries without a link carry null rather than undefined', () => {
   assert.equal(out[0].entries[0].link, null);
 });
 
+test('entries without an explicit order carry null rather than undefined', () => {
+  const out = buildTimeline({ ...empty, experience: withRole() });
+  assert.equal(out[0].entries[0].order, null);
+});
+
+test('an impossible month is dropped, but 01 and 12 are kept', () => {
+  const out = buildTimeline({
+    ...empty,
+    education: { items: [
+      { id: 'bad-13', institution: 'X', degree: 'D', endDate: '2018-13', displayDate: 'd', images: [], blocks: [] },
+      { id: 'bad-00', institution: 'X', degree: 'D', endDate: '2018-00', displayDate: 'd', images: [], blocks: [] },
+      { id: 'good-01', institution: 'X', degree: 'D', endDate: '2018-01', displayDate: 'd', images: [], blocks: [] },
+      { id: 'good-12', institution: 'X', degree: 'D', endDate: '2018-12', displayDate: 'd', images: [], blocks: [] },
+    ] },
+  });
+  const ids = out.flatMap((g) => g.entries).map((e) => e.id);
+  assert.deepEqual(ids.sort(), ['good-01', 'good-12']);
+});
+
 test('an empty payload produces an empty timeline, not an error', () => {
   assert.deepEqual(buildTimeline(empty), []);
 });

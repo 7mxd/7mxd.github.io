@@ -6,7 +6,7 @@
 
 export const KIND_ORDER = { role: 0, education: 1, project: 2, milestone: 3 };
 
-const DATE = /^(\d{4})(-\d{2})?$/;
+const DATE = /^(\d{4})(-(0[1-9]|1[0-2]))?$/;
 
 function yearOf(value) {
   const match = DATE.exec(String(value ?? '').trim());
@@ -19,7 +19,7 @@ function entry(fields) {
     kind: fields.kind,
     sortDate: fields.sortDate,
     year: fields.year,
-    order: fields.order,
+    order: fields.order ?? null,
     title: fields.title,
     org: fields.org ?? '',
     orgLogo: fields.orgLogo ?? null,
@@ -97,7 +97,7 @@ function fromMilestones(milestones) {
 }
 
 function compare(a, b) {
-  if (a.sortDate !== b.sortDate) return b.sortDate.localeCompare(a.sortDate);
+  if (a.sortDate !== b.sortDate) return a.sortDate > b.sortDate ? -1 : 1;
   const orderA = Number.isFinite(a.order) ? a.order : Number.MAX_SAFE_INTEGER;
   const orderB = Number.isFinite(b.order) ? b.order : Number.MAX_SAFE_INTEGER;
   if (orderA !== orderB) return orderA - orderB;
