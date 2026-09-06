@@ -9,17 +9,18 @@
     ]
   },
 
-  "ascii-chart": {
+  "benchmark": {
     "scope": ["project"],
-    "label": "ASCII chart",
+    "label": "Benchmark table",
     "fields": [
-      { "name": "caption", "type": "text", "label": "Caption (optional)", "required": false },
-      { "name": "chart", "type": "code", "label": "Chart (use \u2587 for bar segments)", "required": true }
+      { "name": "caption", "type": "text", "label": "Caption", "required": false },
+      { "name": "unit", "type": "string", "label": "Unit (e.g. NMSE)", "required": true },
+      { "name": "rows", "type": "list", "label": "Rows as label / value / highlight", "required": true }
     ]
   },
 
   "image": {
-    "scope": ["project", "experience", "education"],
+    "scope": ["project", "experience", "education", "milestone"],
     "label": "Image",
     "fields": [
       { "name": "src", "type": "image", "label": "Image", "required": true },

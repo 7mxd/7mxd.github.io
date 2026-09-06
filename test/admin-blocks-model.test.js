@@ -4,9 +4,9 @@ import { readFileSync } from 'node:fs';
 import { blockTypesForScope, fieldsForBlock, newBlock } from '../admin/blocks-model.js';
 const reg = JSON.parse(readFileSync(new URL('../data/blocks-registry.json', import.meta.url)));
 
-test('project scope includes description and ascii-chart, excludes responsibility', () => {
+test('project scope includes description and benchmark, excludes responsibility', () => {
   const types = blockTypesForScope(reg, 'project').map(t => t.type);
-  assert.ok(types.includes('description') && types.includes('ascii-chart'));
+  assert.ok(types.includes('description') && types.includes('benchmark'));
   assert.ok(!types.includes('responsibility'));
 });
 test('experience scope includes responsibility', () => {
@@ -18,6 +18,6 @@ test('newBlock seeds the type and empty fields', () => {
   assert.equal(b.label, ''); assert.equal(b.value, '');
 });
 test('fieldsForBlock returns the registry field list', () => {
-  const f = fieldsForBlock(reg, 'ascii-chart').map(x => x.name);
-  assert.deepEqual(f, ['caption','chart']);
+  const f = fieldsForBlock(reg, 'benchmark').map(x => x.name);
+  assert.deepEqual(f, ['caption','unit','rows']);
 });

@@ -1,35 +1,29 @@
 {
   "cv": {
-    "path": "assets/ahmed_radhi_cv_2025.pdf",
+    "path": "assets/ahmed_radhi_cv_2026.pdf",
     "downloadName": "Ahmed_Radhi_CV.pdf"
   },
   "siteTitle": "Ahmed Alawi Radhi, Data Scientist",
-  "navLogo": "AR",
   "meta": {
     "title": "Ahmed Alawi Radhi, Data Scientist",
-    "description": "I am a data scientist based in Abu Dhabi. I build ETL pipelines at Saal.ai and work with probability and kernel methods.",
-    "keywords": "Data Science, Applied Mathematics, Statistics, ETL, Kernel Methods, Quantitative Developer, Abu Dhabi, Saal.ai",
+    "description": "Data scientist in Abu Dhabi. Procurement audit systems and data pipelines at Saal.ai. Applied mathematics and statistics, Khalifa University.",
+    "keywords": "Data Science, Applied Mathematics, Statistics, ETL, Data Engineering, Quantitative Developer, Abu Dhabi, Saal.ai",
     "url": "https://7mxd.github.io/"
   },
+  "nav": [
+    { "id": "about", "label": "About" },
+    { "id": "path", "label": "Path" },
+    { "id": "work", "label": "Work" },
+    { "id": "skills", "label": "Skills" },
+    { "id": "contact", "label": "Contact" }
+  ],
   "sections": {
-    "summary": { "enabled": true },
-    "projects": { "enabled": true },
-    "experience": { "enabled": true },
+    "about": { "enabled": true },
+    "path": { "enabled": true },
+    "numbers": { "enabled": true },
+    "work": { "enabled": true },
     "skills": { "enabled": true },
-    "education": { "enabled": true }
+    "contact": { "enabled": true }
   },
-  "statuses": {
-    "in-progress": { "label": "in progress", "glyph": "\u25CF", "tone": "active" },
-    "research":    { "label": "research",    "glyph": "\u00A7", "tone": "scholarly" },
-    "shipped":     { "label": "shipped",     "glyph": "\u2713", "tone": "neutral" },
-    "archived":    { "label": "archived",    "glyph": "\u2014", "tone": "muted" }
-  },
-  "theme": "auto",
-  "graph": {
-    "clusters": {
-      "math":        { "label": "Mathematics",            "color": "#6c5ce7" },
-      "data":        { "label": "Data Science",           "color": "#d68a1e" },
-      "engineering": { "label": "Engineering & Products",  "color": "#1d9bb8" }
-    }
-  }
+  "theme": "auto"
 }

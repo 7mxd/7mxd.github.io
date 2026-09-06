@@ -1,25 +1,54 @@
 {
   "items": [
     {
+      "id": "khalifa-bsc",
       "institution": "Khalifa University",
-      "cluster": "math",
-      "logo": "assets/Khalifa_University_Logo.png",
       "degree": "BSc in Applied Mathematics and Statistics",
+      "location": "Abu Dhabi, UAE",
+      "logo": { "default": "assets/Khalifa_University_Logo.png" },
       "startDate": "2018-08",
       "endDate": "2023-05",
-      "displayDate": "Aug 2018 - May 2023",
-      "grade": "CGPA: 3.30",
+      "displayDate": "2018 — 2023",
+      "grade": "CGPA 3.30",
+      "images": [
+        {
+          "src": "assets/photos/derived/graduation-ceremony-certificate-1600.jpg",
+          "srcSmall": "assets/photos/derived/graduation-ceremony-certificate-800.jpg",
+          "alt": "Ahmed receiving his degree certificate on stage at the Khalifa University graduation ceremony",
+          "caption": "Graduation ceremony, Khalifa University, 2023",
+          "width": 1600,
+          "height": 1067
+        },
+        {
+          "src": "assets/photos/derived/graduation-campus-certificate-1600.jpg",
+          "srcSmall": "assets/photos/derived/graduation-campus-certificate-800.jpg",
+          "alt": "Ahmed holding his Applied Mathematics and Statistics degree certificate on the Khalifa University campus",
+          "caption": "Campus, June 2023",
+          "width": 1290,
+          "height": 850
+        },
+        {
+          "src": "assets/photos/derived/egaming-competition-demo-1600.jpg",
+          "srcSmall": "assets/photos/derived/egaming-competition-demo-800.jpg",
+          "alt": "Ahmed presenting his team's game at a whiteboard during the Sustainability E-gaming Competition",
+          "caption": "Presenting at the Sustainability E-gaming Competition, Khalifa University",
+          "width": 1066,
+          "height": 711
+        }
+      ],
       "blocks": []
     },
     {
+      "id": "al-nahda-diploma",
       "institution": "Al Nahda National Schools",
-      "cluster": "math",
-      "logo": "assets/Al_Nahda_Logo.png",
       "degree": "High School Diploma",
+      "location": "Abu Dhabi, UAE",
+      "logo": { "default": "assets/Al_Nahda_Logo.png" },
       "startDate": "2015",
       "endDate": "2018",
-      "displayDate": "2015 - 2018",
-      "grade": "Grade: 95.9",
+      "displayDate": "2015 — 2018",
+      "grade": "95.9",
+      "images": [],
       "blocks": []
     }
   ]
