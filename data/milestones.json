@@ -1,0 +1,104 @@
+{
+  "items": [
+    {
+      "id": "cert-deeplearning-ai",
+      "kind": "certification",
+      "date": "2024-12",
+      "title": "Supervised Machine Learning: Regression and Classification",
+      "org": "DeepLearning.AI",
+      "note": "",
+      "link": null,
+      "images": []
+    },
+    {
+      "id": "cert-dataiku-mlp",
+      "kind": "certification",
+      "date": "2024-04",
+      "title": "Dataiku ML Practitioner and Core Designer",
+      "org": "Dataiku Academy",
+      "note": "",
+      "link": null,
+      "images": []
+    },
+    {
+      "id": "golden-key",
+      "kind": "award",
+      "date": "2023-05",
+      "title": "Golden Key International Honour Society",
+      "org": "Khalifa University chapter",
+      "note": "Invitation-only, by nomination from the university chapter.",
+      "link": null,
+      "images": [
+        {
+          "src": "assets/photos/derived/honors-day-ceremony-1600.jpg",
+          "srcSmall": "assets/photos/derived/honors-day-ceremony-800.jpg",
+          "alt": "Ahmed receiving a certificate on stage beneath the Golden Key and Khalifa University logos",
+          "caption": "Honors Day, Khalifa University, May 2023",
+          "width": 1600,
+          "height": 1066,
+          "widthSmall": 800
+        }
+      ]
+    },
+    {
+      "id": "feed-and-reap",
+      "kind": "volunteering",
+      "date": "2023-04",
+      "title": "Feed and Reap Initiative",
+      "org": "Absher Ya Watan team, Abu Dhabi",
+      "note": "Ramadan meal packing and distribution.",
+      "link": null,
+      "images": [
+        {
+          "src": "assets/photos/derived/volunteering-meal-packing-1600.jpg",
+          "srcSmall": "assets/photos/derived/volunteering-meal-packing-800.jpg",
+          "alt": "Ahmed in a high-visibility volunteer vest packing meal boxes at a distribution hall",
+          "caption": "Ramadan meal packing, April 2023",
+          "width": 630,
+          "height": 1055,
+          "widthSmall": 478
+        }
+      ]
+    },
+    {
+      "id": "deans-list",
+      "kind": "award",
+      "date": "2022-12",
+      "title": "Dean's List",
+      "org": "Khalifa University",
+      "note": "Fall 2021 and Fall 2022.",
+      "link": { "url": "https://www.ku.ac.ae/student-life/honors-list", "label": "Khalifa University honors list" },
+      "images": []
+    },
+    {
+      "id": "peer-mentor",
+      "kind": "volunteering",
+      "date": "2022-09",
+      "title": "Lead Peer Mentor",
+      "org": "Khalifa University",
+      "note": "Mentored a cohort of first-year students through Fall 2022 and Spring 2023.",
+      "link": null,
+      "images": []
+    },
+    {
+      "id": "python-workshop",
+      "kind": "certification",
+      "date": "2022-06",
+      "title": "Python for Data Analysis Workshop",
+      "org": "Khalifa University",
+      "note": "",
+      "link": null,
+      "images": []
+    },
+    {
+      "id": "mawhibatna",
+      "kind": "volunteering",
+      "date": "2019-07",
+      "title": "Mawhibatna Program volunteer",
+      "org": "Sandooq Al Watan",
+      "note": "Organiser supporting programme activities.",
+      "link": null,
+      "images": []
+    }
+  ]
+}

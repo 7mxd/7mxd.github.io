@@ -1,18 +1,95 @@
+/* Design tokens. Palette derived from Ahmed's own logo artwork.
+   Every text colour below is verified against both grounds by
+   test/tokens-contrast.test.js. Do not edit a colour without re-running it. */
+
 :root {
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", "Cascadia Code", monospace;
-  --space: clamp(1rem, 2vw, 1.5rem);
-  --maxw: 72rem;
-  --radius: 10px;
-  --cluster-math: #6c5ce7;
-  --cluster-data: #d68a1e;
-  --cluster-engineering: #1d9bb8;
+  /* Type. Source Serif 4 for prose, Public Sans for metadata,
+     Amiri for the Arabic name only. */
+  --font-prose: "Source Serif 4", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --font-meta: "Public Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-arabic: "Amiri", "Noto Naskh Arabic", "Segoe UI", serif;
+
+  --text-xs: 0.8125rem;
+  --text-sm: 0.9375rem;
+  --text-base: 1.0625rem;
+  --text-lg: 1.1875rem;
+  --text-xl: clamp(1.375rem, 1.2rem + 0.9vw, 1.75rem);
+  --text-2xl: clamp(2rem, 1.55rem + 2.2vw, 3.25rem);
+
+  --leading-prose: 1.62;
+  --leading-tight: 1.18;
+
+  /* Space */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: clamp(3rem, 2rem + 5vw, 6rem);
+
+  /* Measure and gutters */
+  --measure-prose: 34rem;
+  --measure-wide: 46rem;
+  --measure-nav: 58rem;
+  --gutter: clamp(1.25rem, 0.5rem + 3vw, 4rem);
+
+  --rule-width: 1px;
+  --focus-width: 2px;
+
+  /* Light is the default and the primary theme. */
+  --ground: #fafaf9;
+  --ground-raised: #ffffff;
+  --ink: #1c1f32;
+  --ink-muted: #585b6b;
+  --accent: #a85a32;
+  --accent-strong: #8f4a2c;
+  --rule: #e2e2df;
+  /* Behind a third-party organisation mark that ships in one colourway only.
+     On the light ground it is not needed, so it is not drawn; in dark mode the
+     three marks here are all dark ink (Khalifa royal blue, Daman navy, Al Nahda
+     green) and would otherwise sit at under 2:1 against #15171f. Never carries
+     text, so it is exempt from the AA check the way --rule is. */
+  --logo-ground: transparent;
 }
-[data-theme="light"] {
-  --bg: #f7f6f3; --surface: #ffffff; --ink: #171614; --muted: #5d5a54;
-  --line: #e3e0d8; --accent: var(--cluster-engineering);
-}
+
 [data-theme="dark"] {
-  --bg: #0e1116; --surface: #161b22; --ink: #ecedee; --muted: #9aa1aa;
-  --line: #262c36; --accent: #36b6d6;
+  --ground: #15171f;
+  --ground-raised: #1c1f2a;
+  --ink: #e9e7e2;
+  --ink-muted: #9a9aa6;
+  --accent: #e7ad87;
+  --accent-strong: #f3cbb0;
+  --rule: #2a2d3a;
+  --logo-ground: #eceae5;
+}
+
+/* The page is rendered by JavaScript, so js/theme.js always sets
+   data-theme on <html> before paint. No prefers-color-scheme duplicate
+   block is needed, which keeps the palette defined exactly twice. */
+
+@media (prefers-contrast: more) {
+  :root {
+    --ink-muted: #3d4050;
+    --rule: #9a9a94;
+  }
+  [data-theme="dark"] {
+    --ink-muted: #c8c8d2;
+    --rule: #6a6d7e;
+  }
+}
+
+/* Print's ink-on-paper palette. Deliberately not the screen palette (which
+   stays a warm off-white with earthy accents): a printed page is a different
+   medium, and a recruiter's printer/toner budget wants plain black-on-white.
+   These are consumed by css/print.css, which assigns them to the screen
+   token names inside a `media="print"`-only stylesheet, so this is the only
+   other place raw hex is allowed to live. */
+:root {
+  --print-ground: #ffffff;
+  --print-ink: #111111;
+  --print-ink-muted: #444444;
+  --print-accent: #111111;
+  --print-rule: #bbbbbb;
 }

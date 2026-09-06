@@ -9,22 +9,25 @@
     ]
   },
 
-  "ascii-chart": {
+  "benchmark": {
     "scope": ["project"],
-    "label": "ASCII chart",
+    "label": "Benchmark table",
     "fields": [
-      { "name": "caption", "type": "text", "label": "Caption (optional)", "required": false },
-      { "name": "chart", "type": "code", "label": "Chart (use \u2587 for bar segments)", "required": true }
+      { "name": "caption", "type": "text", "label": "Caption", "required": false },
+      { "name": "unit", "type": "string", "label": "Unit (e.g. NMSE)", "required": true },
+      { "name": "rows", "type": "list", "label": "Rows as label / value / highlight", "required": true }
     ]
   },
 
   "image": {
-    "scope": ["project", "experience", "education"],
+    "scope": ["project", "experience", "education", "milestone"],
     "label": "Image",
     "fields": [
       { "name": "src", "type": "image", "label": "Image", "required": true },
       { "name": "alt", "type": "string", "label": "Alt text", "required": true },
-      { "name": "caption", "type": "string", "label": "Caption (optional)", "required": false }
+      { "name": "caption", "type": "string", "label": "Caption (optional)", "required": false },
+      { "name": "width", "type": "number", "label": "Intrinsic width, px", "required": true },
+      { "name": "height", "type": "number", "label": "Intrinsic height, px", "required": true }
     ]
   },
 
@@ -32,7 +35,6 @@
     "scope": ["project"],
     "label": "Code snippet",
     "fields": [
-      { "name": "language", "type": "string", "label": "Language (e.g. python)", "required": false },
       { "name": "content", "type": "code", "label": "Code", "required": true }
     ]
   },

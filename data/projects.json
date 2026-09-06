@@ -1,64 +1,121 @@
 {
   "items": [
     {
-      "title": "HiSalon",
-      "status": "in-progress",
-      "cluster": "engineering",
-      "tags": ["TypeScript", "Flutter", "PostgreSQL", "AWS", "Supabase"],
-      "links": {},
-      "blocks": [
-        { "type": "description", "content": "A production salon-management platform built with the Join-Future team. I work across the stack \u2014 TypeScript services, a Flutter client, and a production PostgreSQL backend on AWS. My focus has been making it reliable and safe to run in production." }
-      ]
-    },
-    {
-      "title": "Stmnt: AI-powered bank statement analyzer",
-      "status": "in-progress",
-      "cluster": "engineering",
-      "tags": ["Flutter", "Dart", "OpenRouter", "Supabase", "TypeScript", "iOS", "Xcode Cloud", "Claude / AI agents"],
-      "links": {
-        "ios": "https://apps.apple.com/app/stmnt/id6760298169",
-        "webapp": "https://stmnt.7mxd.me"
-      },
+      "id": "saal-audit-platform",
+      "title": "Procurement audit platform",
+      "org": "Saal.ai",
+      "timeline": false,
+      "startDate": "2024-09",
+      "displayDate": "2024 — 2026",
+      "tags": ["Python", "Pandas", "MongoDB", "Azure Blob Storage", "Docker", "APScheduler", "NLP", "Dynamics 365"],
       "blocks": [
         {
           "type": "description",
-          "content": "A Flutter iOS app that reads a bank statement PDF and turns it into spending analytics, forecasts, and recurring-subscription detection. The app runs a multi-stage AI pipeline on top of OpenRouter: extract, parse, normalize, convert currency, categorize, detect recurring charges, detect reversals, and remove duplicates (both at the file level using SHA-256 and at the transaction level). It uses 159 keyword rules across 17 categories, normalizes 100+ merchant brands, and supports 35+ currencies. Reports can be shared with other users through encrypted Supabase storage. Stmnt is live on the App Store and I ship updates to it every week."
+          "content": "A platform that ingests Microsoft Dynamics 365 ERP data from Azure Blob Storage and audits it across procure-to-pay, vendor master data, and user access rights. I was its primary developer and wrote most of the exception logic it runs."
+        },
+        {
+          "type": "description",
+          "content": "I designed the Delegation of Authority control set, which traces ERP workflow records to flag purchases approved by the wrong person, or approved at fewer levels than company spending limits require. I also built controls over payments and vendor master data, extending the platform from the ERP to treasury payment exports."
+        },
+        {
+          "type": "description",
+          "content": "Duplicate detection is the interesting part. Line item descriptions are free text, so exact matching finds almost nothing. The pipeline combines fuzzy and Levenshtein similarity with a cross-encoder transformer model to surface near duplicates that a human reviewer would recognise but a string comparison would miss."
+        },
+        {
+          "type": "description",
+          "content": "I containerised the pipeline with Docker, scheduled it with APScheduler, scaled it to run over one business entity or all of them, and added automatic retry with backoff on Azure ingestion. On the client-facing dashboard I replaced a pop-up with a standalone, shareable exception page and added an info panel explaining each check."
+        },
+        {
+          "type": "callout",
+          "tone": "note",
+          "content": "This is client audit software, so there are no screenshots. Alongside it I designed ER diagrams, wrote technical documentation for several use cases, and supported client teams in resolving data availability and update issues."
         }
       ]
     },
     {
-      "title": "Wafa",
-      "status": "shipped",
-      "cluster": "engineering",
-      "tags": ["Next.js", "TypeScript", "Supabase", "PostgreSQL", "Row-Level Security", "Claude / AI agents", "OpenRouter", "Tailwind CSS"],
+      "id": "stmnt",
+      "title": "Stmnt, bank statement analyser",
+      "org": "Independent",
+      "timeline": true,
+      "startDate": "2026-02",
+      "displayDate": "Feb 2026 — present",
+      "tags": ["Flutter", "Dart", "OpenRouter", "Gemini", "Supabase", "iOS", "Xcode Cloud"],
       "links": {
-        "webapp": "https://wafa.7mxd.me",
-        "github": "https://github.com/7mxd/Wafa"
+        "ios": "https://apps.apple.com/app/stmnt/id6760298169",
+        "webapp": "https://stmnt.7mxd.me"
       },
+      "images": [
+        {
+          "src": "assets/photos/derived/stmnt-01-spending-by-category-1600.jpg",
+          "srcSmall": "assets/photos/derived/stmnt-01-spending-by-category-800.jpg",
+          "alt": "Stmnt spending by category screen showing a donut chart and a ranked category breakdown",
+          "caption": "Spending breakdown",
+          "width": 738,
+          "height": 1600,
+          "widthSmall": 369
+        },
+        {
+          "src": "assets/photos/derived/stmnt-04-recurring-subscriptions-1600.jpg",
+          "srcSmall": "assets/photos/derived/stmnt-04-recurring-subscriptions-800.jpg",
+          "alt": "Stmnt recurring expenses screen listing detected monthly subscriptions and their amounts",
+          "caption": "Detected subscriptions",
+          "width": 738,
+          "height": 1600,
+          "widthSmall": 369
+        },
+        {
+          "src": "assets/photos/derived/stmnt-05-smart-forecast-1600.jpg",
+          "srcSmall": "assets/photos/derived/stmnt-05-smart-forecast-800.jpg",
+          "alt": "Stmnt forecast screen plotting actual spending against predicted spending for the coming month",
+          "caption": "Forecast against actuals",
+          "width": 738,
+          "height": 1600,
+          "widthSmall": 369
+        }
+      ],
       "blocks": [
-        { "type": "description", "content": "A take-home for Mal (an AI-native, Sharia-compliant fintech): a deployed qard-hasan (interest-free) loan-tracking app for friends. One clean flow \u2014 a borrower requests a loan, the lender approves, counters, or declines, and it is tracked to settled, with every transition written to an immutable audit timeline both sides can see. A record of agreement, not a payment processor: no money moves through it, which keeps it genuinely shippable and clear of payments/regulatory scope. Built with Next.js and Supabase (Postgres + Row-Level Security), with two light server-side AI touches via Claude on OpenRouter." }
+        {
+          "type": "description",
+          "content": "An iOS app, published on the App Store, that reads bank statement PDFs from any bank and turns them into spending breakdowns, subscription tracking, and forecasts. I am its sole developer."
+        },
+        {
+          "type": "description",
+          "content": "The pipeline pulls transactions out of unstructured PDF text, then categorises them, removes duplicates at both the file and transaction level, normalises the currencies a statement mixes, and flags unusual spending. Extraction runs through OpenRouter with Gemini as the primary model and a GPT model as a fallback, so a single provider outage or rate limit does not fail the import."
+        },
+        {
+          "type": "description",
+          "content": "Built in Flutter and Dart through an agent-driven workflow with Claude Code, while owning the architecture and reviewing every change. I ship updates most weeks."
+        }
       ]
     },
     {
+      "id": "kernel-rls",
       "title": "On a Generalization of Kernel RLS to Nonlinear State-Space Systems",
-      "status": "research",
-      "cluster": "math",
-      "tags": ["MATLAB", "Kernel Methods", "Time-Series", "State-Space", "RKHS", "Signal Processing"],
+      "org": "Khalifa University",
+      "timeline": true,
+      "startDate": "2023-05",
+      "displayDate": "Sep 2022 — May 2023",
+      "tags": ["MATLAB", "Kernel Methods", "Time Series", "State Space", "RKHS"],
       "links": {
         "github": "https://github.com/7mxd/Senior-Research-Project-2022-2023",
         "extra": [
-          { "url": "assets/SRP_Kernel_RLS_Nonlinear_State_Space_2023.pdf", "label": "paper (PDF)" }
+          { "url": "assets/SRP_Kernel_RLS_Nonlinear_State_Space_2023.pdf", "label": "Read the paper" }
         ]
       },
       "blocks": [
         {
           "type": "description",
-          "content": "My senior research project at Khalifa University (May 2023). I derived the ARMA time-series learning algorithm from first principles, rewrote it as a least-squares problem in two unknowns, and turned it into the Kernel Recursive Least Squares (KRLS) algorithm in MATLAB. I then extended the construction to nonlinear state-space systems using tensor products in a reproducing kernel Hilbert space (the KAARMA algorithm). The project was supervised by Prof. Ibrahim M. Elfadel (EECS) and Prof. Jorge P. Zubelli (Mathematics)."
+          "content": "My senior research project at Khalifa University, supervised by Prof. Ibrahim Elfadel and Prof. Jorge Zubelli. I derived the ARMA learning algorithm from first principles, rewrote it as a least squares problem in two unknowns, and implemented least squares, recursive least squares, and kernel recursive least squares in MATLAB. I then extended the construction to nonlinear state-space systems using tensor products in a reproducing kernel Hilbert space."
         },
         {
-          "type": "ascii-chart",
-          "caption": "Benchmarked on the Santa Fe laser time-series, the standard test for chaotic time-series prediction. NMSE (normalized mean squared error) measures how far a prediction lands from the true value. Lower is better.",
-          "chart": "competition winner (NN, 1993)  \u2587\u2587\u2587\u2587\u2587\u2587\u2587 0.028\nmy iterative KRLS              \u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587 0.042\ncompetition 2nd place          \u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587\u2587 0.080"
+          "type": "benchmark",
+          "caption": "Tested on the Santa Fe laser series, the standard benchmark for chaotic time-series prediction. NMSE is normalised mean squared error; lower is better.",
+          "unit": "NMSE",
+          "rows": [
+            { "label": "Competition winner, 1993", "value": "0.028" },
+            { "label": "This work, iterative KRLS", "value": "0.043", "highlight": true },
+            { "label": "Competition second place", "value": "0.080" }
+          ]
         }
       ]
     }

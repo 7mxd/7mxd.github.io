@@ -1,52 +1,54 @@
 {
   "categories": [
     {
-      "name": "programming languages",
+      "name": "Programming languages",
       "type": "tags",
       "items": [
-        { "name": "Python" },
-        { "name": "R" },
-        { "name": "MATLAB" },
-        { "name": "Java" },
-        { "name": "LaTeX" }
+        { "name": "Python" }, { "name": "R" }, { "name": "MATLAB" },
+        { "name": "Java" }
       ]
     },
     {
-      "name": "data science & analytics",
+      "name": "Libraries",
       "type": "tags",
       "items": [
-        { "name": "NumPy" },
-        { "name": "Pandas" },
-        { "name": "Seaborn" },
-        { "name": "Tidyverse" },
-        { "name": "Caret" },
-        { "name": "Power BI" },
-        { "name": "Tableau" },
-        { "name": "Dataiku" }
+        { "name": "Pandas" }, { "name": "NumPy" }, { "name": "Matplotlib" },
+        { "name": "Seaborn" }, { "name": "scikit-learn" }, { "name": "TensorFlow" },
+        { "name": "Keras" }, { "name": "PyMongo" }, { "name": "Tidyverse" },
+        { "name": "lubridate" }, { "name": "caret" }
       ]
     },
     {
-      "name": "databases & tools",
+      "name": "Databases and cloud",
       "type": "tags",
       "items": [
-        { "name": "MongoDB" },
-        { "name": "PyMongo" },
-        { "name": "Postman" },
-        { "name": "Studio 3T" },
-        { "name": "Docker" },
-        { "name": "Git / GitHub" },
-        { "name": "VS Code" },
-        { "name": "Jupyter" },
-        { "name": "RStudio" }
+        { "name": "MongoDB" }, { "name": "Studio 3T" },
+        { "name": "Azure Blob Storage" }, { "name": "Docker" }
       ]
     },
     {
-      "name": "languages",
+      "name": "Analytics and BI",
+      "type": "tags",
+      "items": [
+        { "name": "Power BI" }, { "name": "Tableau" },
+        { "name": "Dataiku" }, { "name": "Minitab" }
+      ]
+    },
+    {
+      "name": "Developer tools",
+      "type": "tags",
+      "items": [
+        { "name": "Claude Code" }, { "name": "Git and GitHub" }, { "name": "VS Code" },
+        { "name": "Jupyter" }, { "name": "RStudio" }, { "name": "Postman" }, { "name": "LaTeX" }
+      ]
+    },
+    {
+      "name": "Languages",
       "type": "languages",
       "items": [
-        { "name": "Arabic",  "level": "native"   },
-        { "name": "English", "level": "fluent"   },
-        { "name": "Spanish", "level": "beginner" }
+        { "name": "Arabic", "level": "Native" },
+        { "name": "English", "level": "Fluent" },
+        { "name": "Spanish", "level": "Beginner" }
       ]
     }
   ]

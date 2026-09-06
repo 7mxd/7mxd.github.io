@@ -1,17 +1,20 @@
 {
   "name": "Ahmed Alawi Radhi",
-  "title": "Data scientist at Saal.ai. ETL pipelines, kernel methods, applied statistics.",
+  "nameArabic": "أحمد علوي رضي",
+  "role": "Data scientist in Abu Dhabi",
+  "tagline": "I build data pipelines and audit systems. Applied mathematics and statistics, Khalifa University.",
+  "location": "Abu Dhabi, United Arab Emirates",
+  "portrait": {
+    "src": "assets/photos/derived/portrait-formal-1600.jpg",
+    "srcSmall": "assets/photos/derived/portrait-formal-800.jpg",
+    "alt": "Ahmed Alawi Radhi in a red and white ghutra against a plain background",
+    "width": 827,
+    "height": 1063,
+    "widthSmall": 622
+  },
   "contact": {
     "email": "AhmedARadhi00@gmail.com",
-    "phone": "+971 56 913 5351",
-    "location": "Abu Dhabi, UAE",
-    "linkedin": {
-      "url": "https://www.linkedin.com/in/ahmedaradhi/",
-      "label": "LinkedIn"
-    },
-    "github": {
-      "url": "https://github.com/7mxd",
-      "label": "GitHub"
-    }
+    "linkedin": { "url": "https://www.linkedin.com/in/ahmedaradhi/", "label": "LinkedIn" },
+    "github": { "url": "https://github.com/7mxd", "label": "GitHub" }
   }
 }
