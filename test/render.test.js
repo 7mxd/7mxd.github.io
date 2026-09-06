@@ -44,7 +44,7 @@ class FakeElement {
   getAttribute(name) { return this._attrs[name]; }
 }
 
-function renderFixture() {
+function buildFixtureDoc() {
   const sections = new Map(SECTION_IDS.map((id) => [id, new FakeElement()]));
   const hooks = {
     '[data-nav-name]': new FakeElement(),
@@ -65,7 +65,22 @@ function renderFixture() {
     set title(v) { this._title = v; },
     get title() { return this._title; },
   };
+  return { doc, sections, hooks };
+}
+
+function renderFixture() {
+  const { doc, sections, hooks } = buildFixtureDoc();
   renderAll(doc, DATA, TIMELINE);
+  return { doc, sections, hooks };
+}
+
+/** Render the real DATA (already-validated content files) against a
+ *  hand-built timeline instead of the one buildTimeline() produces, so a
+ *  test can exercise a shape today's data/*.json doesn't happen to contain
+ *  — like a timeline entry carrying a non-empty `blocks` array. */
+function renderWithTimeline(timeline) {
+  const { doc, sections, hooks } = buildFixtureDoc();
+  renderAll(doc, DATA, timeline);
   return { doc, sections, hooks };
 }
 
@@ -149,6 +164,31 @@ test('a project timeline entry carries no images or blocks, only title/org/dateR
   assert.deepEqual(stmntGroup.blocks, []);
   assert.equal(stmntGroup.workRef, 'stmnt');
   assert.ok(stmntGroup.title && stmntGroup.org && stmntGroup.dateRange);
+});
+
+test('a timeline entry\'s blocks actually render (entryMarkup must call renderBlocks(entry.blocks))', () => {
+  // js/timeline.js threads `blocks` through from experience/education roles
+  // into every timeline entry, and data/blocks-registry.json scopes several
+  // block types (responsibility, honor, thesis, coursework, metric,
+  // linked-artifact, image) to experience/education/milestone — but nothing
+  // in today's data/*.json happens to populate a role or education item's
+  // `blocks` array, so a regression here would render silently, with no
+  // error and no failing test. Built by hand rather than via buildTimeline,
+  // since no real fixture data exercises this shape.
+  const syntheticTimeline = [{
+    year: 2099,
+    entries: [{
+      id: 'fixture-entry', kind: 'education', sortDate: '2099-01', year: 2099, order: null,
+      title: 'Fixture Degree', org: 'Fixture University', orgLogo: null, location: '', dateRange: '2099',
+      bullets: [], images: [],
+      blocks: [{ type: 'linked-artifact', label: 'Fixture link', url: 'https://example.test/fixture' }],
+      workRef: null, link: null, note: '',
+    }],
+  }];
+  const { sections } = renderWithTimeline(syntheticTimeline);
+  const html = sections.get('path').innerHTML;
+  assert.match(html, /class="block-link"/, 'entry.blocks did not render at all');
+  assert.match(html, /<a href="https:\/\/example\.test\/fixture">Fixture link<\/a>/);
 });
 
 test('the image block renderer neutralises a quote-breakout payload in width and height', async () => {

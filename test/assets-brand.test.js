@@ -23,6 +23,17 @@ test('logo icon is square, RGBA, and reasonably sized', () => {
   assert.equal(info.colourType, 6, 'icon must have an alpha channel');
 });
 
+test('a dark-mode nav icon exists, square and RGBA, alongside the light one', () => {
+  assert.ok(existsSync(asset('assets/brand/logo-icon-dark.png')), 'assets/brand/logo-icon-dark.png is missing');
+  const light = pngInfo(asset('assets/brand/logo-icon.png'));
+  const dark = pngInfo(asset('assets/brand/logo-icon-dark.png'));
+  assert.equal(dark.width, dark.height, 'dark icon must be square');
+  assert.equal(dark.colourType, 6, 'dark icon must have an alpha channel');
+  // Same crop and canvas as the light icon, so css/layout.css can swap one
+  // for the other with no layout shift — only the line art is recoloured.
+  assert.equal(dark.width, light.width, 'dark icon must match the light icon’s canvas size');
+});
+
 test('logo wordmark is transparent and wider than tall', () => {
   const info = pngInfo(asset('assets/brand/logo-wordmark.png'));
   assert.equal(info.colourType, 6, 'wordmark must have an alpha channel');

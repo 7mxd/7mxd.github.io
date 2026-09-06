@@ -139,6 +139,21 @@ function extractStaticClassLiterals(src) {
   return classes;
 }
 
+// How many class="...${...}" interpolation sites exist in the two modules
+// right now — kept in lock-step with HAND_ENUMERATED_DYNAMIC_CLASSES's three
+// groups by the test below. A fourth site would silently ship unstyled
+// otherwise: it can't be picked up by extractStaticClassLiterals, and
+// nothing else would fail.
+const KNOWN_INTERPOLATED_CLASS_SITE_COUNT = 3;
+
+function countInterpolatedClassSites(src) {
+  return [...src.matchAll(/class="[^"]*\$\{[^"]*"/g)].length;
+}
+
+function stripCssComments(css) {
+  return css.replace(/\/\*[\s\S]*?\*\//g, ' ');
+}
+
 function cssHasRuleFor(css, className) {
   const escaped = className.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   // A selector reference to .className not immediately followed by another
@@ -147,16 +162,35 @@ function cssHasRuleFor(css, className) {
   return new RegExp(`\\.${escaped}(?![\\w-])`).test(css);
 }
 
+const renderJsPath = fileURLToPath(new URL('../js/render.js', import.meta.url));
+const blocksJsPath = fileURLToPath(new URL('../js/blocks.js', import.meta.url));
+const renderJsSource = readFileSync(renderJsPath, 'utf8');
+const blocksJsSource = readFileSync(blocksJsPath, 'utf8');
+
+test('the hand-enumerated interpolated class sites still number exactly three', () => {
+  // If this fails, someone added (or removed) a class="...${...}" attribute
+  // in render.js/blocks.js. Update the comment and
+  // HAND_ENUMERATED_DYNAMIC_CLASSES above to cover the new site's static
+  // part and enumerated dynamic values, add any newly-unstyled class to
+  // css/sections.css or to CLASS_COVERAGE_ALLOWLIST with a reason, then
+  // bump this count.
+  const found = countInterpolatedClassSites(renderJsSource) + countInterpolatedClassSites(blocksJsSource);
+  assert.equal(
+    found,
+    KNOWN_INTERPOLATED_CLASS_SITE_COUNT,
+    `expected ${KNOWN_INTERPOLATED_CLASS_SITE_COUNT} class="...\${...}" sites across render.js/blocks.js, found ${found} — ` +
+      'a hand-enumerated site was added or removed; see the comment on this test',
+  );
+});
+
 test('js/render.js and js/blocks.js: every emitted class has a CSS rule, or a documented allowlist reason', () => {
-  const renderJsPath = fileURLToPath(new URL('../js/render.js', import.meta.url));
-  const blocksJsPath = fileURLToPath(new URL('../js/blocks.js', import.meta.url));
-  const renderJs = readFileSync(renderJsPath, 'utf8');
-  const blocksJs = readFileSync(blocksJsPath, 'utf8');
-  const allCss = files.map((f) => readFileSync(`${cssDir}${f}`, 'utf8')).join('\n');
+  // Comments are stripped first: a class name mentioned only in a /* ... */
+  // explanation must not satisfy this guard — only an actual selector may.
+  const allCss = stripCssComments(files.map((f) => readFileSync(`${cssDir}${f}`, 'utf8')).join('\n'));
 
   const emitted = new Set([
-    ...extractStaticClassLiterals(renderJs),
-    ...extractStaticClassLiterals(blocksJs),
+    ...extractStaticClassLiterals(renderJsSource),
+    ...extractStaticClassLiterals(blocksJsSource),
     ...HAND_ENUMERATED_DYNAMIC_CLASSES,
   ]);
 

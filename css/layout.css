@@ -34,6 +34,16 @@
 .nav-mark img { width: 2rem; height: 2rem; }
 .nav-mark-name { white-space: nowrap; }
 
+/* The icon's line art is recoloured for dark mode (see
+   tools/process_brand.py's recolor_dark_lines): the source drawing keys
+   the ghutra's white cloth out as transparent negative space, so a dark
+   ground makes both that gap and the near-black outline disappear,
+   leaving only a floating skin-tone patch. Same on/off idiom as
+   .icon-sun/.icon-moon above. */
+.nav-icon-dark { display: none; }
+[data-theme="dark"] .nav-icon-light { display: none; }
+[data-theme="dark"] .nav-icon-dark { display: block; }
+
 .nav-links {
   margin-left: auto;
   display: flex;
@@ -164,8 +174,11 @@ main {
   .nav-links.is-open { display: flex; }
   .site-nav { flex-wrap: wrap; }
   .nav-list { flex-direction: column; gap: var(--space-3); font-size: var(--text-base); }
-}
 
-/* js/main.js toggles this on <body> while the mobile menu is open; lock
-   background scroll so the page behind the open menu doesn't move. */
-body.nav-open { overflow: hidden; }
+  /* js/main.js toggles this on <body> while the mobile menu is open; lock
+     background scroll so the page behind the open menu doesn't move. Scoped
+     to this same breakpoint: the toggle only exists below 46rem, and
+     js/main.js has no resize handler to clear the class if the viewport
+     grows past it while open, so the rule must not apply above 46rem. */
+  body.nav-open { overflow: hidden; }
+}

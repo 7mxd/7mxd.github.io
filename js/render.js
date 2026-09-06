@@ -62,7 +62,7 @@ function entryMarkup(entry) {
   return `<li class="entry is-${escapeHtml(entry.kind)}">
 <h3 class="entry-title">${escapeHtml(entry.title)}</h3>
 <p class="entry-meta">${org}${dates}</p>
-${note}${bullets}${more}${gallery(entry.images)}
+${note}${renderBlocks(entry.blocks)}${bullets}${more}${gallery(entry.images)}
 </li>`;
 }
 

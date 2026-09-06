@@ -132,6 +132,12 @@
 
 .gallery { margin-top: var(--space-4); display: grid; gap: var(--space-3); }
 .gallery.is-single { grid-template-columns: 1fr; }
+/* A lone portrait-orientation photo (e.g. volunteering-meal-packing at
+   630x1055) would otherwise run taller than a laptop viewport for one
+   image. Mirrors the cap already on Work galleries below; landscape
+   photos are unaffected since their computed height is already well
+   under this. */
+.gallery.is-single .figure img { max-height: 30rem; width: auto; }
 
 @media (min-width: 40rem) {
   .gallery.is-grid { grid-template-columns: 1fr 1fr; }
@@ -153,7 +159,22 @@
 .metrics {
   display: grid;
   gap: var(--space-6);
-  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  /* 8rem (not 11rem) so the four current figures fit four-across at both
+     768 and 1280 rather than breaking 3+1 with an orphan, and fall to a
+     clean 2x2 at 390. .metric-label already caps at 16rem and wraps, so a
+     narrower track doesn't crowd it.
+
+     8rem, not 9rem: --gutter is partly vw-based, so even though main caps
+     at measure-wide (736px) past ~768px wide, the gutter keeps eating
+     further into that fixed box as the viewport keeps growing, all the way
+     up to its own 4rem-per-side ceiling (viewport >= ~1867px). That leaves
+     as little as 608px for this grid in the worst case (736 - 2*4rem).
+     Fitting 4 tracks plus 3 gaps needs floor <= (608 - 3*1.5rem) / 4 = 8.375rem;
+     9rem clears 768px's 674px easily but comes in 5px over budget at
+     1280px's 643px, so the 4th metric wraps there specifically — confirmed
+     by measuring metrics.clientWidth in the actual browser, not by eyeballing
+     it. 8rem clears every case with room to spare. */
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
 }
 /* A bare grid-item wrapper: min-width: 0 keeps a long label from forcing
    the auto-fit track wider than the viewport, which is what would open a
@@ -268,10 +289,11 @@
   color: var(--ink-muted);
 }
 
-/* A code snippet is one of the few places a monospace face is legitimate:
-   it is the typeface of literal code, not a terminal-metaphor affectation.
-   overflow-x keeps a long unwrapped line from opening the page's own
-   horizontal scrollbar. */
+/* No font-family override here: the user-agent stylesheet already sets
+   `code { font-family: monospace }`, and tokens.css asserts no monospace
+   family is declared, since the terminal metaphor is retired. overflow-x
+   keeps a long unwrapped line from opening the page's own horizontal
+   scrollbar. */
 .block-code {
   margin: var(--space-4) 0;
   padding: var(--space-4);
@@ -280,9 +302,6 @@
   border: var(--rule-width) solid var(--rule);
   font-size: var(--text-sm);
   line-height: var(--leading-tight);
-}
-.block-code code {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
 .benchmark {
