@@ -1,0 +1,60 @@
+/* A recruiter printing the page should get a clean document.
+   Loaded with media="print" (see index.html), so nothing here needs an
+   @media print wrapper — the whole file only ever applies to print.
+
+   The palette below is deliberately not the screen palette: print is a
+   different medium with its own ink-on-paper conventions (plain black text
+   on white, no accent colour). The actual hex values live in
+   css/tokens.css as --print-* tokens, per the Task 9 ruling that hex
+   literals belong only in tokens.css; this file only ever references them
+   through var(), same as every other stylesheet. */
+:root, [data-theme="dark"] {
+  --ground: var(--print-ground);
+  --ground-raised: var(--print-ground);
+  --ink: var(--print-ink);
+  --ink-muted: var(--print-ink-muted);
+  --accent: var(--print-accent);
+  --accent-strong: var(--print-accent);
+  --rule: var(--print-rule);
+}
+
+body { font-size: 10.5pt; line-height: 1.4; }
+
+.site-nav-wrap,
+.nav-actions,
+.nav-menu-toggle,
+.skip-link,
+.noscript-warning,
+.entry-more,
+.work-tags { display: none !important; }
+
+main { max-width: none; padding: 0; }
+
+.section { padding-block: 0.6cm; break-inside: avoid; }
+.section + .section { border-top: 1px solid var(--rule); }
+
+.hero { padding-block: 0 0.6cm; }
+.hero-portrait { width: 2.6cm; }
+
+.year-group { break-inside: avoid; padding-block: 0.35cm; }
+.entry { break-inside: avoid; }
+.entries { gap: 0.35cm; }
+
+/* Photographs are dropped in print; only the portrait survives. */
+.gallery { display: none !important; }
+
+.work + .work { margin-top: 0.5cm; padding-top: 0.5cm; }
+
+/* Print the destination of every link, since a printed page cannot be clicked. */
+.hero-links a::after,
+.work-links a::after,
+.contact-row a::after {
+  content: " (" attr(href) ")";
+  font-size: 8pt;
+  color: var(--ink-muted);
+  word-break: break-all;
+}
+.hero-links a[href^="mailto:"]::after,
+.contact-row a[href^="mailto:"]::after { content: ""; }
+
+@page { margin: 1.4cm; }

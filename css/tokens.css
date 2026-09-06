@@ -76,3 +76,17 @@
     --rule: #6a6d7e;
   }
 }
+
+/* Print's ink-on-paper palette. Deliberately not the screen palette (which
+   stays a warm off-white with earthy accents): a printed page is a different
+   medium, and a recruiter's printer/toner budget wants plain black-on-white.
+   These are consumed by css/print.css, which assigns them to the screen
+   token names inside a `media="print"`-only stylesheet, so this is the only
+   other place raw hex is allowed to live. */
+:root {
+  --print-ground: #ffffff;
+  --print-ink: #111111;
+  --print-ink-muted: #444444;
+  --print-accent: #111111;
+  --print-rule: #bbbbbb;
+}
