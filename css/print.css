@@ -20,13 +20,20 @@
 
 body { font-size: 10.5pt; line-height: 1.4; }
 
+/* .noscript-warning is deliberately NOT hidden: it only exists in the document
+   at all when scripting is off, and in that case it is the entire page. */
 .site-nav-wrap,
 .nav-actions,
 .nav-menu-toggle,
 .skip-link,
-.noscript-warning,
-.entry-more,
 .work-tags { display: none !important; }
+
+/* .entry-more is two different links wearing one class: a "Read more about this
+   work" jump to a section further down the same sheet of paper, and a
+   milestone's link to third-party corroboration — the Khalifa University honors
+   list, which the spec singles out as the one piece of independent evidence on
+   the page. Hiding the class hid both. Hide only the internal jump. */
+.entry-more:has(a[href^="#"]) { display: none !important; }
 
 main { max-width: none; padding: 0; }
 
@@ -66,9 +73,12 @@ main { max-width: none; padding: 0; }
    to the next one. */
 .block-callout, .benchmark { break-inside: avoid; }
 
-/* Print the destination of every link, since a printed page cannot be clicked. */
+/* Print the destination of every link, since a printed page cannot be clicked.
+   The surviving .entry-more link is external by definition — the internal jump
+   is hidden above — so its URL is worth the ink. */
 .hero-links a::after,
 .work-links a::after,
+.entry-more a::after,
 .contact-row a::after {
   content: " (" attr(href) ")";
   font-size: 8pt;

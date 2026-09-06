@@ -72,6 +72,14 @@
 <link rel="stylesheet" href="css/sections.css">
 <link rel="stylesheet" href="css/print.css" media="print">
 
+<!-- Every section below is filled in by js/main.js, so with scripting off the
+     page is 1300 pixels of empty skeleton, a Download CV link with no href, and
+     a copyright line with no year. Hide the shell and let the noscript message
+     above <main> be the page. -->
+<noscript><style>
+  #main, .site-nav-wrap, .site-footer { display: none; }
+</style></noscript>
+
 <script type="module" src="js/main.js"></script>
 </head>
 <body>
@@ -120,6 +128,12 @@
   </nav>
 </header>
 
+<noscript>
+  <div class="noscript-warning">
+    <p>This page is rendered with JavaScript. Please enable it to load the content.</p>
+  </div>
+</noscript>
+
 <main id="main">
   <section id="hero" class="hero"></section>
   <section id="about" class="section" aria-labelledby="about-heading"></section>
@@ -133,11 +147,5 @@
 <footer class="site-footer">
   <p>&copy; <span data-footer-year></span> <span data-footer-name></span></p>
 </footer>
-
-<noscript>
-  <div class="noscript-warning">
-    <p>This page is rendered with JavaScript. Please enable it to load the content.</p>
-  </div>
-</noscript>
 </body>
 </html>

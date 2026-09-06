@@ -53,6 +53,23 @@ test('the web app manifest describes the same person the page does', () => {
   assert.equal(/Saal\.ai/.test(manifest.description), false, 'the manifest names a role that ends');
 });
 
+test('a visitor with scripting off gets the message, not the empty skeleton', () => {
+  // Every section is filled in by js/main.js. With the noscript block last in
+  // the body and nothing hiding the shell, scripting-off meant 1300 pixels of
+  // empty skeleton, a Download CV link with no href, and a copyright with no
+  // year, followed eventually by the explanation.
+  const headStyle = html.match(/<noscript><style>([^]*?)<\/style><\/noscript>/);
+  assert.ok(headStyle, 'no <noscript><style> in the head to hide the JS-rendered shell');
+  for (const selector of ['#main', '.site-nav-wrap', '.site-footer']) {
+    assert.ok(headStyle[1].includes(selector), `${selector} is left visible with scripting off`);
+  }
+  assert.ok(html.indexOf(headStyle[0]) < html.indexOf('<body>'), 'the hiding style must be in the head');
+
+  const warning = html.indexOf('class="noscript-warning"');
+  assert.notEqual(warning, -1, 'no noscript message at all');
+  assert.ok(warning < html.indexOf('<main id="main">'), 'the message must come before the shell it replaces');
+});
+
 test('the manifest theme colour matches the light-primary ground', () => {
   // A #15171f theme colour against a #fafaf9 background paints the browser
   // chrome in the dark palette while the splash screen stays light. Light is

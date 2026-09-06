@@ -36,7 +36,19 @@ test/               node --test suite
 
 ## Content as data
 
-All copy, dates, and project listings live in `data/*.json`. Section visibility is toggled via `data/settings.json`. Nothing is hard-coded in HTML or JS — extend the JSON schema to add content.
+Anything Ahmed writes about himself lives in `data/*.json`: experience and
+education bullets, project descriptions, dates, the summary, milestone and
+metric copy. Section visibility is toggled via `data/settings.json`.
+
+Structural interface labels are not content and stay in HTML and JS: section
+headings, navigation labels, and affordances like "Download CV" or "Read more
+about this work". The test is whether the string would still make sense on
+someone else's site with the JSON swapped in. See "Content vs. interface" in
+`CLAUDE.md` for the full ruling.
+
+The admin UI under `admin/` rebuilds each JSON file from `admin/schema.js`, so a
+new field has to be declared there as well as written to the data file, or it is
+dropped on the next save. `test/admin-roundtrip.test.js` enforces that.
 
 ## Design
 

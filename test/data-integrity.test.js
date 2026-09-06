@@ -92,9 +92,12 @@ test('every image declares widthSmall, and it matches the small file on disk', (
   }
 });
 
-test('the CV path in settings resolves', () => {
+test('the CV path in settings resolves, and the superseded CV is gone', () => {
   assert.ok(existsSync(repoFile(settings.cv.path)), `missing ${settings.cv.path}`);
   assert.match(settings.cv.path, /2026/, 'settings still points at the old CV');
+  // Spec section 14: the 2025 CV is replaced, not kept alongside. Leaving it
+  // committed ships an unreferenced, stale copy of Ahmed's CV to the public web.
+  assert.equal(existsSync(repoFile('assets/ahmed_radhi_cv_2025.pdf')), false, 'the 2025 CV is still committed');
 });
 
 test('the Arabic name is present and correct', () => {

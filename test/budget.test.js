@@ -27,8 +27,15 @@ test('the legacy monolith files are gone', () => {
 });
 
 test('the stylesheets are split into five files', () => {
-  const css = readdirSync(`${root}css`).filter((f) => f.endsWith('.css'));
-  assert.ok(css.length >= 5, 'expected the five split stylesheets');
+  // `>= 5` was true of six, or sixty. The split is a named architecture — one
+  // file per concern, listed in the spec's section 6 — so name the five.
+  const css = readdirSync(`${root}css`).filter((f) => f.endsWith('.css')).sort();
+  assert.deepEqual(css, ['base.css', 'layout.css', 'print.css', 'sections.css', 'tokens.css']);
+});
+
+test('the ES modules are split into six files', () => {
+  const js = readdirSync(`${root}js`).filter((f) => f.endsWith('.js')).sort();
+  assert.deepEqual(js, ['blocks.js', 'data.js', 'main.js', 'render.js', 'theme.js', 'timeline.js']);
 });
 
 // The task-11 brief named this test 'no stylesheet mentions the retired
