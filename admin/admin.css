@@ -6,7 +6,7 @@ body { margin:0; font-family: var(--font-sans, system-ui); background: var(--bg,
 .err { color:#b3261e; min-height:1.2em; }
 #login { min-height:100vh; display:grid; place-items:center; }
 .login-card { max-width:28rem; text-align:center; padding:2rem; border:1px solid var(--line,#ddd); border-radius:12px; background:var(--surface,#fff); }
-#topbar { display:flex; align-items:center; gap:1rem; padding:.6rem 1rem; border-bottom:1px solid var(--line,#ddd); position:sticky; top:0; background:var(--bg); z-index:5; }
+#topbar { display:flex; align-items:center; gap:1rem; padding:.6rem 1rem; border-bottom:1px solid var(--line,#ddd); position:sticky; top:0; background:var(--bg,#f7f6f3); z-index:5; }
 #topbar .spacer { flex:1; }
 .brand { font-family:var(--font-mono,monospace); font-weight:700; }
 .who { color:var(--muted,#666); font-size:.85rem; }

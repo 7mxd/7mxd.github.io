@@ -24,15 +24,22 @@ test('every field has name/label and a valid type', () => {
     walk(c.kind === 'list' ? c.itemFields : c.fields);
   }
 });
-test('projects item has cluster + tags + blocks(scope project)', () => {
+test('projects item has tags + blocks(scope project), and no cluster field', () => {
   const p = getCollection('projects');
   const names = p.itemFields.map(f => f.name);
-  assert.ok(names.includes('cluster') && names.includes('tags'));
+  assert.ok(names.includes('tags'));
+  assert.ok(!names.includes('cluster'), 'cluster field should have been removed with settings.graph');
   assert.ok(p.itemFields.some(f => f.type === 'blocks' && f.scope === 'project'));
 });
-test('settings has graph.clusters and theme', () => {
+test('settings has theme but no graph.clusters or navLogo', () => {
   const s = getCollection('settings');
-  const graph = s.fields.find(f => f.name === 'graph');
-  assert.ok(graph && graph.fields.some(f => f.name === 'clusters'));
+  assert.ok(!s.fields.some(f => f.name === 'graph'), 'graph field should have been removed from settings');
+  assert.ok(!s.fields.some(f => f.name === 'navLogo'), 'navLogo field should have been removed from settings');
   assert.ok(s.fields.some(f => f.name === 'theme' && f.type === 'select'));
+});
+test('experience and education items have no cluster field', () => {
+  const experienceNames = getCollection('experience').itemFields.map(f => f.name);
+  const educationNames = getCollection('education').itemFields.map(f => f.name);
+  assert.ok(!experienceNames.includes('cluster'));
+  assert.ok(!educationNames.includes('cluster'));
 });
