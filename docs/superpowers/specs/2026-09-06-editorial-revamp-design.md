@@ -159,7 +159,7 @@ Page order, top to bottom:
    two to four bullets, and optional photographs with captions.
 5. **By the numbers.** A short honest strip of quantities that appear nowhere
    else on the page.
-6. **Selected work.** Two entries with room to breathe.
+6. **Selected work.** Three entries with room to breathe.
 7. **Skills.** Grouped lists. No proficiency percentages or bars.
 8. **Contact.** Email, LinkedIn, GitHub.
 9. **Footer.** Copyright and year.
@@ -325,25 +325,59 @@ dashboards.
 
 ### Experience
 
-The Saal.ai Graduate Trainee entry is currently five vague bullets. The CV has
-ten specific ones. The site takes the best four; the CV keeps all ten. The site
-is not the CV.
+**Rule: the timeline carries a role's full bullet list, unless that role's work
+has its own Selected Work entry, in which case the timeline carries three
+headline bullets and links down to the full treatment.**
 
-Selected for the site:
+An earlier draft simply truncated the Saal.ai role to four of its ten bullets.
+That threw away real evidence the hiring-manager audience wants. Promoting the
+procurement audit platform to Selected Work keeps every bullet while preserving
+the timeline's scanning rhythm, and it strengthens a Selected Work section left
+thin by the removal of Wafa and HiSalon.
+
+Applying the rule to the three roles:
+
+| Role | Bullets in CV | Treatment |
+|---|---|---|
+| Saal.ai, Graduate Trainee | 10 | 3 in the timeline, all 10 in Selected Work |
+| Saal.ai, Data Scientist Intern | 4 | all 4 in the timeline |
+| Daman, Data Analyst Intern | 2 | both in the timeline |
+
+Only one role triggers the exception, so the timeline stays predictable.
+
+The three headline bullets for the Graduate Trainee entry:
 
 - Primary developer of a procurement audit platform ingesting Dynamics 365 ERP
   data from Azure Blob Storage, authoring 28 of its 38 exception checks.
-- Designed the Delegation of Authority control set, six checks tracing ERP
-  workflow records to flag approvals by the wrong person or at too few levels.
 - Applied NLP matching combining fuzzy and Levenshtein similarity with a
   cross-encoder transformer to flag near-duplicate line items.
-- Containerised the pipeline with Docker, scheduled it with APScheduler, and
-  added retry with backoff on Azure ingestion.
+- Built ETL pipelines in a microservices architecture with Python, Pandas, and
+  MongoDB, and interactive dashboards in Power BI and Tableau.
+
+Note that the current `experience.json` bullets are not merely fewer than the
+CV's, they are vaguer. Every bullet is rewritten from the CV regardless of how
+many survive into the timeline.
 
 ### Selected work
 
-Two entries. Wafa and HiSalon are removed at Ahmed's request, leaving the site
-consistent with the CV.
+Three entries. Wafa and HiSalon are removed at Ahmed's request. The procurement
+audit platform is promoted here from the experience bullets, per the rule above.
+
+**Procurement audit platform, Saal.ai.** The full ten-bullet treatment: ingestion
+of Dynamics 365 ERP data from Azure Blob Storage across procure-to-pay, vendor
+master data, and user access rights; 28 of the 38 exception checks authored; the
+six-check Delegation of Authority control set tracing ERP workflow records to
+flag approvals by the wrong person or at fewer levels than spending limits
+require; four further controls over payments and vendor master data extending to
+treasury payment exports; NLP matching with fuzzy, Levenshtein, and cross-encoder
+similarity for near-duplicate line items; Docker containerisation with
+APScheduler scheduling, scaled across one or all business entities, with retry
+and backoff on Azure ingestion; and the client-facing dashboard work replacing a
+pop-up with a standalone shareable exception page.
+
+No screenshots exist for this work and none can be published, since it is client
+audit software. The entry is text and it has to carry itself on specificity. The
+Saal.ai logo already in `assets/` provides the only visual anchor.
 
 **Stmnt.** The model description is corrected. Verified in the Stmnt repository
 at `lib/core/constants.dart`: OpenRouter is the gateway,
@@ -396,7 +430,7 @@ Every figure traces to the CV or a verified repository:
 
 ## 9. Photography
 
-Eight photographs are in `assets/photos/`. Six will be used.
+Eight photographs and three app screenshots are staged. Nine assets will be used.
 
 | File | Placement |
 |---|---|
@@ -405,16 +439,40 @@ Eight photographs are in `assets/photos/`. Six will be used.
 | `graduation-campus-certificate.jpg` | 2023, graduation |
 | `honors-day-ceremony.jpg` | 2023, Golden Key |
 | `volunteering-meal-packing.jpg` | 2023, Feed and Reap, cropped closer |
-| `egaming-competition-demo.jpg` | year pending |
+| `egaming-competition-demo.jpg` | Sustainability E-gaming Competition, year pending |
+| `stmnt/01-spending-by-category.png` | Selected Work, Stmnt |
+| `stmnt/04-recurring-subscriptions.png` | Selected Work, Stmnt |
+| `stmnt/05-smart-forecast.png` | Selected Work, Stmnt |
 | `graduation-ceremony-stage.jpg` | unused, near-duplicate of the close shot |
 | `honors-day-certificate.jpg` | unused, a document rather than a moment |
 
-Gaps that remain, in priority order: anything from Saal.ai, which covers two
-years of career with no image at all; Stmnt screenshots from a real device; and
-peer mentoring.
+The campus graduation photograph has been replaced with a version where the
+diploma text is redacted down to the first name.
 
-The design must therefore look complete with the photographs it has. Years
-without a photograph render as clean text entries.
+### App screenshots
+
+The three Stmnt images are App Store marketing exports: a device mockup on a
+branded ground, under a marketing headline, in Stmnt's teal. Used as delivered,
+they would import another product's brand and marketing voice into the page.
+
+They are therefore cropped to the device screen only. The headline, the ground,
+and the marketing frame are discarded. The app's own teal remains inside the
+screenshot, which is correct, since that is the product.
+
+The three chosen map onto the three claims the CV makes about Stmnt: spending
+breakdowns, subscription tracking, and spending forecasts. The data shown is
+sample data, so there is no personal financial exposure.
+
+### The Saal.ai gap
+
+Two years of career have no photograph, and none is available. Client audit
+software cannot be screenshotted either. That stretch of the timeline is
+carried by the Saal.ai logo already in `assets/` and by the specificity of the
+writing.
+
+This is a constraint the design must absorb rather than paper over. Years
+without a photograph render as clean text entries, never as a gap or a
+placeholder.
 
 ## 10. Accessibility
 
@@ -488,7 +546,12 @@ accepted and is the first item of the admin revamp that follows.
 
 ## 15. Open items
 
-1. Year and role for the Sustainability E-gaming Competition.
-2. Whether to crop the campus graduation photograph so the diploma text, which
-   currently shows Ahmed's full legal name, is not legible.
-3. Saal.ai photographs and Stmnt device screenshots, both still outstanding.
+1. Year for the Sustainability E-gaming Competition. Ahmed's role is confirmed:
+   he presented the team's project. Without a year the entry cannot be placed on
+   the timeline, so this is the one genuinely blocking item, and it blocks a
+   single entry rather than the build.
+
+Resolved since the first draft: the campus graduation photograph is redacted;
+the Stmnt screenshots are staged; the Saal.ai photograph gap is confirmed
+permanent and absorbed into the design; and the experience-truncation question
+is answered by the Selected Work promotion in section 8.
