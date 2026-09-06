@@ -82,6 +82,12 @@ def main():
     icon = center_square(key_green(BRAND / "logo-icon-source.jpg"))
     icon.save(BRAND / "logo-icon.png")
 
+    # The master is ~876px and ~250KB. The nav draws it at 2.25rem, so it gets
+    # its own small pair instead: 72px for the 1x slot, 144px for 2x and up.
+    # The master stays for the favicon sizes generated below.
+    for name, size in (("logo-icon-72.png", 72), ("logo-icon-144.png", 144)):
+        icon.resize((size, size), Image.LANCZOS).save(BRAND / name)
+
     wordmark = trim(key_green(BRAND / "logo-wordmark-source.jpg"))
     wordmark.save(BRAND / "logo-wordmark.png")
 

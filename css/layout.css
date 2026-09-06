@@ -31,11 +31,13 @@
   font-weight: 600;
   font-size: var(--text-sm);
 }
-/* The mark is a half-face: tall and narrow. Set its height and let the
-   width follow, rather than forcing a square box and paying for the empty
-   columns either side. The artwork is keyed from a chroma-green source, so
-   the ghutra stays opaque white and the mark needs no backing on either
-   ground. */
+/* The file is a square canvas (tools/process_brand.py centres the half-face
+   drawing on one, because the favicon slots require square). The drawing
+   inside it is tall and narrow, so it fills the height and leaves transparent
+   columns either side — inherent to the subject, not a packing bug. Set the
+   height and let the square width follow. The artwork is keyed from a
+   chroma-green source, so the ghutra stays opaque white and the mark needs no
+   backing on either ground. */
 .nav-mark-icon {
   height: 2.25rem;
   width: auto;

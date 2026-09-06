@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 
 const asset = (p) => new URL(`../${p}`, import.meta.url);
+const readText = (p) => readFileSync(asset(p), 'utf8');
 
 // Minimal PNG header reader: width, height, colour type.
 function pngInfo(path) {
@@ -16,11 +17,48 @@ function pngInfo(path) {
   };
 }
 
-test('the recoloured dark-mode icon is gone; one faithful mark serves both themes', () => {
-  // Recolouring selected pixels by darkness, which caught the agal, eyebrow,
-  // moustache, beard and eye as well as the outline. Dark mode uses --plate
-  // behind the original artwork instead. See css/layout.css .nav-mark-icon.
-  assert.equal(existsSync(asset('assets/brand/logo-icon-dark.png')), false);
+test('one faithful mark serves both themes: no dark variant, no plate, no recolouring', () => {
+  // The first attempt shipped a second file recoloured by pixel darkness, which
+  // caught the agal, eyebrow, moustache, beard and eye along with the outline.
+  // The second put a light plate behind the original artwork in dark mode. Both
+  // are gone: tools/process_brand.py keys a chroma-green source instead, so the
+  // ghutra stays opaque white and the one file reads on either ground. Asserting
+  // the file is absent is not enough on its own — the CSS could reintroduce
+  // either workaround without adding a file.
+  assert.equal(existsSync(asset('assets/brand/logo-icon-dark.png')), false, 'a recoloured second mark came back');
+  const layout = readText('css/layout.css');
+  const tokens = readText('css/tokens.css');
+  assert.equal(/--plate\b/.test(layout + tokens), false, 'the --plate backing token came back');
+
+  // Nothing may repaint the mark: no filter, no mix-blend-mode, no background
+  // behind it, in either theme.
+  const rules = [...layout.matchAll(/\.nav-mark-icon[^{]*\{([^}]*)\}/g)].map((m) => m[1]);
+  assert.ok(rules.length > 0, 'no .nav-mark-icon rule found at all');
+  for (const body of rules) {
+    assert.doesNotMatch(body, /\bfilter\s*:/, 'the mark is being recoloured by filter');
+    assert.doesNotMatch(body, /mix-blend-mode\s*:/, 'the mark is being recoloured by blend mode');
+    assert.doesNotMatch(body, /\bbackground(-color)?\s*:(?!\s*none)/, 'the mark has a plate behind it');
+  }
+});
+
+test('the nav uses its own small rasters, not the quarter-megabyte favicon master', () => {
+  // The master is ~876px and ~250KB and the nav draws it at 2.25rem, so it is
+  // kept only for the favicon pipeline in tools/process_brand.py.
+  const nav72 = pngInfo(asset('assets/brand/logo-icon-72.png'));
+  const nav144 = pngInfo(asset('assets/brand/logo-icon-144.png'));
+  assert.deepEqual([nav72.width, nav72.height], [72, 72]);
+  assert.deepEqual([nav144.width, nav144.height], [144, 144]);
+  assert.ok(readFileSync(asset('assets/brand/logo-icon-72.png')).length < 16 * 1024);
+
+  const html = readText('index.html');
+  const tag = html.match(/<img class="nav-mark-icon"[^>]*>/s);
+  assert.ok(tag, 'no nav mark image found');
+  assert.match(tag[0], /src="assets\/brand\/logo-icon-72\.png"/, 'the nav still points at the master');
+  assert.match(tag[0], /srcset="assets\/brand\/logo-icon-72\.png 72w, assets\/brand\/logo-icon-144\.png 144w"/);
+  // Declared dimensions must be the file's own, not a number typed from memory:
+  // this shipped as 883x883 for an 876x876 file.
+  assert.match(tag[0], new RegExp(`width="${nav72.width}"`));
+  assert.match(tag[0], new RegExp(`height="${nav72.height}"`));
 });
 
 test('logo icon is square, RGBA, and reasonably sized', () => {

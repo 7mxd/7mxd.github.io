@@ -50,7 +50,7 @@
 <meta name="apple-mobile-web-app-title" content="Ahmed Radhi">
 
 <!-- Hero portrait is eager and preloaded, per the design spec.
-     imagesrcset/imagesizes must mirror the <img> js/render.js emits exactly, or the
+     imagesrcset/imagesizes must mirror the image element js/render.js emits, or the
      browser preloads one candidate and then downloads a different one for the image
      itself — 199KB of it, on the LCP path, for a mark 176 CSS pixels wide. The href
      is the no-imagesrcset fallback and must match profile.portrait.src.
@@ -81,7 +81,12 @@
 <header class="site-nav-wrap">
   <nav class="site-nav" aria-label="Main navigation">
     <a class="nav-mark" href="#main">
-      <img class="nav-mark-icon" src="assets/brand/logo-icon.png" alt="" width="883" height="883" decoding="async">
+      <!-- Nav-sized rasters, not the 250KB favicon master: css/layout.css draws
+           this at 2.25rem, so 72px covers 1x and 144px covers 2x and up.
+           test/assets-brand.test.js pins these dimensions to the real files. -->
+      <img class="nav-mark-icon" src="assets/brand/logo-icon-72.png"
+           srcset="assets/brand/logo-icon-72.png 72w, assets/brand/logo-icon-144.png 144w"
+           sizes="2.25rem" alt="" width="72" height="72" decoding="async">
       <span class="nav-mark-name" data-nav-name></span>
     </a>
     <button class="nav-menu-toggle" aria-expanded="false" aria-controls="nav-links">
