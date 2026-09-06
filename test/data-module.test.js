@@ -35,6 +35,26 @@ test('validateSiteData accepts a minimal well-formed payload', () => {
   assert.equal(result.ok, true, result.errors.join('; '));
 });
 
+test('validateSiteData rejects settings with no nav or no sections', () => {
+  // js/render.js's renderChrome calls settings.nav.filter and iterates
+  // settings.sections unguarded, so a settings file missing either one throws
+  // from inside a renderer and the page shows the load error. This is the check
+  // that names the real problem instead.
+  const base = {
+    profile: { name: 'A', nameArabic: 'ب', role: 'R', contact: { email: 'e@x.com' } },
+    summary: { content: 'x' },
+    experience: { items: [] }, education: { items: [] }, projects: { items: [] },
+    milestones: { items: [] }, metrics: { items: [] }, skills: { categories: [] }, registry: {},
+  };
+  const noNav = validateSiteData({ ...base, settings: { cv: { path: 'a.pdf' }, sections: {} } });
+  assert.equal(noNav.ok, false);
+  assert.ok(noNav.errors.some((e) => /nav/.test(e)), noNav.errors.join('; '));
+
+  const noSections = validateSiteData({ ...base, settings: { cv: { path: 'a.pdf' }, nav: [] } });
+  assert.equal(noSections.ok, false);
+  assert.ok(noSections.errors.some((e) => /sections/.test(e)), noSections.errors.join('; '));
+});
+
 test('validateSiteData reports every missing top-level key by name', () => {
   const result = validateSiteData({ profile: { name: 'A' } });
   assert.equal(result.ok, false);

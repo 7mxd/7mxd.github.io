@@ -35,7 +35,15 @@ export function normalizeImage(img) {
 const SHAPES = {
   profile: (v) => (v && v.name && v.role && v.contact ? null : 'profile needs name, role, contact'),
   summary: (v) => (v && typeof v.content === 'string' ? null : 'summary needs content'),
-  settings: (v) => (v && v.cv && v.cv.path ? null : 'settings needs cv.path'),
+  // nav and sections are checked here because js/render.js's renderChrome
+  // dereferences settings.nav.filter and iterates settings.sections without a
+  // guard of its own. Catching them here fails with a named error rather than
+  // a TypeError from inside a renderer.
+  settings: (v) => (
+    v && v.cv && v.cv.path && Array.isArray(v.nav) && v.sections && typeof v.sections === 'object'
+      ? null
+      : 'settings needs cv.path, nav[], and sections{}'
+  ),
   experience: (v) => (v && Array.isArray(v.items) ? null : 'experience needs items[]'),
   education: (v) => (v && Array.isArray(v.items) ? null : 'education needs items[]'),
   projects: (v) => (v && Array.isArray(v.items) ? null : 'projects needs items[]'),
