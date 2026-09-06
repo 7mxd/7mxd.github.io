@@ -14,7 +14,7 @@
       "blocks": [
         {
           "type": "description",
-          "content": "A platform that ingests Microsoft Dynamics 365 ERP data from Azure Blob Storage and audits it across procure-to-pay, vendor master data, and user access rights. I am its primary developer and authored 28 of its 38 exception checks."
+          "content": "A platform that ingests Microsoft Dynamics 365 ERP data from Azure Blob Storage and audits it across procure-to-pay, vendor master data, and user access rights. I was its primary developer and authored 28 of its 38 exception checks."
         },
         {
           "type": "description",
