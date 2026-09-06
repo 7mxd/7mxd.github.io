@@ -156,7 +156,8 @@ Page order, top to bottom:
 3. **About.** Three or four sentences, rewritten from the 2026 CV.
 4. **The path so far.** Reverse chronological, 2026 back to 2015. Grouped by
    year. Each entry has a headline, an organisation, an optional date range,
-   two to four bullets, and optional photographs with captions.
+   its bullets per the rule in section 8, and optional photographs with
+   captions.
 5. **By the numbers.** A short honest strip of quantities that appear nowhere
    else on the page.
 6. **Selected work.** Three entries with room to breathe.
