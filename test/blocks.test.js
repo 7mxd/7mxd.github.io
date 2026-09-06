@@ -35,6 +35,23 @@ test('an unknown block type renders nothing rather than throwing', () => {
   assert.equal(renderBlock({ type: 'ascii-chart', chart: 'xxx' }), '');
 });
 
+test('consecutive responsibility blocks are wrapped in one real list', () => {
+  const html = renderBlocks([
+    { type: 'description', content: 'intro' },
+    { type: 'responsibility', content: 'first duty' },
+    { type: 'responsibility', content: 'second duty' },
+    { type: 'description', content: 'outro' },
+    { type: 'responsibility', content: 'later duty' },
+  ]);
+  assert.equal((html.match(/<ul class="block-bullets">/g) || []).length, 2,
+    'each run of bullets gets its own list, and a run is not merged across other blocks');
+  assert.equal(/<li class="block-bullet">[^]*?<\/li>\s*<p/.test(html), false);
+  // No <li> may appear outside a <ul>: strip the lists and none should remain.
+  const withoutLists = html.replace(/<ul class="block-bullets">[^]*?<\/ul>/g, '');
+  assert.equal(/<li\b/.test(withoutLists), false, 'a bare <li> escaped its list');
+  assert.match(html, /<ul class="block-bullets"><li class="block-bullet">first duty<\/li><li class="block-bullet">second duty<\/li><\/ul>/);
+});
+
 test('renderBlocks joins several blocks and tolerates an empty list', () => {
   const html = renderBlocks([
     { type: 'description', content: 'one' },

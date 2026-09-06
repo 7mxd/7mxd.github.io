@@ -234,10 +234,19 @@
    js/blocks.js can be reached the moment the admin authors one, so each
    gets a real rule now rather than shipping unstyled the day it is used. */
 
+/* js/blocks.js wraps a run of consecutive `responsibility` blocks in this list,
+   so the bullets are a real list to assistive technology rather than orphaned
+   <li> elements. Matches .entry-bullets, which does the same job for the
+   bullets a timeline entry carries directly. */
+.block-bullets {
+  display: grid;
+  gap: var(--space-2);
+  margin: var(--space-4) 0;
+}
+
 .block-bullet {
   position: relative;
   padding-left: 1.1em;
-  margin-bottom: var(--space-2);
   max-width: var(--measure-prose);
 }
 .block-bullet::before {

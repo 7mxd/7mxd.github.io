@@ -43,6 +43,12 @@ function blockItem(blocks, i, scope, registry, rerender, ctx) {
     } else if (f.type === 'code' || f.type === 'text') {
       const ta = document.createElement('textarea'); ta.value = block[f.name] || '';
       ta.addEventListener('input', () => block[f.name] = ta.value); field.appendChild(ta);
+    } else if (f.type === 'number') {
+      // Written as a Number, not the input's string: the image block's width
+      // and height become HTML attributes the browser uses to reserve space.
+      const inp = document.createElement('input'); inp.type = 'number'; inp.value = block[f.name] ?? '';
+      inp.addEventListener('input', () => { block[f.name] = inp.value === '' ? '' : Number(inp.value); });
+      field.appendChild(inp);
     } else if (f.type === 'select' && Array.isArray(f.options)) {
       const sel = document.createElement('select');
       sel.innerHTML = f.options.map(o => `<option value="${o.value}">${o.label}</option>`).join('');

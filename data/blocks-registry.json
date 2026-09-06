@@ -25,7 +25,9 @@
     "fields": [
       { "name": "src", "type": "image", "label": "Image", "required": true },
       { "name": "alt", "type": "string", "label": "Alt text", "required": true },
-      { "name": "caption", "type": "string", "label": "Caption (optional)", "required": false }
+      { "name": "caption", "type": "string", "label": "Caption (optional)", "required": false },
+      { "name": "width", "type": "number", "label": "Intrinsic width, px", "required": true },
+      { "name": "height", "type": "number", "label": "Intrinsic height, px", "required": true }
     ]
   },
 
@@ -33,7 +35,6 @@
     "scope": ["project"],
     "label": "Code snippet",
     "fields": [
-      { "name": "language", "type": "string", "label": "Language (e.g. python)", "required": false },
       { "name": "content", "type": "code", "label": "Code", "required": true }
     ]
   },

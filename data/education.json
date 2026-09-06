@@ -17,7 +17,8 @@
           "alt": "Ahmed receiving his degree certificate on stage at the Khalifa University graduation ceremony",
           "caption": "Graduation ceremony, Khalifa University, 2023",
           "width": 1600,
-          "height": 1067
+          "height": 1067,
+          "widthSmall": 800
         },
         {
           "src": "assets/photos/derived/graduation-campus-certificate-1600.jpg",
@@ -25,7 +26,8 @@
           "alt": "Ahmed holding his Applied Mathematics and Statistics degree certificate on the Khalifa University campus",
           "caption": "Campus, June 2023",
           "width": 1290,
-          "height": 850
+          "height": 850,
+          "widthSmall": 800
         },
         {
           "src": "assets/photos/derived/egaming-competition-demo-1600.jpg",
@@ -33,10 +35,10 @@
           "alt": "Ahmed presenting his team's game at a whiteboard during the Sustainability E-gaming Competition",
           "caption": "Presenting at the Sustainability E-gaming Competition, Khalifa University",
           "width": 1066,
-          "height": 711
+          "height": 711,
+          "widthSmall": 800
         }
-      ],
-      "blocks": []
+      ]
     },
     {
       "id": "al-nahda-diploma",
@@ -47,9 +49,7 @@
       "startDate": "2015",
       "endDate": "2018",
       "displayDate": "2015 — 2018",
-      "grade": "95.9",
-      "images": [],
-      "blocks": []
+      "grade": "95.9"
     }
   ]
 }

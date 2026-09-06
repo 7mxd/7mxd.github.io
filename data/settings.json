@@ -23,6 +23,5 @@
     "work": { "enabled": true },
     "skills": { "enabled": true },
     "contact": { "enabled": true }
-  },
-  "theme": "auto"
+  }
 }

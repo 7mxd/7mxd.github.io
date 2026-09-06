@@ -79,6 +79,29 @@ export function renderBlock(block) {
   return renderer ? renderer(block) : '';
 }
 
+/** Render a run of blocks.
+ *
+ *  `responsibility` is the one renderer that emits a list item rather than a
+ *  self-contained element, so a run of consecutive ones is wrapped in a single
+ *  <ul> here. Emitting a bare <li> is invalid HTML and, more to the point,
+ *  gives a screen reader no list to announce — no item count, no position. */
 export function renderBlocks(blocks) {
-  return (blocks ?? []).map(renderBlock).join('');
+  const out = [];
+  let bullets = [];
+  const flushBullets = () => {
+    if (!bullets.length) return;
+    out.push(`<ul class="block-bullets">${bullets.join('')}</ul>`);
+    bullets = [];
+  };
+
+  for (const block of blocks ?? []) {
+    if (block && block.type === 'responsibility') {
+      bullets.push(renderBlock(block));
+      continue;
+    }
+    flushBullets();
+    out.push(renderBlock(block));
+  }
+  flushBullets();
+  return out.join('');
 }

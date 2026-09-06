@@ -8,8 +8,6 @@
       "startDate": "2024-09",
       "displayDate": "2024 — 2026",
       "tags": ["Python", "Pandas", "MongoDB", "Azure Blob Storage", "Docker", "APScheduler", "NLP", "Dynamics 365"],
-      "links": {},
-      "images": [],
       "blocks": [
         {
           "type": "description",
@@ -53,7 +51,8 @@
           "alt": "Stmnt spending by category screen showing a donut chart and a ranked category breakdown",
           "caption": "Spending breakdown",
           "width": 738,
-          "height": 1600
+          "height": 1600,
+          "widthSmall": 369
         },
         {
           "src": "assets/photos/derived/stmnt-04-recurring-subscriptions-1600.jpg",
@@ -61,7 +60,8 @@
           "alt": "Stmnt recurring expenses screen listing detected monthly subscriptions and their amounts",
           "caption": "Detected subscriptions",
           "width": 738,
-          "height": 1600
+          "height": 1600,
+          "widthSmall": 369
         },
         {
           "src": "assets/photos/derived/stmnt-05-smart-forecast-1600.jpg",
@@ -69,7 +69,8 @@
           "alt": "Stmnt forecast screen plotting actual spending against predicted spending for the coming month",
           "caption": "Forecast against actuals",
           "width": 738,
-          "height": 1600
+          "height": 1600,
+          "widthSmall": 369
         }
       ],
       "blocks": [
@@ -101,7 +102,6 @@
           { "url": "assets/SRP_Kernel_RLS_Nonlinear_State_Space_2023.pdf", "label": "Read the paper" }
         ]
       },
-      "images": [],
       "blocks": [
         {
           "type": "description",

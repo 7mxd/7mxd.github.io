@@ -20,11 +20,19 @@ function fieldEl(field, model, ctx) {
   if (field.type === 'text') { input = document.createElement('textarea'); }
   else if (field.type === 'boolean') { input = document.createElement('input'); input.type = 'checkbox'; input.checked = !!model[field.name]; }
   else if (field.type === 'select') { input = document.createElement('select'); input.innerHTML = field.options.map(o=>`<option value="${o.value}">${o.label}</option>`).join(''); input.value = model[field.name] ?? ''; }
+  else if (field.type === 'number') { input = document.createElement('input'); input.type = 'number'; }
   else { input = document.createElement('input'); input.type = 'text'; }
   input.id = id;
   if (field.type !== 'boolean' && field.type !== 'select') input.value = model[field.name] ?? '';
   const evt = field.type === 'boolean' ? 'change' : 'input';
-  input.addEventListener(evt, () => { model[field.name] = field.type==='boolean'? input.checked : input.value; });
+  // A number field must write a Number, not the input's string: image width /
+  // height and the timeline's `order` are compared numerically by the site,
+  // and "1600" would silently behave differently from 1600.
+  input.addEventListener(evt, () => {
+    if (field.type === 'boolean') model[field.name] = input.checked;
+    else if (field.type === 'number') model[field.name] = input.value === '' ? '' : Number(input.value);
+    else model[field.name] = input.value;
+  });
   wrap.appendChild(input);
   if (field.type === 'image') {
     const thumb = document.createElement('img'); thumb.className='thumb'; thumb.hidden = !model[field.name]; if (model[field.name]) thumb.src = '../'+model[field.name];
