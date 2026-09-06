@@ -5,7 +5,7 @@
       "type": "tags",
       "items": [
         { "name": "Python" }, { "name": "R" }, { "name": "MATLAB" },
-        { "name": "Java" }, { "name": "LaTeX" }
+        { "name": "Java" }
       ]
     },
     {
@@ -39,7 +39,7 @@
       "type": "tags",
       "items": [
         { "name": "Claude Code" }, { "name": "Git and GitHub" }, { "name": "VS Code" },
-        { "name": "Jupyter" }, { "name": "RStudio" }, { "name": "Postman" }
+        { "name": "Jupyter" }, { "name": "RStudio" }, { "name": "Postman" }, { "name": "LaTeX" }
       ]
     },
     {

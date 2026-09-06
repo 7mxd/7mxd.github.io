@@ -24,6 +24,24 @@ function everyImage() {
   return out;
 }
 
+// Walk JPEG segment markers to read the SOF frame dimensions. Same approach
+// as test/assets-photos.test.js:21 — reused rather than reinvented, so both
+// tests agree on how a JPEG's real dimensions are read.
+function jpegSize(buf) {
+  let i = 2;
+  while (i < buf.length) {
+    if (buf[i] !== 0xff) { i += 1; continue; }
+    const marker = buf[i + 1];
+    const len = buf.readUInt16BE(i + 2);
+    // SOF0..SOF3 and SOF5..SOF7 and SOF9..SOF11 carry the frame header.
+    if ((marker >= 0xc0 && marker <= 0xc3) || (marker >= 0xc5 && marker <= 0xc7) || (marker >= 0xc9 && marker <= 0xcb)) {
+      return { height: buf.readUInt16BE(i + 5), width: buf.readUInt16BE(i + 7) };
+    }
+    i += 2 + len;
+  }
+  throw new Error('no SOF marker found');
+}
+
 test('every referenced image exists on disk at both widths', () => {
   for (const img of everyImage()) {
     assert.ok(existsSync(repoFile(img.src)), `missing ${img.src}`);
@@ -44,6 +62,18 @@ test('every image declares intrinsic dimensions so layout does not shift', () =>
     assert.equal(typeof img.width, 'number', `width missing for ${img.src}`);
     assert.equal(typeof img.height, 'number', `height missing for ${img.src}`);
     assert.ok(img.width > 0 && img.height > 0, `bad dimensions for ${img.src}`);
+  }
+});
+
+test('declared dimensions match the real file, so Task 8 does not lay out a lie', () => {
+  for (const img of everyImage()) {
+    // Every image in the data is a JPEG derivative from tools/process_photos.py.
+    // Assert that rather than assume it, so a future PNG entry fails loudly
+    // here instead of silently skipping dimension verification.
+    assert.match(img.src, /\.jpe?g$/i, `expected a JPEG derivative, got ${img.src}`);
+    const { width, height } = jpegSize(readFileSync(repoFile(img.src)));
+    assert.equal(img.width, width, `declared width ${img.width} does not match actual ${width} for ${img.src}`);
+    assert.equal(img.height, height, `declared height ${img.height} does not match actual ${height} for ${img.src}`);
   }
 });
 

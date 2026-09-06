@@ -116,7 +116,7 @@
           "unit": "NMSE",
           "rows": [
             { "label": "Competition winner, 1993", "value": "0.028" },
-            { "label": "This work, iterative KRLS", "value": "0.042", "highlight": true },
+            { "label": "This work, iterative KRLS", "value": "0.043", "highlight": true },
             { "label": "Competition second place", "value": "0.080" }
           ]
         }
