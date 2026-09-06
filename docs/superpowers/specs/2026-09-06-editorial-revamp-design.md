@@ -230,6 +230,7 @@ by source precedence: role, education, project, milestone.
   "title": "Golden Key International Honour Society",
   "org": "Khalifa University chapter",
   "note": "Invitation-only, top fifteen percent of the class.",
+  "link": null,
   "images": [
     {
       "src": "assets/photos/honors-day-ceremony.jpg",
@@ -240,7 +241,23 @@ by source precedence: role, education, project, milestone.
 }
 ```
 
-`kind` is one of `award`, `certification`, `volunteering`.
+`kind` is one of `award`, `certification`, `volunteering`. `link` is an optional
+`{ url, label }` pointing at third-party corroboration.
+
+### Third-party verification
+
+The Dean's List milestone carries a link to Khalifa University's published
+honors list at `https://www.ku.ac.ae/student-life/honors-list`, which names
+Ahmed under Applied Mathematics and Statistics for Fall 2022. Independent
+corroboration is rare on a portfolio and worth surfacing.
+
+Two caveats are recorded rather than hidden. The university page prints Ahmed's
+full legal name, which the redacted graduation photograph deliberately omits, so
+the link partially reverses that redaction. And the page rotates its terms as new
+semesters publish, so the citation may stop resolving to Fall 2022 in future. The
+link is therefore labelled as the university's honors list rather than as proof
+of a specific term, and it is presented as supporting evidence, not as the claim
+itself.
 
 ### Image schema
 
@@ -458,17 +475,20 @@ diploma text is redacted down to the first name.
 
 ### App screenshots
 
-The three Stmnt images are App Store marketing exports: a device mockup on a
-branded ground, under a marketing headline, in Stmnt's teal. Used as delivered,
-they would import another product's brand and marketing voice into the page.
+Stmnt ships two screenshot sets. The App Store marketing exports put a device
+mockup on a branded ground under a marketing headline, which would import
+another product's brand and marketing voice into the page. The raw device
+captures are clean, full-bleed app UI at 1290 by 2796.
 
-They are therefore cropped to the device screen only. The headline, the ground,
-and the marketing frame are discarded. The app's own teal remains inside the
-screenshot, which is correct, since that is the product.
+The raw captures are used. No cropping is required.
 
 The three chosen map onto the three claims the CV makes about Stmnt: spending
 breakdowns, subscription tracking, and spending forecasts. The data shown is
 sample data, so there is no personal financial exposure.
+
+Because these are tall portrait captures at a 1:2.17 ratio, they are displayed
+as a row of three at a constrained height rather than at full measure, so a
+single screenshot does not consume a whole screen of scroll.
 
 ### The Saal.ai gap
 
