@@ -72,3 +72,104 @@ for (const file of files) {
     );
   });
 }
+
+// --- Class coverage --------------------------------------------------------
+//
+// Task 10 ruling: every CSS class name emitted by js/render.js and
+// js/blocks.js must have at least one rule somewhere in css/. This is the
+// guard against an element rendering completely unstyled — the exact failure
+// this task exists to prevent. Extraction is a static scan of `class="..."`
+// occurrences inside those two modules' template literals, not a check of
+// what today's data/*.json happens to use: every renderer in js/blocks.js's
+// dispatch table can be reached the moment the admin authors a block of that
+// type, so each one needs a rule now, not the day it first ships.
+//
+// Interpolated class attributes (containing `${...}`) can't be extracted by
+// a generic regex, so their static part and enumerated dynamic values are
+// listed by hand below, one group per interpolation site, matched against
+// the actual source at the time of writing:
+//   js/render.js   gallery():      class="gallery ${modifier}"          modifier ∈ {is-single, is-grid}
+//   js/render.js   entryMarkup():  class="entry is-${entry.kind}"       kind     ∈ {role, education, project, milestone}
+//   js/blocks.js   callout:        class="block-callout is-${b.tone}"   tone     ∈ {note, tip, warning} (registry-declared options)
+const HAND_ENUMERATED_DYNAMIC_CLASSES = new Set([
+  'gallery', 'is-single', 'is-grid',
+  'entry', 'is-role', 'is-education', 'is-project', 'is-milestone',
+  'block-callout', 'is-note', 'is-tip', 'is-warning',
+]);
+
+// Classes intentionally left with no dedicated rule, each with the reason.
+// Keep this small: a class belongs here only when the element it names is
+// already fully styled without it, never merely because a rule felt like
+// extra work.
+const CLASS_COVERAGE_ALLOWLIST = new Map([
+  [
+    'is-role',
+    'role entries render with the base .entry treatment and no override; ' +
+      'only .entry.is-milestone diverges (reads quieter, as supporting evidence) ' +
+      'per the comment above that rule in css/sections.css.',
+  ],
+  [
+    'is-education',
+    'education entries render with the base .entry treatment and no override; ' +
+      'same reasoning as is-role above.',
+  ],
+  [
+    'is-project',
+    'project entries render with the base .entry treatment and no override; ' +
+      'same reasoning as is-role above.',
+  ],
+  [
+    'is-note',
+    '"note" is the baseline callout tone: .block-callout alone (background, ' +
+      'border, padding, colour) already renders it fully styled. is-tip and ' +
+      'is-warning each have their own rule in css/sections.css that steps up ' +
+      'the border colour; is-note intentionally adds no override.',
+  ],
+]);
+
+function extractStaticClassLiterals(src) {
+  // Matches class="..." only when the attribute value contains no `${`
+  // template interpolation — those are handled by the hand-enumerated list
+  // above instead, since a regex can't expand a runtime expression.
+  const classes = new Set();
+  for (const m of src.matchAll(/class="([^"]*)"/g)) {
+    if (m[1].includes('${')) continue;
+    for (const cls of m[1].trim().split(/\s+/)) if (cls) classes.add(cls);
+  }
+  return classes;
+}
+
+function cssHasRuleFor(css, className) {
+  const escaped = className.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  // A selector reference to .className not immediately followed by another
+  // class-name character, so `.entry` doesn't false-match inside
+  // `.entry-title`, but does match compound selectors like `.entry.is-milestone`.
+  return new RegExp(`\\.${escaped}(?![\\w-])`).test(css);
+}
+
+test('js/render.js and js/blocks.js: every emitted class has a CSS rule, or a documented allowlist reason', () => {
+  const renderJsPath = fileURLToPath(new URL('../js/render.js', import.meta.url));
+  const blocksJsPath = fileURLToPath(new URL('../js/blocks.js', import.meta.url));
+  const renderJs = readFileSync(renderJsPath, 'utf8');
+  const blocksJs = readFileSync(blocksJsPath, 'utf8');
+  const allCss = files.map((f) => readFileSync(`${cssDir}${f}`, 'utf8')).join('\n');
+
+  const emitted = new Set([
+    ...extractStaticClassLiterals(renderJs),
+    ...extractStaticClassLiterals(blocksJs),
+    ...HAND_ENUMERATED_DYNAMIC_CLASSES,
+  ]);
+
+  const missing = [];
+  for (const cls of emitted) {
+    if (CLASS_COVERAGE_ALLOWLIST.has(cls)) continue;
+    if (!cssHasRuleFor(allCss, cls)) missing.push(cls);
+  }
+
+  assert.deepEqual(
+    missing,
+    [],
+    `these classes are emitted by render.js/blocks.js but have no CSS rule anywhere ` +
+      `in css/, and are not in CLASS_COVERAGE_ALLOWLIST: ${missing.join(', ')}`,
+  );
+});

@@ -165,3 +165,7 @@ main {
   .site-nav { flex-wrap: wrap; }
   .nav-list { flex-direction: column; gap: var(--space-3); font-size: var(--text-base); }
 }
+
+/* js/main.js toggles this on <body> while the mobile menu is open; lock
+   background scroll so the page behind the open menu doesn't move. */
+body.nav-open { overflow: hidden; }
