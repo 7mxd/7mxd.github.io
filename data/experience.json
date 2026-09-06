@@ -13,8 +13,8 @@
           "id": "saal-graduate-trainee",
           "title": "Graduate Trainee, Data Science",
           "startDate": "2024-09",
-          "endDate": "Present",
-          "displayDate": "Sep 2024 — Present",
+          "endDate": "2026-09",
+          "displayDate": "Sep 2024 — Sep 2026",
           "workRef": "saal-audit-platform",
           "bullets": [
             "Primary developer of a procurement audit platform that ingests Microsoft Dynamics 365 ERP data from Azure Blob Storage, authoring 28 of its 38 exception checks.",
