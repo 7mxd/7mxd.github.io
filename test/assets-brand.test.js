@@ -16,22 +16,18 @@ function pngInfo(path) {
   };
 }
 
+test('the recoloured dark-mode icon is gone; one faithful mark serves both themes', () => {
+  // Recolouring selected pixels by darkness, which caught the agal, eyebrow,
+  // moustache, beard and eye as well as the outline. Dark mode uses --plate
+  // behind the original artwork instead. See css/layout.css .nav-mark-icon.
+  assert.equal(existsSync(asset('assets/brand/logo-icon-dark.png')), false);
+});
+
 test('logo icon is square, RGBA, and reasonably sized', () => {
   const info = pngInfo(asset('assets/brand/logo-icon.png'));
   assert.equal(info.width, info.height, 'icon must be square');
   assert.ok(info.width >= 512, `icon too small: ${info.width}`);
   assert.equal(info.colourType, 6, 'icon must have an alpha channel');
-});
-
-test('a dark-mode nav icon exists, square and RGBA, alongside the light one', () => {
-  assert.ok(existsSync(asset('assets/brand/logo-icon-dark.png')), 'assets/brand/logo-icon-dark.png is missing');
-  const light = pngInfo(asset('assets/brand/logo-icon.png'));
-  const dark = pngInfo(asset('assets/brand/logo-icon-dark.png'));
-  assert.equal(dark.width, dark.height, 'dark icon must be square');
-  assert.equal(dark.colourType, 6, 'dark icon must have an alpha channel');
-  // Same crop and canvas as the light icon, so css/layout.css can swap one
-  // for the other with no layout shift — only the line art is recoloured.
-  assert.equal(dark.width, light.width, 'dark icon must match the light icon’s canvas size');
 });
 
 test('logo wordmark is transparent and wider than tall', () => {

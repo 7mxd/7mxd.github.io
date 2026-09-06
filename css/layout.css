@@ -31,18 +31,17 @@
   font-weight: 600;
   font-size: var(--text-sm);
 }
-.nav-mark img { width: 2rem; height: 2rem; }
+/* The mark is a half-face: tall and narrow. Set its height and let the
+   width follow, rather than forcing a square box and paying for the empty
+   columns either side. */
+.nav-mark-icon {
+  height: 2.25rem;
+  width: auto;
+  background: var(--plate);
+  border-radius: 3px;
+  padding: 0 2px;
+}
 .nav-mark-name { white-space: nowrap; }
-
-/* The icon's line art is recoloured for dark mode (see
-   tools/process_brand.py's recolor_dark_lines): the source drawing keys
-   the ghutra's white cloth out as transparent negative space, so a dark
-   ground makes both that gap and the near-black outline disappear,
-   leaving only a floating skin-tone patch. Same on/off idiom as
-   .icon-sun/.icon-moon above. */
-.nav-icon-dark { display: none; }
-[data-theme="dark"] .nav-icon-light { display: none; }
-[data-theme="dark"] .nav-icon-dark { display: block; }
 
 .nav-links {
   margin-left: auto;
