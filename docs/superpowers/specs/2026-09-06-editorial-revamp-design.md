@@ -122,9 +122,23 @@ None appear on the Impeccable reflex-reject list. Amiri is subsetted with the
 Google Fonts `&text=` parameter to only the glyphs in `أحمد علوي رضي`, which
 reduces it to a negligible download.
 
-Loading uses `font-display: swap` with metric-compatible fallback stacks
-declared via `size-adjust` to avoid layout shift. Only the regular prose weight
-is preloaded.
+Loading uses `font-display: swap`, and only the regular prose weight is
+preloaded. Each family falls back to a stack of locally available faces chosen
+for a similar feel — Iowan Old Style and Palatino behind Source Serif 4, the
+system UI stack behind Public Sans, Noto Naskh Arabic behind Amiri.
+
+**There is no metric matching.** An earlier draft of this section claimed
+metric-compatible fallbacks declared through `size-adjust`, and none were ever
+written. Getting `size-adjust`, `ascent-override` and `descent-override` right
+requires measuring the real per-family metrics; guessing at them produces a
+fallback that reflows *worse* than an unadjusted one while looking authoritative
+in the stylesheet. So the honest statement is the one that ships: text is
+readable in the fallback face from first paint, and swapping to the web font
+shifts the line boxes slightly. That trade is accepted here — the page is a
+single column of prose with no fold-critical layout, and no measured overrides
+exist to do better.
+
+If this is ever revisited, it needs measured numbers per family, not estimates.
 
 Type scale is fluid `clamp()` for headings with a ratio of at least 1.25 and a
 maximum no more than 2.5 times the minimum. Body text is a fixed rem size.
