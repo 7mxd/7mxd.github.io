@@ -180,3 +180,35 @@ test('by-the-numbers metrics each carry a value and a label', () => {
     assert.ok(m.value && m.label, `incomplete metric: ${JSON.stringify(m)}`);
   }
 });
+
+// The timeline draws each organisation mark at 1.375rem, about 22 CSS pixels.
+// The original sources were 225-400px and totalled ~138 KB — more image weight
+// than the hero portrait, for five marks the size of a full stop. Both Saal.ai
+// variants also download on every load regardless of theme, because a
+// display:none image is still fetched; that stops mattering once each file is a
+// couple of KB. tools/process_logos.py emits them, and this keeps the data from
+// drifting back to the full-size originals.
+test('organisation marks are the downscaled rasters, not the full-size sources', () => {
+  const logos = [];
+  const walk = (node) => {
+    if (Array.isArray(node)) return node.forEach(walk);
+    if (node && typeof node === 'object') {
+      for (const [key, value] of Object.entries(node)) {
+        if (key === 'logo' && value && typeof value === 'object') {
+          logos.push(...Object.values(value).filter((s) => typeof s === 'string'));
+        } else {
+          walk(value);
+        }
+      }
+    }
+  };
+  walk(experience);
+  walk(education);
+
+  assert.ok(logos.length >= 4, `expected several organisation marks, found ${logos.length}`);
+  for (const src of logos) {
+    assert.match(src, /^assets\/logos\//, `${src} is not one of the downscaled marks`);
+    const bytes = readFileSync(repoFile(src)).length;
+    assert.ok(bytes < 12 * 1024, `${src} is ${Math.round(bytes / 1024)}KB, too heavy for a 22px mark`);
+  }
+});

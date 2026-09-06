@@ -4,9 +4,9 @@
       "company": "Saal.ai",
       "location": "Abu Dhabi, UAE",
       "logo": {
-        "default": "assets/SAAL_LIGHT.png",
-        "light": "assets/SAAL_LIGHT.png",
-        "dark": "assets/SAAL_DARK.png"
+        "default": "assets/logos/saal-light.png",
+        "light": "assets/logos/saal-light.png",
+        "dark": "assets/logos/saal-dark.png"
       },
       "roles": [
         {
@@ -41,7 +41,7 @@
       "company": "Daman, National Health Insurance Company",
       "location": "Abu Dhabi, UAE",
       "logo": {
-        "default": "assets/Daman_Logo.png"
+        "default": "assets/logos/daman.png"
       },
       "roles": [
         {

@@ -175,17 +175,17 @@ test('the Saal.ai mark renders on its roles, in both themes', () => {
   const logos = [...html.matchAll(/<span class="entry-logo[^"]*">.*?<\/span>/gs)].map((m) => m[0]);
   assert.ok(logos.length > 0, 'no organisation mark rendered at all');
 
-  const saal = logos.filter((l) => l.includes('SAAL'));
+  const saal = logos.filter((l) => l.includes('saal-'));
   assert.equal(saal.length, 2, 'both Saal.ai roles carry the mark');
   for (const mark of saal) {
-    assert.match(mark, /class="entry-logo-light" src="assets\/SAAL_LIGHT\.png"/);
-    assert.match(mark, /class="entry-logo-dark" src="assets\/SAAL_DARK\.png"/);
+    assert.match(mark, /class="entry-logo-light" src="assets\/logos\/saal-light\.png"/);
+    assert.match(mark, /class="entry-logo-dark" src="assets\/logos\/saal-dark\.png"/);
     assert.equal(/is-plated/.test(mark), false, 'a two-variant mark needs no plate');
   }
 
   // The Khalifa, Daman and Al Nahda marks ship in one dark-ink colourway, so
   // they get the light chip that keeps them legible on the dark ground.
-  const single = logos.filter((l) => !l.includes('SAAL'));
+  const single = logos.filter((l) => !l.includes('saal-'));
   assert.ok(single.length >= 3, `expected the single-colourway marks, got ${single.length}`);
   for (const mark of single) assert.match(mark, /class="entry-logo is-plated"/);
 });
