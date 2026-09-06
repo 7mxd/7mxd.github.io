@@ -45,6 +45,23 @@ main { max-width: none; padding: 0; }
 
 .work + .work { margin-top: 0.5cm; padding-top: 0.5cm; }
 
+/* A .work article (Selected work) can run longer than a page, so it isn't
+   forced whole onto one page the way a short .entry is — that would trade a
+   mid-paragraph split for a large blank gap on the page before it. Instead,
+   target the specific ways a break reads badly: a heading stranded alone at
+   the foot of a page, a short link row torn from the project it belongs to,
+   or a paragraph leaving a single orphaned/widowed line at the boundary. */
+.work-title, .work-meta { break-after: avoid; }
+.work-links { break-inside: avoid; }
+.work p, .block-text { orphans: 3; widows: 3; }
+
+/* Both are short, self-contained units — a bordered aside, a three-row
+   table — so forcing them whole never risks the large-blank-gap trade-off
+   that ruled out break-inside: avoid on .work itself; a callout or a
+   benchmark table split across a page reads worse than either being pushed
+   to the next one. */
+.block-callout, .benchmark { break-inside: avoid; }
+
 /* Print the destination of every link, since a printed page cannot be clicked. */
 .hero-links a::after,
 .work-links a::after,
