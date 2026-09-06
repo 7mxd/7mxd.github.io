@@ -32,6 +32,7 @@
   /* Measure and gutters */
   --measure-prose: 34rem;
   --measure-wide: 46rem;
+  --measure-nav: 58rem;
   --gutter: clamp(1.25rem, 0.5rem + 3vw, 4rem);
 
   --rule-width: 1px;

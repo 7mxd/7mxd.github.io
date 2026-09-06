@@ -10,7 +10,10 @@
 }
 
 .site-nav {
-  max-width: var(--measure-wide);
+  /* A nav bar is chrome, not prose: it gets its own measure rather than
+     the reading column's, so its five links and two controls have room
+     to sit on one line at normal desktop widths. */
+  max-width: var(--measure-nav);
   margin: 0 auto;
   padding: var(--space-3) var(--gutter);
   display: flex;
@@ -29,6 +32,7 @@
   font-size: var(--text-sm);
 }
 .nav-mark img { width: 2rem; height: 2rem; }
+.nav-mark-name { white-space: nowrap; }
 
 .nav-links {
   margin-left: auto;
@@ -90,6 +94,7 @@
   color: var(--ground);
 }
 .cv-button svg { width: 1rem; height: 1rem; }
+.cv-button span { white-space: nowrap; }
 
 .nav-menu-toggle { display: none; }
 
