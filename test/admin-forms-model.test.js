@@ -17,7 +17,7 @@ test('list: buildFormModel preserves items and fills item defaults', () => {
 });
 test('modelToData round-trips a project and drops empties', () => {
   const c = getCollection('projects');
-  const data = { items:[{ title:'P', status:'shipped', tags:['X'], links:{ github:'g' }, blocks:[{type:'description',content:'d'}] }] };
+  const data = { items:[{ title:'P', tags:['X'], links:{ github:'g' }, blocks:[{type:'description',content:'d'}] }] };
   const back = modelToData(c, buildFormModel(c, data));
   assert.equal(back.items[0].title, 'P');
   assert.equal(back.items[0].tags[0], 'X');

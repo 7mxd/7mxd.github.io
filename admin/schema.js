@@ -51,9 +51,6 @@ export const COLLECTIONS = [
 
   { name:'projects', file:'data/projects.json', label:'Projects', kind:'list', listKey:'items', itemFields:[
     { name:'title', label:'Title', type:'string', required:true },
-    { name:'status', label:'Status', type:'select', options:[
-      {label:'(none)', value:''}, {label:'in progress', value:'in-progress'}, {label:'shipped', value:'shipped'},
-      {label:'research', value:'research'}, {label:'archived', value:'archived'} ] },
     tagsField,
     { name:'image', label:'Image', type:'image' },
     { name:'links', label:'Links', type:'object', fields:[
