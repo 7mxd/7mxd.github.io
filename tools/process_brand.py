@@ -1,41 +1,57 @@
 # tools/process_brand.py
-"""Key the flat-white background out of the logo art and emit brand marks.
+"""Key the chroma-green background out of the logo art and emit brand marks.
 
 Run from the repository root:  python tools/process_brand.py
 """
 from pathlib import Path
 
 import numpy as np
-from PIL import Image, ImageDraw, ImageFilter
+from PIL import Image
 
 ROOT = Path(__file__).resolve().parent.parent
 BRAND = ROOT / "assets" / "brand"
 ASSETS = ROOT / "assets"
 
-SENTINEL = (255, 0, 255)
 GROUND = (250, 250, 249)  # --ground, for the opaque Apple touch icon
 
+# The source art is drawn on a chroma-key green. Keying green rather than
+# white matters: the ghutra is WHITE cloth, and an earlier white-keyed
+# version left it as transparent negative space, which read as paper on a
+# light ground and vanished on a dark one. Keying green keeps the cloth
+# opaque, so the mark works on any background with no plate behind it.
+KEY_RGB = np.array([11, 248, 6], dtype=float)
 
-def key_background(path, thresh=30, feather=0.8):
-    """Remove background white reachable from the border, keeping enclosed white."""
+
+def key_green(path, tol=110.0, soft=60.0, despill=True):
+    """Remove the chroma-key green background, keeping white cloth opaque.
+
+    Alpha ramps from 0 for pixels within `tol` of the key colour to 255 at
+    `tol + soft`, so anti-aliased edges keep a soft transition instead of a
+    hard stair-step. Distance is measured with the green channel weighted
+    down, so a pixel is judged green by how far its red and blue sit below
+    green rather than by absolute brightness — that keeps the white cloth
+    (high in all three channels) far from the key even though it is bright.
+    """
     im = Image.open(path).convert("RGB")
-    w, h = im.size
-    for seed in ((0, 0), (w - 1, 0), (0, h - 1), (w - 1, h - 1)):
-        ImageDraw.floodfill(im, seed, SENTINEL, thresh=thresh)
+    arr = np.array(im).astype(float)
+    r, g, b = arr[:, :, 0], arr[:, :, 1], arr[:, :, 2]
 
-    arr = np.array(im)
-    mask = np.all(arr == np.array(SENTINEL, dtype=arr.dtype), axis=-1)
+    # Greenness: how much green exceeds the stronger of red and blue.
+    greenness = g - np.maximum(r, b)
+    dist = np.clip(tol - greenness, 0, None)
+    alpha = np.clip(dist / soft, 0, 1) * 255
 
-    # Repaint sentinel pixels white so feathering cannot bleed magenta inward.
-    arr[mask] = (255, 255, 255)
+    if despill:
+        # Anti-aliased edge pixels carry a green fringe. Pull green down to
+        # the brighter of red and blue wherever it overshoots, which removes
+        # the fringe without touching genuinely green-free colour.
+        cap = np.maximum(r, b)
+        overshoot = g > cap
+        g = np.where(overshoot, cap, g)
+        arr[:, :, 1] = g
 
-    alpha = Image.fromarray(np.where(mask, 0, 255).astype("uint8"))
-    if feather:
-        alpha = alpha.filter(ImageFilter.GaussianBlur(feather))
-
-    out = Image.fromarray(arr).convert("RGBA")
-    out.putalpha(alpha)
-    return out
+    out = np.dstack([arr, alpha]).astype("uint8")
+    return Image.fromarray(out, "RGBA")
 
 
 def trim(im):
@@ -63,10 +79,10 @@ def center_square(im, pad_ratio=0.06):
 
 
 def main():
-    icon = center_square(key_background(BRAND / "logo-icon-source.jpg"))
+    icon = center_square(key_green(BRAND / "logo-icon-source.jpg"))
     icon.save(BRAND / "logo-icon.png")
 
-    wordmark = trim(key_background(BRAND / "logo-wordmark-source.jpg"))
+    wordmark = trim(key_green(BRAND / "logo-wordmark-source.jpg"))
     wordmark.save(BRAND / "logo-wordmark.png")
 
     for name, size in (

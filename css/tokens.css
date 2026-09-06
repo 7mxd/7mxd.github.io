@@ -46,9 +46,6 @@
   --accent: #a85a32;
   --accent-strong: #8f4a2c;
   --rule: #e2e2df;
-  /* Backing for artwork whose own white is transparent negative space.
-     None is needed on a light ground; see css/layout.css .nav-mark-icon. */
-  --plate: transparent;
 }
 
 [data-theme="dark"] {
@@ -59,7 +56,6 @@
   --accent: #e7ad87;
   --accent-strong: #f3cbb0;
   --rule: #2a2d3a;
-  --plate: #fafaf9;
 }
 
 /* The page is rendered by JavaScript, so js/theme.js always sets

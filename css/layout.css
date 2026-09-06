@@ -33,13 +33,12 @@
 }
 /* The mark is a half-face: tall and narrow. Set its height and let the
    width follow, rather than forcing a square box and paying for the empty
-   columns either side. */
+   columns either side. The artwork is keyed from a chroma-green source, so
+   the ghutra stays opaque white and the mark needs no backing on either
+   ground. */
 .nav-mark-icon {
   height: 2.25rem;
   width: auto;
-  background: var(--plate);
-  border-radius: 3px;
-  padding: 0 2px;
 }
 .nav-mark-name { white-space: nowrap; }
 
