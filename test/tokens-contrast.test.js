@@ -34,22 +34,65 @@ function contrast(a, b) {
 
 const AA = 4.5;
 
-test('light theme text tokens pass AA against both grounds', () => {
+// --ground-tint is the top stop of the wash css/base.css paints over the first
+// 46rem of the document, so it is a ground real text really sits on — the whole
+// hero does. It is checked here alongside the other two, which is what makes
+// "the background may carry chroma toward the accent" a bounded permission
+// rather than an unbounded one: the tint can only get as blue as AA allows.
+const GROUNDS = ['ground', 'ground-tint', 'ground-raised'];
+const TEXT = ['ink', 'ink-muted', 'accent', 'accent-strong'];
+
+test('light theme text tokens pass AA against every ground, wash included', () => {
   const t = blockTokens(':root');
-  for (const ground of [t.ground, t['ground-raised']]) {
-    for (const name of ['ink', 'ink-muted', 'accent', 'accent-strong']) {
-      const ratio = contrast(t[name], ground);
-      assert.ok(ratio >= AA, `light --${name} on ${ground} is ${ratio.toFixed(2)}:1`);
+  for (const g of GROUNDS) {
+    assert.ok(t[g], `light --${g} is not defined`);
+    for (const name of TEXT) {
+      const ratio = contrast(t[name], t[g]);
+      assert.ok(ratio >= AA, `light --${name} on --${g} ${t[g]} is ${ratio.toFixed(2)}:1`);
     }
   }
 });
 
-test('dark theme text tokens pass AA against both grounds', () => {
+test('dark theme text tokens pass AA against every ground, wash included', () => {
   const t = blockTokens('[data-theme="dark"]');
-  for (const ground of [t.ground, t['ground-raised']]) {
-    for (const name of ['ink', 'ink-muted', 'accent', 'accent-strong']) {
-      const ratio = contrast(t[name], ground);
-      assert.ok(ratio >= AA, `dark --${name} on ${ground} is ${ratio.toFixed(2)}:1`);
+  for (const g of GROUNDS) {
+    assert.ok(t[g], `dark --${g} is not defined`);
+    for (const name of TEXT) {
+      const ratio = contrast(t[name], t[g]);
+      assert.ok(ratio >= AA, `dark --${name} on --${g} ${t[g]} is ${ratio.toFixed(2)}:1`);
+    }
+  }
+});
+
+// The amended ground rule: chroma is permitted toward the accent's hue only.
+// Warm tints — cream, sand, beige — stay banned, and so does drifting toward
+// the anti-reference teal at hue 191. Asserted rather than asserted-in-prose,
+// because "a very light blue" is exactly the kind of instruction that decays
+// into "a very light something" three edits later.
+function hueOf(hex) {
+  const h = hex.replace('#', '');
+  const [r, g, b] = [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16) / 255);
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  if (max === min) return null;
+  const d = max - min;
+  let deg;
+  if (max === r) deg = ((g - b) / d) % 6;
+  else if (max === g) deg = (b - r) / d + 2;
+  else deg = (r - g) / d + 4;
+  return ((deg * 60) % 360 + 360) % 360;
+}
+
+test('every tinted ground and hairline sits in the accent hue family', () => {
+  for (const selector of [':root', '[data-theme="dark"]']) {
+    const t = blockTokens(selector);
+    const accentHue = hueOf(t.accent);
+    for (const name of ['ground-tint', 'rule', 'rule-accent']) {
+      const hue = hueOf(t[name]);
+      assert.ok(hue !== null, `${selector} --${name} is a pure grey, so it carries no accent`);
+      const delta = Math.abs(hue - accentHue);
+      assert.ok(delta <= 15, `${selector} --${name} is at hue ${hue.toFixed(1)}, ${delta.toFixed(1)} off the accent's ${accentHue.toFixed(1)}`);
+      assert.ok(Math.abs(hue - 191) > 20, `${selector} --${name} at hue ${hue.toFixed(1)} is drifting into the banned teal`);
     }
   }
 });

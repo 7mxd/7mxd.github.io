@@ -112,14 +112,19 @@ test('theme-color is a single tag, not keyed to the OS preference', () => {
   assert.equal(/prefers-color-scheme/.test(tags[0]), false, 'theme-color is still media-keyed');
 });
 
-test('every theme-color value agrees with --ground in css/tokens.css', () => {
+// --ground-tint, not --ground. The assertion this test has always made is that
+// the browser chrome matches the colour painted at the top of the page; that is
+// still the assertion. What changed underneath it is the colour: css/base.css
+// washes the first 46rem of the document with --ground-tint, so the flat
+// --ground no longer touches the address bar at all.
+test('every theme-color value agrees with --ground-tint in css/tokens.css', () => {
   const tokens = read('css/tokens.css');
   const grounds = {};
   for (const [selector, key] of [[':root', 'light'], ['[data-theme="dark"]', 'dark']]) {
     const start = tokens.indexOf(selector);
     const open = tokens.indexOf('{', start);
     const body = tokens.slice(open + 1, tokens.indexOf('}', open));
-    grounds[key] = body.match(/--ground:\s*(#[0-9a-f]{6})/i)[1];
+    grounds[key] = body.match(/--ground-tint:\s*(#[0-9a-f]{6})/i)[1];
   }
 
   // The tag in the shell carries the light value: it is what the pre-paint

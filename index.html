@@ -14,7 +14,7 @@
      which made the script's querySelector return null and left every dark
      reader under a light address bar until the module graph resolved.
      test/index-html.test.js pins the order. -->
-<meta name="theme-color" content="#fafaf9">
+<meta name="theme-color" content="#eaf0fb">
 
 <!-- Set the theme before first paint so the page never flashes the wrong ground. -->
 <script>
@@ -33,7 +33,7 @@
   }
   document.documentElement.setAttribute('data-theme', theme);
   var meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute('content', theme === 'dark' ? '#15171f' : '#fafaf9');
+  if (meta) meta.setAttribute('content', theme === 'dark' ? '#1a1f30' : '#eaf0fb');
 })();
 </script>
 

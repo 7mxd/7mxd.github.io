@@ -4,7 +4,15 @@
   position: sticky;
   top: 0;
   z-index: 20;
-  background: color-mix(in srgb, var(--ground) 92%, transparent);
+  /* --ground-tint, not --ground. The bar is translucent, but only 8% so, which
+     is not enough to pick the wash up from behind it: mixed from the flat
+     ground it read as a pale strip laid across a tinted hero, exactly the seam
+     the wash exists to avoid. Mixed from the tint it is continuous with the top
+     of the page, and further down it is a bar 5 dE off the ground it floats
+     over, which is a difference you have to go looking for. It also means the
+     one piece of chrome that is on screen at every scroll position carries the
+     accent hue, which is most of what "generally more of the blue" costs. */
+  background: color-mix(in srgb, var(--ground-tint) 92%, transparent);
   backdrop-filter: blur(8px);
   border-bottom: var(--rule-width) solid var(--rule);
 }
@@ -124,9 +132,25 @@ main {
 .section { padding-block: var(--space-section); }
 .section + .section { border-top: var(--rule-width) solid var(--rule); }
 
+/* The load-bearing decision of this treatment. Six or seven headings spaced
+   down a very long page is the only element that puts the accent on every
+   screenful without putting it on anything Ahmed actually wrote. They are
+   wayfinding — "About", "The path so far", "Skills" — words that would still
+   be there if the JSON belonged to someone else, which is exactly the
+   content/interface line CLAUDE.md already draws. Prose, entry titles,
+   employers, dates, metric values and the tagline all stay --ink, and that is
+   the rule: the accent marks the page's skeleton and its identity; ink carries
+   every statement he makes.
+
+   --accent, not --accent-strong: at 22-28px and weight 600 this is large text
+   under WCAG, so 6.41:1 on --ground and 6.04:1 on the wash are both roughly
+   double the 3:1 it has to clear. The deeper --accent-strong was tried first
+   and read as very dark navy ink rather than as the accent — it made the
+   change invisible, which is the opposite of the brief. */
 .section-heading {
   font-size: var(--text-xl);
   margin-bottom: var(--space-6);
+  color: var(--accent);
 }
 
 .section-note {

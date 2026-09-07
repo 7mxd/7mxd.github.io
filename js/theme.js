@@ -1,9 +1,12 @@
 /** Theme selection. The pure helpers are unit tested; initTheme wires the DOM. */
 
 const THEMES = ['light', 'dark'];
-/** --ground per theme, for the one place a colour has to leave CSS: the
- *  theme-color meta the browser paints its own chrome with. */
-const GROUND = { light: '#fafaf9', dark: '#15171f' };
+/** --ground-tint per theme, for the one place a colour has to leave CSS: the
+ *  theme-color meta the browser paints its own chrome with. The tint, not
+ *  --ground, because css/base.css washes the top 46rem of the document with it
+ *  — so the tint is the colour that actually meets the address bar, and pinning
+ *  this to the flat ground left a visible seam there on a phone. */
+const CHROME = { light: '#eaf0fb', dark: '#1a1f30' };
 const KEY = 'theme';
 
 export function nextTheme(current) {
@@ -30,10 +33,10 @@ export function initTheme(doc, storage, media) {
     if (button) button.setAttribute('aria-pressed', String(theme === 'dark'));
     // The browser chrome around the page has to follow the toggle too, or a
     // reader who switches to dark gets a dark page under a light address bar.
-    // Values mirror --ground in css/tokens.css; test/index-html.test.js pins
-    // the light one to the tag in index.html and to manifest.json.
+    // Values mirror --ground-tint in css/tokens.css; test/index-html.test.js
+    // pins the light one to the tag in index.html and to manifest.json.
     const meta = doc.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute('content', GROUND[theme] ?? GROUND.light);
+    if (meta) meta.setAttribute('content', CHROME[theme] ?? CHROME.light);
     if (announceIt) announce(doc, theme);
   };
 

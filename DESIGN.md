@@ -13,10 +13,23 @@ light: a dark ground would be a style choice fighting the context.
 Dark mode is a properly derived second palette, not an inversion, and is the
 theme where the accent can sit at its lightest without losing the ground.
 
-Colour strategy: **restrained**. Tinted neutrals plus one accent under ten
-percent of the surface. The page is carried by photographs and typography; the
-accent marks links, bullet glyphs, and the one highlighted row in the benchmark
-table.
+Colour strategy: **the accent lives in the letterforms.** The ground stays a
+near-white carrying only a faint wash of the accent hue, and the accent itself
+is a text colour almost everywhere it appears. One rule decides which type gets
+it: *the accent marks the page's skeleton and its identity; ink carries every
+statement Ahmed makes.*
+
+Accent: the Arabic name, every section heading, the hero pills, the skill-group
+and block labels, the year numerals and badge rings, links, bullet glyphs, and
+the benchmark's own-result row.
+
+Ink: the Latin name, the tagline, the availability line, every entry and project
+title, employers, dates, metric values, project tags, contact labels, the nav
+wordmark and the Download CV button.
+
+An underline is what separates a link from accent type — `css/base.css` never
+removes it — so blue-and-underlined is clickable and blue-and-not is a label.
+That is why the pills can take the full accent without reading as buttons.
 
 ## Color
 
@@ -33,33 +46,56 @@ hex. The figures below are recomputed from `css/tokens.css` by
 `test/design-doc.test.js`, so this table cannot silently go stale the way it
 did when the accent changed.
 
-Body background is a true off-white at near-zero chroma. Deliberately not a
-cream, sand, or parchment; warmth comes from the logo, the accent, and the
-photographs.
+Body background is a near-white carrying a small amount of chroma **toward the
+accent's own hue and no other**. `--ground` stays at near-zero chroma but was rotated
+from a warm hsl 60 to a cool hsl 220 at the same lightness, because a warm
+off-white next to a cool wash reads as cream; every published contrast figure
+below is unchanged to three decimals by that move. `--ground-tint` is that same
+near-white pulled 6.1 dE toward hsl 218.8, the accent's own hue, and
+`css/base.css` paints it as a wash over the first 46rem of the document, fading
+into `--ground` below. The introduction sits on tinted air; the document
+under it is plain paper. Cream, sand, and parchment remain banned, and so does
+any tint that is not the accent's hue — `test/tokens-contrast.test.js` checks
+the hue of every tinted ground and hairline against `--accent` and fails at more
+than 15 degrees off, or anywhere near the anti-reference teal at hue 191.
+
+The tint is checked for contrast as a ground in its own right, because the whole
+hero sits on it: ink 14.21:1, ink-muted 5.88:1, accent 5.86:1, accent-strong
+7.74:1 in light; 13.25:1, 5.88:1, 7.50:1 and 9.05:1 in dark.
+
+`--rule` was `#e2e2df`, a warm grey at hue 60. It drew every hairline on the
+page — section dividers, the timeline rail, pill and figure and table borders —
+in the one colour family the palette bans elsewhere. It is now the same
+lightness (L* 89.80 against 89.81) rotated onto the accent's hue, so no hairline
+changed weight and the page's whole structure stopped being beige.
 
 ### Light
 
 | Token | Value | Role | Contrast on `--ground` |
 |---|---|---|---|
-| `--ground` | `#fafaf9` | page | — |
+| `--ground` | `#f9fafc` | page | — |
+| `--ground-tint` | `#eaf0fb` | top of the wash | — |
 | `--ground-raised` | `#ffffff` | callouts, chips | — |
 | `--ink` | `#1c1f32` | body and headings | 15.57:1 |
 | `--ink-muted` | `#585b6b` | metadata, captions | 6.44:1 |
-| `--accent` | `#2959ae` | links, bullet glyphs, year badges | 6.41:1 |
+| `--accent` | `#2959ae` | Arabic name, section headings, pills, links, bullet glyphs, year badges, skill labels | 6.41:1 |
 | `--accent-strong` | `#21488c` | link hover, benchmark row | 8.48:1 |
-| `--rule` | `#e2e2df` | hairlines only, never text | — |
+| `--rule` | `#dee2ea` | hairlines only, never text | — |
+| `--rule-accent` | `#c4d1e8` | pill and year-badge hairlines only | — |
 
 ### Dark
 
 | Token | Value | Contrast on `--ground` |
 |---|---|---|
 | `--ground` | `#15171f` | — |
+| `--ground-tint` | `#1a1f30` | — |
 | `--ground-raised` | `#1c1f2a` | — |
 | `--ink` | `#e9e7e2` | 14.47:1 |
 | `--ink-muted` | `#9a9aa6` | 6.43:1 |
 | `--accent` | `#90b2df` | 8.19:1 |
 | `--accent-strong` | `#a8c3e6` | 9.89:1 |
-| `--rule` | `#2a2d3a` | — |
+| `--rule` | `#2b3040` | — |
+| `--rule-accent` | `#374561` | — |
 
 `--print-*` tokens live in a second `:root` block and are reassigned onto the
 same names inside `css/print.css`. Print is ink on white regardless of theme.
