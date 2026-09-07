@@ -13,12 +13,25 @@
      or a dark-mode reader prints with dark form controls. */
   color-scheme: light;
   --ground: var(--print-ground);
+  /* The wash is a screen effect and must not reach paper: most printers drop
+     background images by default, but "most" is not a design decision. Killing
+     the image here also kills the token the tint reaches paper through, so the
+     nav bar's color-mix (hidden in print anyway) and anything else built on
+     --ground-tint collapse to plain white with it. */
+  --ground-tint: var(--print-ground);
+  --ground-wash: none;
   --ground-raised: var(--print-ground);
   --ink: var(--print-ink);
   --ink-muted: var(--print-ink-muted);
+  /* Every accent decision in this proposal is a text colour, and print maps the
+     accent to --print-ink. So the Arabic name, the section headings, the pills,
+     the year numerals and the skill labels all print as the same black as the
+     prose, and the printed document is byte-for-byte the one it was before —
+     which is the point: the treatment lives entirely in the screen palette. */
   --accent: var(--print-accent);
   --accent-strong: var(--print-accent);
   --rule: var(--print-rule);
+  --rule-accent: var(--print-rule);
   --portrait-ring: var(--print-portrait-ring);
 }
 

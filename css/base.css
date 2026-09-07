@@ -25,7 +25,16 @@ html {
 
 body {
   margin: 0;
-  background: var(--ground);
+  /* Two declarations, not one shorthand. The colour is the whole canvas and
+     the wash is an image painted over its first 46rem, so a browser that
+     cannot resolve the gradient — or a print stylesheet that sets
+     --ground-wash to none — still gets a correctly filled page rather than a
+     transparent one. no-repeat matters: the gradient's positioning area is the
+     full document box, so its 46rem stop is 46rem from the top of the page and
+     the flat --ground carries every screenful after that. */
+  background-color: var(--ground);
+  background-image: var(--ground-wash);
+  background-repeat: no-repeat;
   color: var(--ink);
   font-family: var(--font-prose);
   font-size: var(--text-base);

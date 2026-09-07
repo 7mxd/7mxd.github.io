@@ -55,8 +55,11 @@ plain and by letting photographs carry the page.
 
 - Photographs are load-bearing. Zero images is a bug, not restraint.
 - No display-serif affectation, no monospace metadata labels, no card grids.
-- The background is a true off-white at near-zero chroma. Never a cream, sand,
-  or beige, and never token names like `--paper` or `--cream`.
+- The background is a near-white that may carry chroma toward the accent's
+  hue and no other. `--ground` stays at near-zero chroma; `--ground-tint`
+  washes the top 46rem of the document. Never a cream, sand, or beige, never
+  a hue more than 15 degrees off the accent, and never token names like
+  `--paper` or `--cream`.
 - Warmth comes from the logo, the accent, and the photography.
 
 ### Palette
@@ -64,11 +67,21 @@ plain and by letting photographs carry the page.
 Derived from Ahmed's own logo artwork. Every value is verified against both
 grounds by `test/tokens-contrast.test.js`; do not change one without running it.
 
-Light: ground `#fafaf9`, raised `#ffffff`, ink `#1c1f32`, muted `#585b6b`,
-accent `#2959ae`, accent-strong `#21488c`, rule `#e2e2df`.
+Light: ground `#f9fafc`, tint `#eaf0fb`, raised `#ffffff`, ink `#1c1f32`,
+muted `#585b6b`, accent `#2959ae`, accent-strong `#21488c`, rule `#dee2ea`,
+rule-accent `#c4d1e8`.
 
-Dark: ground `#15171f`, raised `#1c1f2a`, ink `#e9e7e2`, muted `#9a9aa6`,
-accent `#90b2df`, accent-strong `#a8c3e6`, rule `#2a2d3a`.
+Dark: ground `#15171f`, tint `#1a1f30`, raised `#1c1f2a`, ink `#e9e7e2`,
+muted `#9a9aa6`, accent `#90b2df`, accent-strong `#a8c3e6`, rule `#2b3040`,
+rule-accent `#374561`.
+
+The accent lives in the letterforms. One rule decides which type gets it: the
+accent marks the page's skeleton and its identity, ink carries every statement
+Ahmed makes. Accent: the Arabic name, section headings, hero pills, skill and
+block labels, year badges, links, bullet glyphs. Ink: the Latin name, the
+tagline, the status line, entry and project titles, employers, dates, metric
+values, contact labels, the nav wordmark and the CV button. An underline is
+what marks a link, which is why blue pills do not read as buttons.
 
 ### Typography
 
