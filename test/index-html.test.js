@@ -13,12 +13,32 @@ const read = (rel) => readFileSync(new URL(`../${rel}`, import.meta.url), 'utf8'
 const html = read('index.html');
 const settings = JSON.parse(read('data/settings.json'));
 const manifest = JSON.parse(read('manifest.json'));
+const profile = JSON.parse(read('data/profile.json'));
 
 const metaContent = (attr, name) => {
   const m = html.match(new RegExp(`<meta ${attr}="${name}" content="([^"]*)"`));
   assert.ok(m, `no <meta ${attr}="${name}"> in index.html`);
   return m[1];
 };
+
+test('the description a share preview shows is what the page itself says', () => {
+  // The one line most readers see before they see anything else: WhatsApp,
+  // iMessage and a search result render it under the title. It drifted from the
+  // page twice — once describing a role that had ended, once narrowed to a
+  // single project — and both times nobody noticed until a preview was seen in
+  // the wild. Deriving it from the hero removes the chance to write it wrong.
+  assert.equal(
+    settings.meta.description,
+    `${profile.role}. ${profile.tagline}`,
+    'settings.meta.description no longer matches the role line and tagline the hero renders',
+  );
+  // Google truncates a snippet around 155-160 characters, so a longer tagline
+  // means the last clause never reaches a reader.
+  assert.ok(
+    settings.meta.description.length <= 165,
+    `the description is ${settings.meta.description.length} characters and will be cut off in a search result`,
+  );
+});
 
 test('all three description tags come from settings.meta.description', () => {
   const expected = settings.meta.description;
