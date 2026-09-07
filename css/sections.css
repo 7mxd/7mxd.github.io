@@ -653,12 +653,20 @@
 .contacts { display: grid; gap: var(--space-3); }
 .contact-row {
   display: grid;
-  grid-template-columns: 6rem 1fr;
+  grid-template-columns: 7rem 1fr;
   gap: var(--space-3);
   font-family: var(--font-meta);
   font-size: var(--text-sm);
 }
-.contact-label { color: var(--ink-muted); }
+/* The mark sits with the label, not beside the address: next to
+   "AhmedARadhi00@gmail.com" an envelope only repeats the word "Email" that is
+   already in the column to its left. */
+.contact-label {
+  display: flex;
+  align-items: center;
+  gap: 0.45em;
+  color: var(--ink-muted);
+}
 
 /* Narrow screens: the year column stacks above its entries. */
 @media (max-width: 40rem) {
@@ -702,5 +710,5 @@
 
   .hero { align-items: flex-start; }
   .hero-portrait { width: 8rem; height: 8rem; }
-  .contact-row { grid-template-columns: 5rem 1fr; }
+  .contact-row { grid-template-columns: 6.25rem 1fr; }
 }

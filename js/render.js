@@ -56,6 +56,15 @@ const ICONS = {
     + `<polyline points="3.5 7 12 13 20.5 7"></polyline></svg>`,
   linkedin: `<svg class="link-icon" ${FILL}><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.42v1.56h.04c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zm1.78 13.02H3.56V9h3.56zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"></path></svg>`,
   github: `<svg class="link-icon" ${FILL}><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.82-.26.82-.58l-.015-2.04c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.61-2.8 5.62-5.48 5.92.43.36.81 1.1.81 2.22l-.015 3.29c0 .31.21.69.83.57A12 12 0 0 0 12 .3z"></path></svg>`,
+  globe: `<svg class="link-icon" ${STROKE}><circle cx="12" cy="12" r="9"></circle>`
+    + `<path d="M3.2 9.5h17.6M3.2 14.5h17.6"></path>`
+    + `<path d="M12 3a14 14 0 0 1 0 18a14 14 0 0 1 0-18"></path></svg>`,
+  // A phone, not the Apple mark. LinkedIn and GitHub publish their glyphs for
+  // linking to a profile; Apple's guidelines reserve theirs and sanction only
+  // the full "Download on the App Store" badge, which is far too heavy for a
+  // link row. A handset beside the words "App Store" is unambiguous anyway.
+  app: `<svg class="link-icon" ${STROKE}><rect x="6" y="2.5" width="12" height="19" rx="2.5"></rect>`
+    + `<path d="M10.5 18.5h3"></path></svg>`,
   // Marks a link that leaves the site. The page had no such signal, so "Verify"
   // (an issuer's page) looked identical to "Read more" (a jump further down the
   // same page).
@@ -64,8 +73,11 @@ const ICONS = {
     + `<path d="M18 13.5V18a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4.5"></path></svg>`,
 };
 
-/** Anything not starting with `#` or `mailto:` leaves the site. */
-function outboundIcon(href) {
+/** The icon a link earns. `kind` names it where the destination is known from
+ *  the data (a project's App Store or website URL); everything else is inferred
+ *  from the href, and anything outbound with no better mark gets the arrow. */
+function outboundIcon(href, kind) {
+  if (kind && ICONS[kind]) return ICONS[kind];
   const url = String(href ?? '');
   if (/^https?:\/\/(www\.)?linkedin\.com/i.test(url)) return ICONS.linkedin;
   if (/^https?:\/\/(www\.)?github\.com/i.test(url)) return ICONS.github;
@@ -74,8 +86,8 @@ function outboundIcon(href) {
 }
 
 /** An anchor with its icon, for the rows where links sit together. */
-function iconLink(href, label) {
-  return `<a href="${escapeHtml(href)}">${outboundIcon(href)}<span>${escapeHtml(label)}</span></a>`;
+function iconLink(href, label, kind) {
+  return `<a href="${escapeHtml(href)}">${outboundIcon(href, kind)}<span>${escapeHtml(label)}</span></a>`;
 }
 
 /** In a timeline gallery an odd trailing image spans both columns rather than
@@ -237,9 +249,9 @@ function entryMarkup(entry) {
   }
   // A published app that nobody can open from the entry describing it is a
   // dead end. Labels are interface, not content, so they live here.
-  for (const [key, label] of [['webapp', 'Website'], ['ios', 'App Store'], ['github', 'GitHub']]) {
+  for (const [key, label, kind] of [['webapp', 'Website', 'globe'], ['ios', 'App Store', 'app'], ['github', 'GitHub', null]]) {
     const url = entry.outboundLinks?.[key];
-    if (url) links.push(`<a href="${escapeHtml(url)}" rel="noopener">${outboundIcon(url)}<span>${label}</span></a>`);
+    if (url) links.push(`<a href="${escapeHtml(url)}" rel="noopener">${outboundIcon(url, kind)}<span>${label}</span></a>`);
   }
   const more = links.length ? `<p class="entry-more">${links.join('')}</p>` : '';
 
@@ -310,10 +322,10 @@ function workMarkup(project) {
     ? `<p class="work-tags">${project.tags.map((t) => `<span>${escapeHtml(t)}</span>`).join('')}</p>`
     : '';
 
-  const named = { ios: 'App Store', webapp: 'Website', github: 'GitHub' };
+  const named = [['ios', 'App Store', 'app'], ['webapp', 'Website', 'globe'], ['github', 'GitHub', null]];
   const links = [];
-  for (const [key, label] of Object.entries(named)) {
-    if (project.links?.[key]) links.push(iconLink(project.links[key], label));
+  for (const [key, label, kind] of named) {
+    if (project.links?.[key]) links.push(iconLink(project.links[key], label, kind));
   }
   for (const extra of project.links?.extra ?? []) {
     links.push(`<a href="${escapeHtml(extra.url)}">${outboundIcon(extra.url)}<span>${escapeHtml(extra.label)}</span></a>`);
@@ -385,7 +397,7 @@ function renderContact(doc, profile) {
       : null,
   ].filter(Boolean).map(([label, href, text]) => `
 <div class="contact-row">
-  <span class="contact-label">${escapeHtml(label)}</span>
+  <span class="contact-label">${outboundIcon(href)}<span>${escapeHtml(label)}</span></span>
   <a href="${escapeHtml(href)}">${escapeHtml(text)}</a>
 </div>`).join('');
 
