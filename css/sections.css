@@ -360,12 +360,11 @@
 
 .gallery { margin-top: var(--space-4); display: grid; gap: var(--space-3); }
 .gallery.is-single { grid-template-columns: 1fr; }
-/* A lone portrait-orientation photo (e.g. volunteering-meal-packing at
-   630x1055) would otherwise run taller than a laptop viewport for one
-   image. Mirrors the cap already on Work galleries below; landscape
-   photos are unaffected since their computed height is already well
-   under this. */
-.gallery.is-single .figure img { max-height: 30rem; width: auto; }
+/* Every photograph, in every gallery, shares one height ceiling. Applying it
+   only to lone images left the grid uncapped, so a portrait in the spanning
+   lead slot would have rendered half again as tall as the landscape it
+   replaced. See --photo-cap in css/tokens.css for the number and why. */
+.gallery .figure img { max-height: var(--photo-cap); width: auto; }
 
 @media (min-width: 40rem) {
   .gallery.is-grid { grid-template-columns: 1fr 1fr; }
@@ -577,7 +576,6 @@
 /* The Stmnt captures are 1:2.17 portraits. Constrain them so one screenshot
    does not consume a whole screen of scroll. */
 .work .gallery.is-grid { grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); }
-.work .gallery .figure img { max-height: 26rem; width: auto; }
 @media (min-width: 40rem) {
   .work .gallery.is-grid > .figure:first-child:nth-last-child(odd) { grid-column: auto; }
 }

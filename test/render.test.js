@@ -360,15 +360,35 @@ test('srcset w descriptors are the real file widths, per photograph', () => {
   assert.deepEqual(wrong.map((i) => i.src), []);
 });
 
+test('every capPx tracks --photo-cap in css/tokens.css', () => {
+  // capPx is a hand-copied pixel version of a CSS token. Change the token and
+  // forget these and nothing breaks visibly — the page just asks the browser
+  // for the wrong file at every gallery, which is the kind of defect that
+  // survives for months. Three different caps lived here before they were
+  // unified, which is exactly how that happens.
+  const tokens = readFileSync(new URL('../css/tokens.css', import.meta.url), 'utf8');
+  const rem = tokens.match(/--photo-cap:\s*([\d.]+)rem/);
+  assert.ok(rem, 'css/tokens.css no longer defines --photo-cap in rem');
+  const expected = Number(rem[1]) * 16;
+
+  const source = readFileSync(new URL('../js/render.js', import.meta.url), 'utf8');
+  const found = [...source.matchAll(/capPx: (\d+)/g)].map((m) => Number(m[1]));
+  assert.ok(found.length >= 6, `expected a capPx per gallery slot, found ${found.length}`);
+  for (const px of found) {
+    assert.equal(px, expected, `a slot caps at ${px}px but --photo-cap is ${expected}px`);
+  }
+});
+
 test('sizes is per-context, not one constant for every gallery', () => {
   const { sections } = renderFixture();
   const hint = (html, name) => imageHints(html).find((i) => i.src.includes(name));
 
-  // A Selected Work screenshot: .work .gallery caps the image at 26rem tall,
-  // and 738/1600 of 416px is 192px, so the slot width is a fixed number.
-  assert.equal(hint(sections.get('work').innerHTML, 'stmnt-01').sizes, '192px');
-  // A lone portrait milestone photograph, capped at 30rem tall.
-  assert.equal(hint(sections.get('path').innerHTML, 'volunteering-meal-packing').sizes, '287px');
+  // Where the height cap binds — every portrait photograph — the rendered width
+  // is a fixed number, so `sizes` says that rather than a viewport expression
+  // the browser would have to over-read. 738/1600 of 384px is 177px.
+  assert.equal(hint(sections.get('work').innerHTML, 'stmnt-01').sizes, '177px');
+  // A lone portrait milestone photograph: 630/1055 of 384px.
+  assert.equal(hint(sections.get('path').innerHTML, 'volunteering-meal-packing').sizes, '229px');
   // Asserted by POSITION, not by filename: these named specific photographs
   // until the graduation set was reordered into the sequence it happened in,
   // and a test that breaks when content is reordered is testing the wrong
@@ -376,10 +396,11 @@ test('sizes is per-context, not one constant for every gallery', () => {
   // its column whatever slot it holds above that.
   const grad = DATA.education.items.find((e) => e.id === 'khalifa-bsc');
   assert.equal(grad.images.length % 2, 1, 'the spanning slot only exists for an odd count');
-  // The lead photograph spans both columns.
+  // The lead photograph spans both columns. 1600/1067 of 384px is 576px, just
+  // inside the 592px the slot can reach, so the cap decides its width too.
   assert.equal(
     hint(sections.get('path').innerHTML, grad.images[0].src).sizes,
-    '(min-width: 40rem) 37rem, 60vw',
+    '576px',
   );
   // Everything after it pairs off in half columns.
   for (const image of grad.images.slice(1)) {
