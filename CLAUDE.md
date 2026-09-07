@@ -65,10 +65,10 @@ Derived from Ahmed's own logo artwork. Every value is verified against both
 grounds by `test/tokens-contrast.test.js`; do not change one without running it.
 
 Light: ground `#fafaf9`, raised `#ffffff`, ink `#1c1f32`, muted `#585b6b`,
-accent `#a85a32`, accent-strong `#8f4a2c`, rule `#e2e2df`.
+accent `#2959ae`, accent-strong `#21488c`, rule `#e2e2df`.
 
 Dark: ground `#15171f`, raised `#1c1f2a`, ink `#e9e7e2`, muted `#9a9aa6`,
-accent `#e7ad87`, accent-strong `#f3cbb0`, rule `#2a2d3a`.
+accent `#90b2df`, accent-strong `#a8c3e6`, rule `#2a2d3a`.
 
 ### Typography
 

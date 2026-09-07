@@ -5,6 +5,13 @@
 html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
+  /* The nav is sticky and 67px tall, so without this every fragment target
+     lands underneath it: a "Read more about this work" link scrolls 4,000px
+     to put the project title completely behind the bar. On the scroll
+     container rather than per-id, so it covers the section ids, the year
+     group ids, the *-heading ids and the skip link, plus keyboard focus
+     scrolling. */
+  scroll-padding-top: 5rem;
 }
 
 @media (prefers-reduced-motion: reduce) {
