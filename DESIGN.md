@@ -102,7 +102,12 @@ measure.
 
 Gutter is `clamp(1.25rem, 0.5rem + 3vw, 4rem)`.
 
-Spacing scale runs `--space-1` through `--space-16`, the last fluid. Rhythm is
+Spacing scale runs `--space-1` through `--space-16`, the last fluid. Section
+boundaries use `--space-section` instead, a separate token capped at 4rem:
+`--space-16` pins to 96px top *and* bottom above 1280px, which made every
+boundary 192px of empty page with a hairline floating at its exact midpoint,
+belonging to neither section. `--space-16` keeps its larger ceiling where it is
+wanted — the hero top pad, the footer bottom pad. Rhythm is
 varied deliberately: generous separation between sections, tight grouping within
 an entry.
 
@@ -116,8 +121,12 @@ No card grids. Sections are separated by a single hairline rule, not by boxes.
   hamburger below 46rem.
 - **Hero.** Portrait beside the text, tops aligned. The portrait is a circle,
   `object-fit: cover` at `object-position: 50% 18%` because the source is a
-  tall portrait and a centred square crop cuts the chin. Two rings, drawn as one
-  `box-shadow`: a band of the raised surface, then a hairline. Below it: name,
+  tall portrait and a centred square crop cuts the chin. One ring, drawn as a
+  two-stop `box-shadow`: a band of the page ground, then a hairline in
+  `--portrait-ring`. It was a band of `--ground-raised`, which is `#ffffff` in
+  light and therefore byte-identical to the photograph's own studio backdrop —
+  the band merged into the picture and the shirt dissolved into the page. The
+  component only ever read as two rings in dark, by accident. Below it: name,
   Arabic name at `dir="rtl"`, role line, tagline, pills, contact links.
 - **Pills.** Outlined, fully rounded, metadata face at `--text-xs`. They state
   facts without tense, which is why the degree lives here rather than in the
