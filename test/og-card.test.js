@@ -28,11 +28,16 @@ const generator = read('tools/make_og_image.py');
 function expectedLines() {
   const company = experience.items[0].company;
   const roles = experience.items[0].roles;
+  const dated = (r) => /^\d{4}$/.test(r.endDate.slice(0, 4));
   const years = [...new Set([
     ...roles.map((r) => r.startDate.slice(0, 4)),
-    ...roles.map((r) => r.endDate.slice(0, 4)).filter((y) => /^\d{4}$/.test(y)),
+    ...roles.filter(dated).map((r) => r.endDate.slice(0, 4)),
   ])].sort();
-  const tenure = years.length > 1 ? `${years[0]}–${years[years.length - 1]}` : years[0];
+  // admin/schema.js advertises "Present" as a valid endDate. Without this the
+  // generator drew "Saal.ai, 2024" and this mirror agreed with it, so a card
+  // describing a year-long job would have passed.
+  const end = roles.every(dated) ? years[years.length - 1] : 'present';
+  const tenure = end === years[0] ? years[0] : `${years[0]}–${end}`;
   return [
     profile.role,
     `${company}, ${tenure} · ${education.items[0].institution}`,
@@ -54,7 +59,9 @@ test('every line the card draws says something checkable', () => {
   // The card used to read "Data pipelines, analysis, applied statistics" — three
   // capability nouns that would fit any data-science graduate, which is what
   // CLAUDE.md's fourth principle forbids.
-  assert.match(credentials, /\d{4}–\d{4}/, 'no date range on the card');
+  // A range, not a year: /\d{4}(–\d{4})?/ would have been satisfied by the
+  // bare "2024" the open-ended branch used to produce.
+  assert.match(credentials, /\d{4}–(\d{4}|present)/, 'no date range on the card');
   assert.ok(credentials.includes(education.items[0].institution), 'no institution on the card');
   assert.match(ask, /^Open to /, 'the card does not state what he is looking for');
   assert.ok(role.length > 0);
@@ -85,10 +92,43 @@ test('og:image and twitter:image agree, and both carry alt text', () => {
     const m = html.match(new RegExp(`<meta ${attr}="${name}" content="([^"]*)"`));
     assert.ok(m, `${name} is missing`);
     // Alt that restates og:title and og:description is worse than none for a
-    // screen-reader user, so it has to carry what the picture carries.
-    assert.ok(m[1].includes(experience.items[0].company), `${name} omits the employer the card shows`);
-    assert.ok(m[1].length > 60, `${name} is too thin to describe the card`);
+    // screen-reader user, so it has to carry what the picture carries. Checked
+    // line by line, not against the sidecar verbatim: the alt deliberately
+    // voices "2024 to 2026, and" where the card draws "2024–2026 ·". Without
+    // these three, a copy edit plus a regeneration left the alt describing the
+    // previous card with the whole suite green.
+    const alt = m[1];
+    assert.ok(alt.includes(experience.items[0].company), `${name} omits the employer the card shows`);
+    assert.ok(alt.includes(education.items[0].institution), `${name} omits the institution`);
+    assert.ok(alt.includes(profile.role), `${name} no longer says what the card says he is`);
+    assert.ok(alt.includes(profile.status.replace(/\.$/, '')), `${name} no longer carries the ask`);
+    assert.ok(alt.length > 60, `${name} is too thin to describe the card`);
   }
+});
+
+test('the shipped card is a real 1200x630 image, not a placeholder', () => {
+  // Everything above reads text. Two zero-byte PNGs passed the whole file, so
+  // nothing bound the tags to the picture they describe. The IHDR is four bytes
+  // of proof that a card was drawn at the size the meta tags promise.
+  const declared = (name) => Number(
+    html.match(new RegExp(`<meta property="${name}" content="(\\d+)"`))[1],
+  );
+  const buf = readFileSync(file('assets/og-image.png'));
+  assert.equal(buf.subarray(1, 4).toString('ascii'), 'PNG', 'the card is not a PNG');
+  assert.equal(buf.readUInt32BE(16), declared('og:image:width'), 'the card is not as wide as og:image:width claims');
+  assert.equal(buf.readUInt32BE(20), declared('og:image:height'), 'the card is not as tall as og:image:height claims');
+});
+
+test('the meta tags point at the filename the generator writes', () => {
+  // CARD_NAME is a frozen literal and og:image matches any og-image-*.png, so
+  // a bump in one and not the other produced "the legacy card is stale — rerun
+  // the generator", which is the wrong instruction for the actual fault.
+  const name = generator.match(/CARD_NAME = "([^"]+)"/);
+  assert.ok(name, 'the generator no longer names its output file');
+  assert.ok(
+    html.includes(`/assets/${name[1]}"`),
+    `the generator writes assets/${name[1]}, which index.html does not reference`,
+  );
 });
 
 test('the generator refuses a bitmap fallback instead of reporting success', () => {

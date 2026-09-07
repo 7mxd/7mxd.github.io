@@ -8,7 +8,7 @@ This is the first surface most readers see. PRODUCT.md says they arrive
 the image, og:title and the domain, then discards og:description entirely. So
 for the primary channel this PNG plus a dozen words of title IS the portfolio.
 
-Two rules follow from that, and both are load-bearing:
+Three rules follow from that, and all three are load-bearing:
 
 1. Every line has to say something checkable. The card used to read "Data
    scientist in Abu Dhabi" over "Data pipelines, analysis, applied statistics":
@@ -20,6 +20,10 @@ Two rules follow from that, and both are load-bearing:
    previews crop to a 630x630 square (x=285..915), so anything wider than about
    550px measured gets its ends cut off. The first draft anchored the block hard
    left and that crop removed the face entirely.
+
+3. Nothing ships that the run itself judged broken. The overflow check runs
+   before the PNGs are written, not after, so a card that fails the crop budget
+   leaves no file behind for the test suite to bless.
 
 The strings are read from data/*.json rather than held here, because a literal
 in a generator is content living in code, which the project's first convention
@@ -44,7 +48,8 @@ MUTED = (88, 91, 107)
 # same path stays invisible on every link already shared. The legacy path is
 # rewritten with the same bytes in the same run, so old shares improve too as
 # their caches expire, rather than being left on a card that no longer matches
-# the page.
+# the page. test/og-card.test.js reads this name back out of this file and
+# asserts index.html points at it, so the two cannot drift.
 CARD_NAME = "og-image-2026-09.png"
 LEGACY_CARD_NAME = "og-image.png"
 
@@ -56,6 +61,12 @@ CROP_SAFE_WIDTH = 550  # the 630px centre crop, less a little breathing room
 # wide logotype, so its width buys height fast.
 WORDMARK_WIDTH = 260
 GAP_AFTER_WORDMARK = 34
+
+# Two gaps, because they do two different jobs. Continuation lines of one
+# wrapped sentence are spaced by the font's own line height and nothing else,
+# so they read as one sentence; this gap is added only where a new card line
+# begins. A single constant served both for a while, which made the wrapped
+# availability line look like a list of unrelated statements.
 GAP_BETWEEN_LINES = 16
 
 # Georgia ships with Windows and is a reasonable stand-in for the site's Source
@@ -95,9 +106,10 @@ def load(name):
 def card_lines():
     """The three lines, derived from the content files.
 
-    Returns a list of (text, font_size, colour) plus the sidecar record. The
-    employer line ages correctly on its own: it is a closed date range, so it
-    stays true after the contract ends without anyone editing anything.
+    Returns a list of (text, font_size, colour). The employer line ages
+    correctly on its own: while the range is closed it stays true after the
+    contract ends without anyone editing anything, and an open role prints as
+    a range ending in "present" rather than as a bare year.
     """
     profile = load("profile")
     experience = load("experience")
@@ -108,7 +120,12 @@ def card_lines():
     years = sorted({r["startDate"][:4] for r in roles} | {
         r["endDate"][:4] for r in roles if r["endDate"][:4].isdigit()
     })
-    tenure = f"{years[0]}\u2013{years[-1]}" if len(years) > 1 else years[0]
+    # admin/schema.js advertises "Present" as a valid endDate, and an open role
+    # is the ordinary state for the person this card is for. Without this the
+    # card drew "Saal.ai, 2024", which reads as a job that lasted a year.
+    open_ended = any(not r["endDate"][:4].isdigit() for r in roles)
+    end = "present" if open_ended else years[-1]
+    tenure = f"{years[0]}\u2013{end}" if end != years[0] else years[0]
     institution = education["items"][0]["institution"]
 
     return [
@@ -116,6 +133,79 @@ def card_lines():
         (f"{company}, {tenure} \u00b7 {institution}", 30, MUTED),
         (profile["status"].rstrip("."), 30, MUTED),
     ]
+
+
+def wrap(text, width_of, budget):
+    """Break one card line into the fewest, most even lines it can be.
+
+    Deliberately not a greedy wrap. Greedy fills the first line to the budget,
+    which here broke "Open to Data Scientist, Quantitative / Developer and Data
+    Analyst roles" — splitting a role name across lines, so the card's most
+    valuable sentence read as a layout accident.
+
+    Two rules replace it. A line may not end between two capitalised words,
+    because that pair is a name: "Quantitative Developer", "Data Analyst".
+    Punctuation closes a name, so "Scientist," may end a line. Subject to that,
+    take the fewest lines the text fits in, and among those the arrangement
+    whose widest line is narrowest: the block is centred, and even lines read as
+    one set where ragged ones read as an accident.
+    """
+    words = text.split()
+    n = len(words)
+    if not n:
+        return []
+
+    def width(i, j):
+        return width_of(" ".join(words[i:j]))
+
+    def may_end_at(j):
+        if j >= n:
+            return True
+        prev, nxt = words[j - 1], words[j]
+        return not (prev[:1].isupper() and nxt[:1].isupper() and prev[-1:].isalnum())
+
+    def arrange(count):
+        """Widest line of the best split of words[i:] into k lines, or None."""
+        memo = {}
+
+        def best(i, k):
+            if k == 0:
+                return (0, None) if i == n else (None, None)
+            if (i, k) not in memo:
+                found = (None, None)
+                for j in range(i + 1, n + 1):
+                    w = width(i, j)
+                    # A single word wider than the budget is allowed to stand
+                    # alone: nothing can be done about it, and refusing to
+                    # place it would wedge the wrap. main() still refuses to
+                    # ship the card.
+                    if w > budget and j > i + 1:
+                        break
+                    if not may_end_at(j):
+                        continue
+                    rest, _ = best(j, k - 1)
+                    if rest is None:
+                        continue
+                    widest = max(w, rest)
+                    if found[0] is None or widest < found[0]:
+                        found = (widest, j)
+                memo[(i, k)] = found
+            return memo[(i, k)]
+
+        if best(0, count)[0] is None:
+            return None
+        lines, i, k = [], 0, count
+        while k:
+            j = best(i, k)[1]
+            lines.append(" ".join(words[i:j]))
+            i, k = j, k - 1
+        return lines
+
+    for count in range(1, n + 1):
+        lines = arrange(count)
+        if lines:
+            return lines
+    return [text]  # unreachable: one word per line is always a valid split
 
 
 def main():
@@ -126,59 +216,62 @@ def main():
     scale = WORDMARK_WIDTH / wordmark.width
     wordmark = wordmark.resize((WORDMARK_WIDTH, round(wordmark.height * scale)), Image.LANCZOS)
 
-    def width_of(text, font):
+    def measure(text, font):
+        """Left bearing and inked width. Not bbox[2], which includes the
+        bearing and so shifted every centred line by a pixel or two."""
         box = draw.textbbox((0, 0), text, font=font)
-        # bbox[2] - bbox[0], not bbox[2]: the left bearing is not part of the
-        # drawn width, and treating it as such shifted every centred line.
-        return box[2] - box[0], box[3] - box[1]
+        return box[0], box[2] - box[0]
 
-    def wrap(text, font):
-        """Greedy wrap to the crop budget.
-
-        The availability line is the longest thing on the card and the one least
-        worth shortening — it names the three roles he actually wants, and
-        trimming it to fit would trade the specificity for the layout. Wrapping
-        keeps the copy exact and spends vertical room the card has.
-        """
-        words, lines, current = text.split(), [], ''
-        for word in words:
-            candidate = f'{current} {word}'.strip()
-            if current and width_of(candidate, font)[0] > CROP_SAFE_WIDTH:
-                lines.append(current)
-                current = word
-            else:
-                current = candidate
-        if current:
-            lines.append(current)
-        return lines
-
-    lines = card_lines()
-    measured = []
-    for text, size, colour in lines:
+    rows = []
+    for text, size, colour in card_lines():
         font = load_font(size)
-        for piece in wrap(text, font):
-            w, h = width_of(piece, font)
-            measured.append((piece, font, colour, w, h))
+        ascent, descent = font.getmetrics()
+        # The font's line box, not the inked height of these particular glyphs.
+        # Stepping by the ink height made the leading depend on whether a line
+        # happened to contain a descender.
+        line_h = ascent + descent
+        pieces = wrap(text, lambda t, f=font: measure(t, f)[1], CROP_SAFE_WIDTH)
+        for i, piece in enumerate(pieces):
+            bearing, ink_w = measure(piece, font)
+            rows.append((piece, font, colour, bearing, ink_w, line_h, i == 0))
 
     content_h = wordmark.height + GAP_AFTER_WORDMARK + sum(
-        h + (GAP_BETWEEN_LINES if i else 0) for i, (_, _, _, _, h) in enumerate(measured)
+        line_h + (GAP_BETWEEN_LINES if i and starts else 0)
+        for i, (_, _, _, _, _, line_h, starts) in enumerate(rows)
     )
     top = (SIZE[1] - content_h) // 2
 
-    # Each element centred on its own width, not on the widest one: centring the
-    # block and left-aligning inside it put the smallest, greyest line dead
-    # centre while the wordmark sat 59px off the midline.
+    print(f"{CARD_NAME}  {SIZE}  top-margin={top}px")
+    for text, _, _, _, ink_w, _, _ in rows:
+        print(f"  {ink_w:4}px  {text}")
+
+    # Both gates run before anything is written. A run that judges the card
+    # unshippable used to have already saved it twice, with a matching sidecar,
+    # so `npm test` went green on a card the generator had just condemned.
+    overflow = [f"{ink_w}px  {text}" for text, _, _, _, ink_w, _, _ in rows if ink_w > CROP_SAFE_WIDTH]
+    if overflow:
+        raise SystemExit(
+            f"\n{len(overflow)} line(s) exceed the {CROP_SAFE_WIDTH}px centre-crop budget "
+            "and would be cut off in a WhatsApp or iMessage preview:\n  "
+            + "\n  ".join(overflow)
+        )
+    if top < 0:
+        raise SystemExit(
+            f"\nThe block is {-2 * top}px taller than the card. Nothing checked this "
+            "before, so a longer status line would have silently drawn off both edges."
+        )
+
+    # Each element centred on its own inked width, not on the widest one:
+    # centring the block and left-aligning inside it put the smallest, greyest
+    # line dead centre while the wordmark sat 59px off the midline.
     card.paste(wordmark, ((SIZE[0] - wordmark.width) // 2, top), wordmark)
 
     y = top + wordmark.height + GAP_AFTER_WORDMARK
-    overflow = []
-    for i, (text, font, colour, w, h) in enumerate(measured):
-        if i:
+    for i, (text, font, colour, bearing, ink_w, line_h, starts) in enumerate(rows):
+        if i and starts:
             y += GAP_BETWEEN_LINES
-        draw.text(((SIZE[0] - w) // 2, y), text, font=font, fill=colour)
-        if w > CROP_SAFE_WIDTH:
-            overflow.append(f"{w}px  {text}")
-        y += h
+        draw.text(((SIZE[0] - ink_w) // 2 - bearing, y), text, font=font, fill=colour)
+        y += line_h
 
     out = ROOT / "assets" / CARD_NAME
     card.save(out, "PNG", optimize=True)
@@ -186,21 +279,14 @@ def main():
 
     # The sidecar is what test/og-card.test.js compares against data/*.json, so
     # a copy edit that never regenerated the card fails the suite instead of
-    # shipping a stale picture with a green build.
+    # shipping a stale picture with a green build. It records the card lines as
+    # authored, not as wrapped: the wrap is layout, the text is content.
     sidecar = ROOT / "assets" / "og-image.json"
     with open(sidecar, "w", encoding="utf-8", newline="\n") as f:
-        json.dump({"lines": [t for t, _, _ in lines]}, f, ensure_ascii=False, indent=2)
+        json.dump({"lines": [t for t, _, _ in card_lines()]}, f, ensure_ascii=False, indent=2)
         f.write("\n")
 
-    print(f"{out.name}  {card.size}  {out.stat().st_size // 1024}KB  top-margin={top}px")
-    for text, _, _, w, _ in measured:
-        print(f"  {w:4}px  {text}")
-    if overflow:
-        raise SystemExit(
-            f"\n{len(overflow)} line(s) exceed the {CROP_SAFE_WIDTH}px centre-crop budget "
-            "and would be cut off in a WhatsApp or iMessage preview:\n  "
-            + "\n  ".join(overflow)
-        )
+    print(f"wrote {out.name} and {LEGACY_CARD_NAME}  {out.stat().st_size // 1024}KB")
 
 
 if __name__ == "__main__":
