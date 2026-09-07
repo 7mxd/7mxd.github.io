@@ -22,7 +22,9 @@
   object-fit: cover;
   object-position: 50% 18%;
   filter: saturate(0.96);
-  box-shadow: 0 0 0 5px var(--ground-raised), 0 0 0 6px var(--rule);
+  /* Band in the page ground, then a hairline that actually contrasts. See
+     --portrait-ring in css/tokens.css for why this is not --ground-raised. */
+  box-shadow: 0 0 0 5px var(--ground), 0 0 0 6px var(--portrait-ring);
   /* The rings sit outside the box, so keep them off the section edge. */
   margin: 6px;
 }
@@ -118,12 +120,21 @@
 .timeline::before {
   content: "";
   position: absolute;
-  top: var(--space-8);
-  bottom: var(--space-8);
+  /* Start on the first badge's centre so the badge occludes the line, which
+     is what makes a year read as a station on it. End at 0, not at the last
+     badge: the timeline's bottom edge is the last entry's last line, and
+     stopping short of it left the chronology looking cut off. */
+  top: calc(var(--rail) / 2);
+  bottom: 0;
   left: calc(var(--rail) / 2);
   width: var(--rule-width);
   background: var(--rule);
 }
+
+/* The first and last groups stacked their own padding on top of the
+   section's, which is where the tail hole came from. */
+.year-group:first-child { padding-top: 0; }
+.year-group:last-child { padding-bottom: 0; }
 
 .year-group {
   display: grid;

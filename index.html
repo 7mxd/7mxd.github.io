@@ -20,6 +20,8 @@
     }
   }
   document.documentElement.setAttribute('data-theme', theme);
+  var meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', theme === 'dark' ? '#15171f' : '#fafaf9');
 })();
 </script>
 
@@ -45,8 +47,12 @@
 <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#fafaf9" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#15171f" media="(prefers-color-scheme: dark)">
+<!-- One tag, not two media-keyed ones. The theme is a data-theme attribute
+     the visitor toggles, not the OS preference a media condition sees, so
+     the pre-paint script below and js/theme.js both write this to match the
+     ground actually rendered. The literal here is the light value, which is
+     what the script resolves to before it runs and what manifest.json pins. -->
+<meta name="theme-color" content="#fafaf9">
 <meta name="apple-mobile-web-app-title" content="Ahmed Radhi">
 
 <!-- Hero portrait is eager and preloaded, per the design spec.

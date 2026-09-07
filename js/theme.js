@@ -1,6 +1,9 @@
 /** Theme selection. The pure helpers are unit tested; initTheme wires the DOM. */
 
 const THEMES = ['light', 'dark'];
+/** --ground per theme, for the one place a colour has to leave CSS: the
+ *  theme-color meta the browser paints its own chrome with. */
+const GROUND = { light: '#fafaf9', dark: '#15171f' };
 const KEY = 'theme';
 
 export function nextTheme(current) {
@@ -25,6 +28,12 @@ export function initTheme(doc, storage, media) {
   const apply = (theme, { announceIt = false } = {}) => {
     root.setAttribute('data-theme', theme);
     if (button) button.setAttribute('aria-pressed', String(theme === 'dark'));
+    // The browser chrome around the page has to follow the toggle too, or a
+    // reader who switches to dark gets a dark page under a light address bar.
+    // Values mirror --ground in css/tokens.css; test/index-html.test.js pins
+    // the light one to the tag in index.html and to manifest.json.
+    const meta = doc.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', GROUND[theme] ?? GROUND.light);
     if (announceIt) announce(doc, theme);
   };
 

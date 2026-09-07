@@ -19,6 +19,7 @@
   --accent: var(--print-accent);
   --accent-strong: var(--print-accent);
   --rule: var(--print-rule);
+  --portrait-ring: var(--print-portrait-ring);
 }
 
 body { font-size: 10.5pt; line-height: 1.4; }
