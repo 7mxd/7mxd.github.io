@@ -139,7 +139,7 @@ test('the Dean\'s List verification link renders', () => {
 test('the Saal.ai role\'s read-more link targets #work-saal-audit-platform', () => {
   const { sections } = renderFixture();
   const html = sections.get('path').innerHTML;
-  const idx = html.indexOf('Graduate Trainee, Data Science');
+  const idx = html.indexOf('Graduate Trainee');
   assert.ok(idx !== -1, 'Saal.ai graduate trainee entry not found');
   // Slice to the next entry's opening tag (or the end of the list), not the
   // first `</li>` — the entry's own bullet list closes with `</li>` tags of

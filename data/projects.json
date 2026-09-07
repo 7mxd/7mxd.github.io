@@ -7,7 +7,16 @@
       "timeline": false,
       "startDate": "2024-09",
       "displayDate": "2024 — 2026",
-      "tags": ["Python", "Pandas", "MongoDB", "Azure Blob Storage", "Docker", "APScheduler", "NLP", "Dynamics 365"],
+      "tags": [
+        "Python",
+        "Pandas",
+        "MongoDB",
+        "Azure Blob Storage",
+        "Docker",
+        "APScheduler",
+        "NLP",
+        "Dynamics 365"
+      ],
       "blocks": [
         {
           "type": "description",
@@ -34,12 +43,20 @@
     },
     {
       "id": "stmnt",
-      "title": "Stmnt, bank statement analyser",
+      "title": "Stmnt: Bank Statement Analyzer",
       "org": "Independent",
       "timeline": true,
       "startDate": "2026-02",
       "displayDate": "Feb 2026 — present",
-      "tags": ["Flutter", "Dart", "OpenRouter", "Gemini", "Supabase", "iOS", "Xcode Cloud"],
+      "tags": [
+        "Flutter",
+        "Dart",
+        "OpenRouter",
+        "Gemini",
+        "Supabase",
+        "iOS",
+        "Xcode Cloud"
+      ],
       "links": {
         "ios": "https://apps.apple.com/app/stmnt/id6760298169",
         "webapp": "https://stmnt.7mxd.me"
@@ -86,6 +103,11 @@
           "type": "description",
           "content": "Built in Flutter and Dart through an agent-driven workflow with Claude Code, while owning the architecture and reviewing every change. I ship updates most weeks."
         }
+      ],
+      "timelineBullets": [
+        "Sole developer of an iOS app, published on the App Store, that reads bank statement PDFs from any bank and turns them into spending breakdowns, subscription tracking, and spending forecasts.",
+        "Built the pipeline that pulls transactions out of unstructured PDF text with Google Gemini, then categorises them, removes duplicates, and flags unusual spending across more than 35 currencies.",
+        "Developed the app in Flutter and Dart, working through an agent-driven workflow with Claude Code while owning the architecture and reviewing every change."
       ]
     },
     {
@@ -95,11 +117,20 @@
       "timeline": true,
       "startDate": "2023-05",
       "displayDate": "Sep 2022 — May 2023",
-      "tags": ["MATLAB", "Kernel Methods", "Time Series", "State Space", "RKHS"],
+      "tags": [
+        "MATLAB",
+        "Kernel Methods",
+        "Time Series",
+        "State Space",
+        "RKHS"
+      ],
       "links": {
         "github": "https://github.com/7mxd/Senior-Research-Project-2022-2023",
         "extra": [
-          { "url": "assets/SRP_Kernel_RLS_Nonlinear_State_Space_2023.pdf", "label": "Read the paper" }
+          {
+            "url": "assets/SRP_Kernel_RLS_Nonlinear_State_Space_2023.pdf",
+            "label": "Read the paper"
+          }
         ]
       },
       "blocks": [
@@ -112,9 +143,19 @@
           "caption": "Tested on the Santa Fe laser series, the standard benchmark for chaotic time-series prediction. NMSE is normalised mean squared error; lower is better.",
           "unit": "NMSE",
           "rows": [
-            { "label": "Competition winner, 1993", "value": "0.028" },
-            { "label": "This work, iterative KRLS", "value": "0.043", "highlight": true },
-            { "label": "Competition second place", "value": "0.080" }
+            {
+              "label": "Competition winner, 1993",
+              "value": "0.028"
+            },
+            {
+              "label": "This work, iterative KRLS",
+              "value": "0.043",
+              "highlight": true
+            },
+            {
+              "label": "Competition second place",
+              "value": "0.080"
+            }
           ]
         }
       ]

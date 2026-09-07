@@ -92,6 +92,11 @@
      too faint to make a pill look like a button, which is what DESIGN.md's
      "outlined rather than filled" protects. Never carries text. */
   --rule-accent: #c4d1e8;
+  /* The plate under the availability line. One step deeper than --ground-tint
+     so it reads as a raised object on the wash rather than a lighter patch of
+     it: L* 91.3 against 94.6, at the accent's own hue. --ink clears 13.04:1
+     on it. */
+  --accent-plate: #dce7f9;
   /* Behind a third-party organisation mark that ships in one colourway only.
      On the light ground it is not needed, so it is not drawn; in dark mode the
      marks that need it are Khalifa (2.55:1 bare) and Daman (1.70:1).
@@ -137,6 +142,7 @@
      Dark hairlines were the fainter half of the pair. */
   --rule: #2b3040;
   --rule-accent: #374561;
+  --accent-plate: #232b42;
   --portrait-ring: #52576b;
   --logo-ground: #d8d8d6;
 }
@@ -154,6 +160,10 @@
        out of this block, leaving high-contrast readers a weaker ring than
        before. These track --rule: 2.81:1 light, 3.64:1 dark. */
     --portrait-ring: #93979f;
+    /* A reader asking for more contrast wants fewer near-identical surfaces,
+       so the plate stops being a tint and becomes the raised surface, bounded
+       by the full accent that --rule-accent already becomes here. */
+    --accent-plate: var(--ground-raised);
     /* The wash is the ground with a tint on it, and a reader asking for more
        contrast is asking for fewer near-identical surfaces, not more. Collapse
        it: the whole page goes to the flat ground, and the accent typography —
@@ -165,6 +175,7 @@
   }
   [data-theme="dark"] {
     --ink-muted: #c8c8d2;
+    --accent-plate: var(--ground-raised);
     --rule: #6a7086;
     --portrait-ring: #6a7086;
     --ground-tint: var(--ground);

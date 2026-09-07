@@ -87,7 +87,7 @@ test('every tinted ground and hairline sits in the accent hue family', () => {
   for (const selector of [':root', '[data-theme="dark"]']) {
     const t = blockTokens(selector);
     const accentHue = hueOf(t.accent);
-    for (const name of ['ground-tint', 'rule', 'rule-accent']) {
+    for (const name of ['ground-tint', 'rule', 'rule-accent', 'accent-plate']) {
       const hue = hueOf(t[name]);
       assert.ok(hue !== null, `${selector} --${name} is a pure grey, so it carries no accent`);
       const delta = Math.abs(hue - accentHue);

@@ -130,6 +130,11 @@ export const COLLECTIONS = [
     { name:'timeline', label:'Show on the timeline', type:'boolean' },
     { name:'startDate', label:'Start (YYYY-MM)', type:'string' },
     { name:'displayDate', label:'Display date', type:'string' },
+    // Shown under the project's timeline entry, above the link into Selected
+    // Work. Separate from `blocks`, which is the deep dive: a timeline entry
+    // that says only "read more" gives nobody a reason to.
+    { name:'timelineBullets', label:'Timeline bullets', type:'list',
+      itemField:{ name:'bullet', label:'Bullet', type:'text' } },
     orderField,
     tagsField,
     { name:'links', label:'Links', type:'object', fields:[

@@ -8,9 +8,26 @@ export const KIND_ORDER = { role: 0, education: 1, project: 2, milestone: 3 };
 
 const DATE = /^(\d{4})(-(0[1-9]|1[0-2]))?$/;
 
+/** Interface labels, not content: they format a date, they do not say anything
+ *  about Ahmed. Fixed rather than Intl.DateTimeFormat so the badge reads the
+ *  same on every machine and the render tests can assert it. */
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
 function yearOf(value) {
   const match = DATE.exec(String(value ?? '').trim());
   return match ? Number(match[1]) : null;
+}
+
+/** The station on the rail. A year alone made the chronology unreadable: four
+ *  entries sat under one 2024 badge in December, September, April and March
+ *  order, and nothing on the rail said so. Month-first, year under it, so the
+ *  column scans as a date. A year-only source date (the school diploma) gets a
+ *  year-only badge rather than a made-up month. */
+function badgeOf(value) {
+  const match = DATE.exec(String(value ?? '').trim());
+  if (!match) return null;
+  const month = match[3] ? MONTHS[Number(match[3]) - 1] : '';
+  return { month, year: match[1] };
 }
 
 function entry(fields) {
@@ -19,6 +36,7 @@ function entry(fields) {
     kind: fields.kind,
     sortDate: fields.sortDate,
     year: fields.year,
+    badge: badgeOf(fields.sortDate),
     order: fields.order ?? null,
     title: fields.title,
     org: fields.org ?? '',
@@ -30,6 +48,7 @@ function entry(fields) {
     blocks: fields.blocks ?? [],
     workRef: fields.workRef ?? null,
     link: fields.link ?? null,
+    outboundLinks: fields.outboundLinks ?? null,
     note: fields.note ?? '',
   };
 }
@@ -76,6 +95,12 @@ function fromProjects(projects) {
     out.push(entry({
       id: item.id, kind: 'project', sortDate: item.startDate, year, order: item.order,
       title: item.title, org: item.org, dateRange: item.displayDate,
+      // Not `blocks` and not `images`: those are the Selected Work entry's
+      // depth, and duplicating them here is what the spec's no-duplication
+      // rule forbids. These are the few lines that give a reader a reason to
+      // follow the link at all.
+      bullets: item.timelineBullets,
+      outboundLinks: item.links,
       workRef: item.id,
     }));
   }
