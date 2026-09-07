@@ -5,6 +5,10 @@
   "tagline": "I build data pipelines and the analysis that runs on top of them: matching, anomaly detection, and dashboards people actually use.",
   "pills": [
     {
+      "label": "Ex-Saal.ai",
+      "showFrom": "2026-09-24"
+    },
+    {
       "label": "Data Science · ETL"
     },
     {
@@ -21,6 +25,7 @@
       "lang": "ar"
     }
   ],
+  "status": "Open to Data Scientist, Quantitative Developer and Data Analyst roles.",
   "location": "Abu Dhabi, United Arab Emirates",
   "portrait": {
     "src": "assets/photos/derived/portrait-formal-1600.jpg",

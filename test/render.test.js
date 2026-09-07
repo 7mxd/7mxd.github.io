@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { validateSiteData, normalizeSiteImages } from '../js/data.js';
 import { buildTimeline } from '../js/timeline.js';
-import { renderAll } from '../js/render.js';
+import { renderAll, visiblePills } from '../js/render.js';
 
 const load = (name) => JSON.parse(readFileSync(new URL(`../data/${name}.json`, import.meta.url), 'utf8'));
 
@@ -68,9 +68,9 @@ function buildFixtureDoc() {
   return { doc, sections, hooks };
 }
 
-function renderFixture() {
+function renderFixture(opts) {
   const { doc, sections, hooks } = buildFixtureDoc();
-  renderAll(doc, DATA, TIMELINE);
+  renderAll(doc, DATA, TIMELINE, opts);
   return { doc, sections, hooks };
 }
 
@@ -327,4 +327,56 @@ test('the preload offers the browser exactly the candidates the <img> does', () 
   assert.equal(attr('href'), rendered.src, 'href is the no-imagesrcset fallback');
   assert.equal(attr('imagesrcset'), rendered.srcset);
   assert.equal(attr('imagesizes'), rendered.sizes);
+});
+
+// A CV site has facts that are not true yet. The owner's Saal.ai contract ends
+// on 23 September 2026, so "Ex-Saal.ai" is wrong until it does, and nobody
+// should have to remember to log in that morning and add it. The gate is
+// date-driven so the page becomes correct on its own.
+test('a pill with showFrom is hidden until its date, then appears', () => {
+  const pills = [
+    { label: 'Always' },
+    { label: 'Later', showFrom: '2026-09-24' },
+  ];
+  assert.deepEqual(visiblePills(pills, '2026-09-23').map((p) => p.label), ['Always']);
+  assert.deepEqual(visiblePills(pills, '2026-09-24').map((p) => p.label), ['Always', 'Later']);
+  assert.deepEqual(visiblePills(pills, '2027-01-01').map((p) => p.label), ['Always', 'Later']);
+  assert.deepEqual(visiblePills(undefined, '2026-09-24'), []);
+});
+
+test('the Ex-Saal.ai pill respects the contract end date in a real render', () => {
+  const gated = DATA.profile.pills.filter((p) => p.showFrom);
+  assert.equal(gated.length, 1, 'expected exactly one date-gated pill');
+  assert.equal(gated[0].showFrom, '2026-09-24');
+
+  const before = renderFixture({ today: '2026-09-23' }).sections.get('hero').innerHTML;
+  const after = renderFixture({ today: '2026-09-24' }).sections.get('hero').innerHTML;
+
+  assert.equal(before.includes(gated[0].label), false, 'the gated pill rendered before its date');
+  assert.ok(after.includes(gated[0].label), 'the gated pill did not render on its date');
+
+  // Every other pill is unaffected in both renders.
+  for (const p of DATA.profile.pills.filter((x) => !x.showFrom)) {
+    assert.ok(before.includes(p.label), `${p.label} missing before the date`);
+    assert.ok(after.includes(p.label), `${p.label} missing after the date`);
+  }
+});
+
+// The ask was the fourth sentence of an eleven-line About paragraph, which is
+// no place for the one thing the page wants a reader to act on.
+test('the availability line renders as its own undecorated element', () => {
+  const hero = renderFixture({ today: '2026-09-10' }).sections.get('hero').innerHTML;
+  assert.ok(DATA.profile.status, 'profile.status is missing from the data');
+  assert.match(hero, /<p class="hero-status">/);
+  assert.ok(hero.includes(DATA.profile.status));
+  // It sits between the pills and the contact links that answer it.
+  assert.ok(hero.indexOf('hero-status') > hero.indexOf('hero-pills'), 'status precedes the pills');
+  assert.ok(hero.indexOf('hero-status') < hero.indexOf('hero-links'), 'status follows the contact links');
+});
+
+test('About renders one paragraph per blank-line-separated block', () => {
+  const expected = DATA.summary.content.split(/\n\s*\n/).filter((p) => p.trim()).length;
+  assert.ok(expected >= 2, 'the summary is still one undivided block');
+  const about = renderFixture({ today: '2026-09-10' }).sections.get('about').innerHTML;
+  assert.equal((about.match(/<p class="prose">/g) || []).length, expected);
 });
