@@ -1,24 +1,53 @@
 // test/budget.test.js
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readdirSync, statSync, existsSync, readFileSync } from 'node:fs';
+import { readdirSync, existsSync, readFileSync } from 'node:fs';
+import { gzipSync } from 'node:zlib';
 import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 
-function bytesIn(dir, extension) {
+function filesIn(dir, extension) {
   const path = `${root}${dir}`;
-  if (!existsSync(path)) return 0;
+  if (!existsSync(path)) return [];
   return readdirSync(path)
     .filter((f) => f.endsWith(extension))
-    .reduce((total, f) => total + statSync(`${path}/${f}`).size, 0);
+    .map((f) => readFileSync(`${path}/${f}`));
 }
 
-const BUDGET = 80 * 1024;
+const assets = [...filesIn('css', '.css'), ...filesIn('js', '.js')];
+const rawBytes = assets.reduce((n, b) => n + b.length, 0);
+const wireBytes = assets.reduce((n, b) => n + gzipSync(b, { level: 9 }).length, 0);
+const kb = (n) => `${(n / 1024).toFixed(1)}KB`;
 
-test('CSS plus JS stays inside the 80KB uncompressed budget', () => {
-  const total = bytesIn('css', '.css') + bytesIn('js', '.js');
-  assert.ok(total <= BUDGET, `${Math.round(total / 1024)}KB used of 80KB`);
+// This was one assertion on uncompressed bytes at 80KB, and it became the
+// binding constraint on the project: three separate pieces of work ended with
+// comments being deleted to fit, which is the budget spending its authority on
+// the wrong thing. GitHub Pages serves these files compressed, so a comment
+// costs a reader almost nothing — prose gzips to roughly a quarter of itself —
+// while costing the uncompressed count in full.
+//
+// So the budget is now measured on what actually reaches a reader, with a
+// second, generous ceiling on what the browser parses so the files still
+// cannot balloon unnoticed. Both numbers are asserted; neither is decoration.
+const WIRE_BUDGET = 36 * 1024;
+const PARSE_CEILING = 100 * 1024;
+
+test('CSS plus JS stays inside the 36KB transfer budget', () => {
+  assert.ok(
+    wireBytes <= WIRE_BUDGET,
+    `${kb(wireBytes)} gzipped of ${kb(WIRE_BUDGET)} — this is what a reader downloads`,
+  );
+});
+
+test('CSS plus JS stays inside the 100KB parse ceiling', () => {
+  // Compression hides growth from the transfer budget, so this catches the case
+  // the wire number cannot: a lot of highly repetitive code that gzips away to
+  // nothing but still has to be read and applied.
+  assert.ok(
+    rawBytes <= PARSE_CEILING,
+    `${kb(rawBytes)} uncompressed of ${kb(PARSE_CEILING)}`,
+  );
 });
 
 test('the legacy monolith files are gone', () => {

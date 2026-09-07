@@ -118,7 +118,12 @@ it depends on who Ahmed is or what he did, it is content.
 
 - WCAG AA minimum. Keep the skip link, `prefers-reduced-motion`,
   `prefers-contrast`, keyboard-usage detection, and theme announcements.
-- CSS plus JS under 80 KB uncompressed, enforced by `test/budget.test.js`.
+- CSS plus JS under **36 KB gzipped**, which is what a reader downloads, with a
+  100 KB uncompressed parse ceiling behind it. Both enforced by
+  `test/budget.test.js`. It was one 80 KB uncompressed number until that became
+  the binding constraint on the project and three pieces of work ended with
+  comments being deleted to fit — a comment gzips to roughly a quarter of
+  itself, so it costs a reader almost nothing and the old count everything.
 - The print stylesheet must keep producing a clean document.
 - Banned: the terminal metaphor and shell-command headers, ASCII charts,
   gradient text, `border-left` accent stripes, uniform card grids, and

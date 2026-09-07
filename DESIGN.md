@@ -213,7 +213,12 @@ is honoured throughout.
 ## Constraints
 
 - No build step, no bundler, no runtime dependencies. Plain ES modules.
-- CSS plus JS under 80 KB uncompressed, enforced by `test/budget.test.js`.
+- CSS plus JS under **36 KB gzipped**, which is what a reader downloads, with a
+  100 KB uncompressed parse ceiling behind it. Both enforced by
+  `test/budget.test.js`. It was one 80 KB uncompressed number until that became
+  the binding constraint on the project and three pieces of work ended with
+  comments being deleted to fit — a comment gzips to roughly a quarter of
+  itself, so it costs a reader almost nothing and the old count everything.
 - Banned and asserted against: `border-left`/`border-right` accent stripes over
   1px, `background-clip: text`, any teal (`#1d9bb8`, `#1a8fa8`, `#36b6d6`), and
   the token names `--paper`, `--cream`, `--sand`, `--bone`, `--linen`,
