@@ -11,7 +11,7 @@ phone in daylight, one-handed, from a link someone sent. That scene forces
 light: a dark ground would be a style choice fighting the context.
 
 Dark mode is a properly derived second palette, not an inversion, and is the
-theme where the accent finally gets to be the logo's own warm tan.
+theme where the accent can sit at its lightest without losing the ground.
 
 Colour strategy: **restrained**. Tinted neutrals plus one accent under ten
 percent of the surface. The page is carried by photographs and typography; the
@@ -21,9 +21,17 @@ table.
 ## Color
 
 The palette is derived from the owner's own logo artwork, not invented: ink navy
-`#1c1f32` and warm tan `#e7ad87` sampled directly from the drawing. The raw tan
-measures 1.87:1 on a light ground, so light mode uses a deepened terracotta and
-dark mode uses the tan at full strength.
+`#1c1f32` and warm tan `#e7ad87` sampled directly from the drawing. The accent is
+blue at hue 218-224, the family the ink navy (hue 232) already sits in, so it is
+still the artwork's own colour rather than a generic tech blue, and it is well
+clear of the banned teals at hue 191. The warm tan now reads as deliberate
+contrast in the logo rather than as a palette match.
+
+Light mode uses the deeper end of the blue and dark mode the lighter end, both
+chosen for legibility on their own ground rather than by lightening the same
+hex. The figures below are recomputed from `css/tokens.css` by
+`test/design-doc.test.js`, so this table cannot silently go stale the way it
+did when the accent changed.
 
 Body background is a true off-white at near-zero chroma. Deliberately not a
 cream, sand, or parchment; warmth comes from the logo, the accent, and the
@@ -37,8 +45,8 @@ photographs.
 | `--ground-raised` | `#ffffff` | callouts, chips | — |
 | `--ink` | `#1c1f32` | body and headings | 15.57:1 |
 | `--ink-muted` | `#585b6b` | metadata, captions | 6.44:1 |
-| `--accent` | `#a85a32` | links, bullet glyphs | 4.82:1 |
-| `--accent-strong` | `#8f4a2c` | link hover, benchmark row | 6.32:1 |
+| `--accent` | `#2959ae` | links, bullet glyphs, year badges | 6.41:1 |
+| `--accent-strong` | `#21488c` | link hover, benchmark row | 8.48:1 |
 | `--rule` | `#e2e2df` | hairlines only, never text | — |
 
 ### Dark
@@ -49,8 +57,8 @@ photographs.
 | `--ground-raised` | `#1c1f2a` | — |
 | `--ink` | `#e9e7e2` | 14.47:1 |
 | `--ink-muted` | `#9a9aa6` | 6.43:1 |
-| `--accent` | `#e7ad87` | 9.13:1 |
-| `--accent-strong` | `#f3cbb0` | 11.91:1 |
+| `--accent` | `#90b2df` | 8.19:1 |
+| `--accent-strong` | `#a8c3e6` | 9.89:1 |
 | `--rule` | `#2a2d3a` | — |
 
 `--print-*` tokens live in a second `:root` block and are reassigned onto the

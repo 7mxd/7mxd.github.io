@@ -38,6 +38,12 @@
   --rule-width: 1px;
   --focus-width: 2px;
 
+  /* Tells the user agent which form controls, scrollbars and default
+     selection colours to render. Without it the UA assumes light, which is
+     invisible in light mode and gives dark mode a light scrollbar track down
+     a 9,907px near-black page. */
+  color-scheme: light;
+
   /* Light is the default and the primary theme.
 
      The accent is blue at hue ~218-224, which is the family the logo's own ink
@@ -64,6 +70,7 @@
 }
 
 [data-theme="dark"] {
+  color-scheme: dark;
   --ground: #15171f;
   --ground-raised: #1c1f2a;
   --ink: #e9e7e2;

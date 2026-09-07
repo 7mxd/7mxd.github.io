@@ -39,6 +39,11 @@
   font-size: var(--text-xl);
   color: var(--ink-muted);
   margin: var(--space-1) 0 var(--space-4);
+  /* Physical `left`, deliberately. dir="rtl" is correct for the script, but it
+     makes the inherited `text-align: start` resolve to the right edge, which
+     flushed the Arabic name 326px away from the Latin name it translates on a
+     phone. Do not "modernise" this to `start`; that is the bug. */
+  text-align: left;
 }
 
 .hero-role {
@@ -226,6 +231,14 @@
 .entry.is-milestone .entry-title {
   font-size: var(--text-base);
   font-weight: 500;
+}
+/* Un-override, not a new colour. .entry-org is promoted to full --ink at 500 so
+   a company name reads stronger than the date range beside it — but a milestone
+   carries no date range, so the promotion has no job here and simply outshouts
+   the certificate title above it. Inherit .entry-meta's muted 400 instead. */
+.entry.is-milestone .entry-org {
+  color: inherit;
+  font-weight: inherit;
 }
 
 /* Galleries */

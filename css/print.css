@@ -9,6 +9,9 @@
    literals belong only in tokens.css; this file only ever references them
    through var(), same as every other stylesheet. */
 :root, [data-theme="dark"] {
+  /* data-theme stays on <html> while printing, so pin the UA to light here
+     or a dark-mode reader prints with dark form controls. */
+  color-scheme: light;
   --ground: var(--print-ground);
   --ground-raised: var(--print-ground);
   --ink: var(--print-ink);
