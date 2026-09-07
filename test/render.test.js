@@ -369,25 +369,26 @@ test('sizes is per-context, not one constant for every gallery', () => {
   assert.equal(hint(sections.get('work').innerHTML, 'stmnt-01').sizes, '192px');
   // A lone portrait milestone photograph, capped at 30rem tall.
   assert.equal(hint(sections.get('path').innerHTML, 'volunteering-meal-packing').sizes, '287px');
-  // A landscape photograph in one half of the education pair.
-  // Below 40rem a multi-image gallery is a swipe strip, so the figure is 72% of
-  // its column rather than the full content width the grid used to give it.
-  assert.equal(
-    hint(sections.get('path').innerHTML, 'graduation-ceremony').sizes,
-    '(min-width: 40rem) 18rem, 60vw',
-  );
-  // The odd trailing photograph spans both columns above 40rem, and is just
-  // another card in the swipe strip below it. Asserted by POSITION, not by
-  // filename: it named `egaming` until the three graduation photographs were
-  // reordered into the sequence they actually happened in, and a test that
-  // breaks when content is reordered is testing the wrong thing.
+  // Asserted by POSITION, not by filename: these named specific photographs
+  // until the graduation set was reordered into the sequence it happened in,
+  // and a test that breaks when content is reordered is testing the wrong
+  // thing. Below 40rem the gallery is a swipe strip, so every figure is 72% of
+  // its column whatever slot it holds above that.
   const grad = DATA.education.items.find((e) => e.id === 'khalifa-bsc');
   assert.equal(grad.images.length % 2, 1, 'the spanning slot only exists for an odd count');
-  const trailing = grad.images[grad.images.length - 1].src;
+  // The lead photograph spans both columns.
   assert.equal(
-    hint(sections.get('path').innerHTML, trailing).sizes,
+    hint(sections.get('path').innerHTML, grad.images[0].src).sizes,
     '(min-width: 40rem) 37rem, 60vw',
   );
+  // Everything after it pairs off in half columns.
+  for (const image of grad.images.slice(1)) {
+    assert.equal(
+      hint(sections.get('path').innerHTML, image.src).sizes,
+      '(min-width: 40rem) 18rem, 60vw',
+      `${image.src} should sit in a half column`,
+    );
+  }
   // No two galleries share a single blanket value any more.
   const all = imageHints(allSectionHtml(sections)).map((i) => i.sizes).filter(Boolean);
   assert.ok(new Set(all).size >= 4, `expected several distinct sizes hints, got ${JSON.stringify([...new Set(all)])}`);

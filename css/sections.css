@@ -369,8 +369,13 @@
 
 @media (min-width: 40rem) {
   .gallery.is-grid { grid-template-columns: 1fr 1fr; }
-  /* An odd trailing image spans rather than sitting alone in a half column. */
-  .gallery.is-grid > .figure:last-child:nth-child(odd) { grid-column: 1 / -1; }
+  /* With an odd count the LEAD image spans, and the rest pair off beneath it.
+     It used to be the trailing one, which put the first two side by side — so
+     the graduation ceremony sat level with the competition that followed it a
+     month later, reading as two things that happened at once rather than in
+     sequence. `:nth-last-child(odd)` on the first child is how a selector asks
+     "is the total odd", since for the first child it counts the whole set. */
+  .gallery.is-grid > .figure:first-child:nth-last-child(odd) { grid-column: 1 / -1; }
 }
 
 .figure { margin: 0; min-width: 0; }
@@ -574,7 +579,7 @@
 .work .gallery.is-grid { grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); }
 .work .gallery .figure img { max-height: 26rem; width: auto; }
 @media (min-width: 40rem) {
-  .work .gallery.is-grid > .figure:last-child:nth-child(odd) { grid-column: auto; }
+  .work .gallery.is-grid > .figure:first-child:nth-last-child(odd) { grid-column: auto; }
 }
 
 .work-tags, .work-links {

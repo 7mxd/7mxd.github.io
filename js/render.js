@@ -90,13 +90,14 @@ function iconLink(href, label, kind) {
   return `<a href="${escapeHtml(href)}">${outboundIcon(href, kind)}<span>${escapeHtml(label)}</span></a>`;
 }
 
-/** In a timeline gallery an odd trailing image spans both columns rather than
- *  sitting alone in one (`:last-child:nth-child(odd)` in css/sections.css). A
- *  Selected Work gallery overrides that back to a single column. */
+/** In a timeline gallery with an odd number of photographs the LEAD image spans
+ *  both columns and the rest pair off beneath it
+ *  (`:first-child:nth-last-child(odd)` in css/sections.css). A Selected Work
+ *  gallery overrides that back to a single column. */
 function slotFor(context, index, count) {
   const slots = GALLERY_SLOTS[context];
   if (count === 1) return slots.single;
-  const spans = context === 'entry' && count % 2 === 1 && index === count - 1;
+  const spans = context === 'entry' && count % 2 === 1 && index === 0;
   return spans ? slots.full : slots.column;
 }
 
