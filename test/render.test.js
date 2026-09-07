@@ -104,17 +104,42 @@ test('every section renders non-empty HTML', () => {
   }
 });
 
-test('exactly 16 timeline entries render, each with a date badge', () => {
+test('every entry is a stop on the rail, under a year station', () => {
   const { sections } = renderFixture();
   const html = sections.get('path').innerHTML;
   const entries = html.match(/<li class="entry is-[a-z]+">/g) || [];
   // 16, not 15: the two Dataiku certificates were one merged entry until each
   // got its own issuer verification page and its own issue date.
   assert.equal(entries.length, 16);
-  // Every entry is a station on the rail. An entry with no badge would leave a
-  // gap in the column and read as if the chronology skipped it.
-  const badges = html.match(/<time class="entry-badge" datetime="[^"]+">/g) || [];
-  assert.equal(badges.length, entries.length, 'an entry rendered without a date badge');
+
+  // Two sizes of station: a year opens each run, and each entry marks its month
+  // underneath. Every entry must hold that column either way, or its grid row
+  // loses a cell and the entry slides under the rail.
+  const years = html.match(/<h3 class="year-label"/g) || [];
+  assert.ok(years.length >= 6, `expected a year station per run, found ${years.length}`);
+  const months = html.match(/<time class="entry-badge" datetime="\d{4}-\d{2}">/g) || [];
+  const undated = html.match(/<span class="entry-badge is-undated">/g) || [];
+  assert.equal(
+    months.length + undated.length,
+    entries.length,
+    'an entry rendered with neither a month stop nor an undated placeholder',
+  );
+  // Only the school diploma carries a year-only source date.
+  assert.equal(undated.length, 1, `expected one undated entry, found ${undated.length}`);
+});
+
+test('a role links to the work it names, not to "this work"', () => {
+  // The role's bullets span the audit platform, a separate ETL project, the
+  // dashboards and the documentation. One link reading "Read more about this
+  // work" claimed the whole block was the single project it opens.
+  const { sections } = renderFixture();
+  const html = sections.get('path').innerHTML;
+  assert.match(html, /<a href="#work-saal-audit-platform">Read more: [^<]+<\/a>/);
+  assert.equal(
+    /<a href="#work-saal-audit-platform">Read more about this work<\/a>/.test(html),
+    false,
+    'the role still claims the whole block is one work',
+  );
 });
 
 test('no photograph appears more than once across the whole page', () => {
@@ -153,7 +178,7 @@ test('the Saal.ai role\'s read-more link targets #work-saal-audit-platform', () 
   // its own well before the entry element's closing tag.
   const nextEntry = html.indexOf('<li class="entry', idx + 1);
   const entryHtml = nextEntry === -1 ? html.slice(idx) : html.slice(idx, nextEntry);
-  assert.match(entryHtml, /<a href="#work-saal-audit-platform">Read more about this work<\/a>/);
+  assert.match(entryHtml, /<a href="#work-saal-audit-platform">Read more: [^<]+<\/a>/);
 });
 
 test('every rendered photograph carries non-empty alt, width, height and decoding', () => {

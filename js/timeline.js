@@ -18,11 +18,11 @@ function yearOf(value) {
   return match ? Number(match[1]) : null;
 }
 
-/** The station on the rail. A year alone made the chronology unreadable: four
- *  entries sat under one 2024 badge in December, September, April and March
- *  order, and nothing on the rail said so. Month-first, year under it, so the
- *  column scans as a date. A year-only source date (the school diploma) gets a
- *  year-only badge rather than a made-up month. */
+/** The entry's own stop on the rail, under the year station its group is
+ *  headed by. A year alone made the chronology unreadable: four entries sat
+ *  under one 2024 badge in December, September, April and March order with
+ *  nothing saying so. A year-only source date leaves `month` empty rather than
+ *  inventing one; render.js draws no stop for it. */
 function badgeOf(value) {
   const match = DATE.exec(String(value ?? '').trim());
   if (!match) return null;
@@ -49,6 +49,7 @@ function entry(fields) {
     workRef: fields.workRef ?? null,
     link: fields.link ?? null,
     outboundLinks: fields.outboundLinks ?? null,
+    workRefTitle: null,
     note: fields.note ?? '',
   };
 }
@@ -137,6 +138,17 @@ export function buildTimeline({ experience = {}, education = {}, projects = {}, 
     ...fromProjects(projects),
     ...fromMilestones(milestones),
   ].sort(compare);
+
+  // A role's bullets span everything it covered, and its link points at one of
+  // those things. "Read more about this work" therefore claimed the whole block
+  // was one project. Carrying the target's title lets the link name what it
+  // actually opens. A project entry links to itself, so it needs no name.
+  const titles = new Map((projects.items ?? []).map((p) => [p.id, p.title]));
+  for (const item of all) {
+    if (item.workRef && item.workRef !== item.id) {
+      item.workRefTitle = titles.get(item.workRef) ?? null;
+    }
+  }
 
   const groups = new Map();
   for (const item of all) {
