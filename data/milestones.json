@@ -82,17 +82,37 @@
       ]
     },
     {
-      "id": "deans-list",
+      "id": "deans-list-fall-2022",
       "kind": "award",
       "date": "2022-12",
       "title": "Dean's List",
       "org": "Khalifa University",
-      "note": "Fall 2021 and Fall 2022.",
+      "note": "Fall 2022 semester.",
       "link": {
         "url": "https://www.ku.ac.ae/student-life/honors-list",
         "label": "Khalifa University honors list"
       },
       "images": []
+    },
+    {
+      "id": "deans-list-fall-2021",
+      "kind": "award",
+      "date": "2021-12",
+      "title": "Dean's List",
+      "org": "Khalifa University",
+      "note": "Fall 2021 semester.",
+      "link": null,
+      "images": [
+        {
+          "src": "assets/photos/derived/honors-day-deans-list-1600.jpg",
+          "srcSmall": "assets/photos/derived/honors-day-deans-list-800.jpg",
+          "alt": "Ahmed holding the blue Dean's List certificate folder at Khalifa University's Honors Day, in front of the Honors Day and Golden Key backdrop",
+          "caption": "Receiving the Fall 2021 Dean's List certificate, Honors Day, May 2023",
+          "width": 1200,
+          "height": 1600,
+          "widthSmall": 600
+        }
+      ]
     },
     {
       "id": "peer-mentor",
@@ -123,7 +143,7 @@
       "date": "2019-07",
       "title": "Mawhibatna Program volunteer",
       "org": "Sandooq Al Watan",
-      "note": "Organiser supporting programme activities.",
+      "note": "Helped organise and run the programme day to day.",
       "link": null,
       "images": []
     }

@@ -119,7 +119,7 @@ test('normalizeSiteImages rejects a nested image missing alt text, same as norma
   assert.throws(() => normalizeSiteImages(data), TypeError);
 });
 
-test('normalizeSiteImages finds and normalises exactly the nine images referenced across data/*.json', () => {
+test('normalizeSiteImages finds and normalises exactly the ten images referenced across data/*.json', () => {
   const load = (name) => JSON.parse(readFileSync(new URL(`../data/${name}.json`, import.meta.url), 'utf8'));
   const data = {
     profile: load('profile'),
@@ -144,7 +144,7 @@ test('normalizeSiteImages finds and normalises exactly the nine images reference
     normalized.projects.items.reduce((n, p) => n + p.images.length, 0) +
     normalized.milestones.items.reduce((n, m) => n + m.images.length, 0);
 
-  assert.equal(count, 9, 'traversal must find all nine images referenced across the data files');
+  assert.equal(count, 10, 'traversal must find all ten images referenced across the data files');
   // Every image survived normalizeImage's required-field checks with a real src/alt.
   assert.equal(normalized.profile.portrait.src, 'assets/photos/derived/portrait-formal-1600.jpg');
 });

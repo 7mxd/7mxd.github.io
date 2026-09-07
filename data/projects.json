@@ -37,7 +37,7 @@
         {
           "type": "callout",
           "tone": "note",
-          "content": "This is client audit software, so there are no screenshots. Alongside it I designed ER diagrams, wrote technical documentation for several use cases, and supported client teams in resolving data availability and update issues."
+          "content": "This is client audit software, so there are no screenshots."
         }
       ]
     },

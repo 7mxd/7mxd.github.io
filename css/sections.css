@@ -134,6 +134,38 @@
   font-size: var(--text-sm);
 }
 
+/* Link icons. The mark and its label are one object: inline-flex so they never
+   wrap apart, and the underline the page uses to mean "link" runs under the
+   text only — an underlined icon reads as a drawing error. */
+.hero-links a,
+.entry-more a,
+.work-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  text-decoration: none;
+}
+.hero-links a span,
+.entry-more a span,
+.work-links a span { text-decoration: underline; }
+
+.link-icon {
+  flex: none;
+  width: 1.05em;
+  height: 1.05em;
+  /* Optical, not geometric: a 24-unit glyph beside 15px type sits a hair high
+     on the baseline it shares. */
+  transform: translateY(0.5px);
+}
+/* The outbound marker is a signal, not a brand: smaller and quieter than a
+   logo, and it follows the label rather than leading it. */
+.link-icon.is-external {
+  width: 0.85em;
+  height: 0.85em;
+  order: 1;
+  opacity: 0.75;
+}
+
 /* Timeline */
 
 /* One continuous rail behind every badge. Drawn on the wrapper rather than per
@@ -337,8 +369,13 @@
 
 @media (min-width: 40rem) {
   .gallery.is-grid { grid-template-columns: 1fr 1fr; }
-  /* An odd trailing image spans rather than sitting alone in a half column. */
-  .gallery.is-grid > .figure:last-child:nth-child(odd) { grid-column: 1 / -1; }
+  /* With an odd count the LEAD image spans, and the rest pair off beneath it.
+     It used to be the trailing one, which put the first two side by side — so
+     the graduation ceremony sat level with the competition that followed it a
+     month later, reading as two things that happened at once rather than in
+     sequence. `:nth-last-child(odd)` on the first child is how a selector asks
+     "is the total odd", since for the first child it counts the whole set. */
+  .gallery.is-grid > .figure:first-child:nth-last-child(odd) { grid-column: 1 / -1; }
 }
 
 .figure { margin: 0; min-width: 0; }
@@ -542,7 +579,7 @@
 .work .gallery.is-grid { grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); }
 .work .gallery .figure img { max-height: 26rem; width: auto; }
 @media (min-width: 40rem) {
-  .work .gallery.is-grid > .figure:last-child:nth-child(odd) { grid-column: auto; }
+  .work .gallery.is-grid > .figure:first-child:nth-last-child(odd) { grid-column: auto; }
 }
 
 .work-tags, .work-links {
@@ -621,12 +658,20 @@
 .contacts { display: grid; gap: var(--space-3); }
 .contact-row {
   display: grid;
-  grid-template-columns: 6rem 1fr;
+  grid-template-columns: 7rem 1fr;
   gap: var(--space-3);
   font-family: var(--font-meta);
   font-size: var(--text-sm);
 }
-.contact-label { color: var(--ink-muted); }
+/* The mark sits with the label, not beside the address: next to
+   "AhmedARadhi00@gmail.com" an envelope only repeats the word "Email" that is
+   already in the column to its left. */
+.contact-label {
+  display: flex;
+  align-items: center;
+  gap: 0.45em;
+  color: var(--ink-muted);
+}
 
 /* Narrow screens: the year column stacks above its entries. */
 @media (max-width: 40rem) {
@@ -636,11 +681,39 @@
   /* The label column costs more than it buys under about 30rem of content
      width, so the category name stacks above its row. */
   .skill-group { grid-template-columns: 1fr; }
+
+  /* Three phone screenshots in a 390px column get about 140px each, at which
+     the app's own interface is unreadable — and stacking them full width makes
+     one project 2,300px tall. A swipe strip keeps them legible and the page
+     short, which is the trade a gallery on a phone actually faces. The partly
+     clipped next figure is the affordance; nothing else announces it. */
+  .gallery.is-grid,
+  .work .gallery.is-grid {
+    display: flex;
+    grid-template-columns: none;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    overscroll-behavior-x: contain;
+    /* Room for the focus ring, which would otherwise be clipped by the
+       scroll container's own overflow. */
+    padding: var(--focus-width);
+    margin: var(--space-4) calc(var(--focus-width) * -1) 0;
+  }
+  .gallery.is-grid > .figure {
+    flex: 0 0 72%;
+    scroll-snap-align: start;
+  }
+  .gallery.is-grid .figure img,
+  .work .gallery.is-grid .figure img {
+    width: 100%;
+    height: auto;
+    max-height: none;
+  }
   .timeline { --rail: 2.75rem; --stop: 1.625rem; }
   .entry { gap: var(--space-4); }
   .year-group { padding-block: var(--space-6); }
 
   .hero { align-items: flex-start; }
   .hero-portrait { width: 8rem; height: 8rem; }
-  .contact-row { grid-template-columns: 5rem 1fr; }
+  .contact-row { grid-template-columns: 6.25rem 1fr; }
 }
