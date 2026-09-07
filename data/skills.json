@@ -4,51 +4,171 @@
       "name": "Programming languages",
       "type": "tags",
       "items": [
-        { "name": "Python" }, { "name": "R" }, { "name": "MATLAB" },
-        { "name": "Java" }
+        {
+          "name": "Python",
+          "primary": true
+        },
+        {
+          "name": "R",
+          "primary": false
+        },
+        {
+          "name": "MATLAB",
+          "primary": false
+        },
+        {
+          "name": "Java",
+          "primary": false
+        }
       ]
     },
     {
       "name": "Libraries",
       "type": "tags",
       "items": [
-        { "name": "Pandas" }, { "name": "NumPy" }, { "name": "Matplotlib" },
-        { "name": "Seaborn" }, { "name": "scikit-learn" }, { "name": "TensorFlow" },
-        { "name": "Keras" }, { "name": "PyMongo" }, { "name": "Tidyverse" },
-        { "name": "lubridate" }, { "name": "caret" }
+        {
+          "name": "Pandas",
+          "primary": true
+        },
+        {
+          "name": "NumPy",
+          "primary": false
+        },
+        {
+          "name": "Matplotlib",
+          "primary": false
+        },
+        {
+          "name": "Seaborn",
+          "primary": false
+        },
+        {
+          "name": "scikit-learn",
+          "primary": false
+        },
+        {
+          "name": "TensorFlow",
+          "primary": false
+        },
+        {
+          "name": "Keras",
+          "primary": false
+        },
+        {
+          "name": "PyMongo",
+          "primary": false
+        },
+        {
+          "name": "Tidyverse",
+          "primary": false
+        },
+        {
+          "name": "lubridate",
+          "primary": false
+        },
+        {
+          "name": "caret",
+          "primary": false
+        }
       ]
     },
     {
       "name": "Databases and cloud",
       "type": "tags",
       "items": [
-        { "name": "MongoDB" }, { "name": "Studio 3T" },
-        { "name": "Azure Blob Storage" }, { "name": "Docker" }
+        {
+          "name": "MongoDB",
+          "primary": true
+        },
+        {
+          "name": "Azure Blob Storage",
+          "primary": true
+        },
+        {
+          "name": "Studio 3T",
+          "primary": false
+        },
+        {
+          "name": "Docker",
+          "primary": false
+        }
       ]
     },
     {
       "name": "Analytics and BI",
       "type": "tags",
       "items": [
-        { "name": "Power BI" }, { "name": "Tableau" },
-        { "name": "Dataiku" }, { "name": "Minitab" }
+        {
+          "name": "Power BI",
+          "primary": true
+        },
+        {
+          "name": "Tableau",
+          "primary": false
+        },
+        {
+          "name": "Dataiku",
+          "primary": false
+        },
+        {
+          "name": "Minitab",
+          "primary": false
+        }
       ]
     },
     {
       "name": "Developer tools",
       "type": "tags",
       "items": [
-        { "name": "Claude Code" }, { "name": "Git and GitHub" }, { "name": "VS Code" },
-        { "name": "Jupyter" }, { "name": "RStudio" }, { "name": "Postman" }, { "name": "LaTeX" }
+        {
+          "name": "Claude Code",
+          "primary": true
+        },
+        {
+          "name": "Git and GitHub",
+          "primary": true
+        },
+        {
+          "name": "VS Code",
+          "primary": false
+        },
+        {
+          "name": "Jupyter",
+          "primary": false
+        },
+        {
+          "name": "RStudio",
+          "primary": false
+        },
+        {
+          "name": "Postman",
+          "primary": false
+        },
+        {
+          "name": "LaTeX",
+          "primary": false
+        }
       ]
     },
     {
       "name": "Languages",
       "type": "languages",
       "items": [
-        { "name": "Arabic", "level": "Native" },
-        { "name": "English", "level": "Fluent" },
-        { "name": "Spanish", "level": "Beginner" }
+        {
+          "name": "Arabic",
+          "level": "Native",
+          "primary": false
+        },
+        {
+          "name": "English",
+          "level": "Fluent",
+          "primary": false
+        },
+        {
+          "name": "Spanish",
+          "level": "Beginner",
+          "primary": false
+        }
       ]
     }
   ]

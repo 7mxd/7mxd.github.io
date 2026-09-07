@@ -152,7 +152,12 @@ export const COLLECTIONS = [
       {label:'Tags', value:'tags'}, {label:'Simple list', value:'list'}, {label:'Languages', value:'languages'} ] },
     { name:'items', label:'Items', type:'list', fields:[
       { name:'name', label:'Name', type:'string', required:true },
-      { name:'level', label:'Level (languages only)', type:'string' } ] } ] }
+      { name:'level', label:'Level (languages only)', type:'string' },
+      // Set on the handful he reaches for most. Thirty-three items set
+      // identically is a keyword dump with nowhere for the eye to land; this
+      // is the section's only hierarchy, so keep it to a few. Emphasised items
+      // must lead their category — test/render.test.js enforces it.
+      { name:'primary', label:'Emphasise in the list', type:'boolean' } ] } ] }
 ];
 
 /** Content files the admin deliberately does not manage yet. milestones and

@@ -104,17 +104,79 @@ test('every section renders non-empty HTML', () => {
   }
 });
 
-test('exactly 16 timeline entries render, each with a date badge', () => {
+test('every entry is a stop on the rail, under a year station', () => {
   const { sections } = renderFixture();
   const html = sections.get('path').innerHTML;
   const entries = html.match(/<li class="entry is-[a-z]+">/g) || [];
   // 16, not 15: the two Dataiku certificates were one merged entry until each
   // got its own issuer verification page and its own issue date.
   assert.equal(entries.length, 16);
-  // Every entry is a station on the rail. An entry with no badge would leave a
-  // gap in the column and read as if the chronology skipped it.
-  const badges = html.match(/<time class="entry-badge" datetime="[^"]+">/g) || [];
-  assert.equal(badges.length, entries.length, 'an entry rendered without a date badge');
+
+  // Two sizes of station: a year opens each run, and each entry marks its month
+  // underneath. Every entry must hold that column either way, or its grid row
+  // loses a cell and the entry slides under the rail.
+  const years = html.match(/<h3 class="year-label"/g) || [];
+  assert.ok(years.length >= 6, `expected a year station per run, found ${years.length}`);
+  const months = html.match(/<time class="entry-badge" datetime="\d{4}-\d{2}">/g) || [];
+  const undated = html.match(/<span class="entry-badge is-undated">/g) || [];
+  assert.equal(
+    months.length + undated.length,
+    entries.length,
+    'an entry rendered with neither a month stop nor an undated placeholder',
+  );
+  // Only the school diploma carries a year-only source date.
+  assert.equal(undated.length, 1, `expected one undated entry, found ${undated.length}`);
+});
+
+test('the skills legend appears only when something is emphasised', () => {
+  // Weight with no stated meaning reads as arbitrary: the first person to see
+  // the bold asked what it was for. The legend explains it, and it must not
+  // outlive the emphasis it explains.
+  const { sections } = renderFixture();
+  const html = sections.get('skills').innerHTML;
+  assert.match(html, /<p class="section-note">Bold marks the ones used most\.<\/p>/);
+  assert.match(html, /<li class="is-primary">/);
+
+  const flat = {
+    categories: DATA.skills.categories.map((cat) => ({
+      ...cat,
+      items: cat.items.map(({ primary, ...rest }) => rest),
+    })),
+  };
+  const { doc, sections: bare } = buildFixtureDoc();
+  renderAll(doc, { ...DATA, skills: flat }, TIMELINE);
+  const bareHtml = bare.get('skills').innerHTML;
+  assert.equal(/section-note/.test(bareHtml), false, 'the legend survived its emphasis');
+  assert.equal(/is-primary/.test(bareHtml), false);
+});
+
+test('every emphasised skill leads its category', () => {
+  // Order and weight say the same thing. An emphasised item buried mid-list
+  // made the bold look scattered rather than like the head of a run.
+  for (const cat of DATA.skills.categories) {
+    const flags = cat.items.map((i) => Boolean(i.primary));
+    const lastPrimary = flags.lastIndexOf(true);
+    if (lastPrimary === -1) continue;
+    assert.deepEqual(
+      flags.slice(0, lastPrimary + 1),
+      flags.slice(0, lastPrimary + 1).map(() => true),
+      `${cat.name}: an emphasised item does not lead its category`,
+    );
+  }
+});
+
+test('a role links to the work it names, not to "this work"', () => {
+  // The role's bullets span the audit platform, a separate ETL project, the
+  // dashboards and the documentation. One link reading "Read more about this
+  // work" claimed the whole block was the single project it opens.
+  const { sections } = renderFixture();
+  const html = sections.get('path').innerHTML;
+  assert.match(html, /<a href="#work-saal-audit-platform">Read more: [^<]+<\/a>/);
+  assert.equal(
+    /<a href="#work-saal-audit-platform">Read more about this work<\/a>/.test(html),
+    false,
+    'the role still claims the whole block is one work',
+  );
 });
 
 test('no photograph appears more than once across the whole page', () => {
@@ -153,7 +215,7 @@ test('the Saal.ai role\'s read-more link targets #work-saal-audit-platform', () 
   // its own well before the entry element's closing tag.
   const nextEntry = html.indexOf('<li class="entry', idx + 1);
   const entryHtml = nextEntry === -1 ? html.slice(idx) : html.slice(idx, nextEntry);
-  assert.match(entryHtml, /<a href="#work-saal-audit-platform">Read more about this work<\/a>/);
+  assert.match(entryHtml, /<a href="#work-saal-audit-platform">Read more: [^<]+<\/a>/);
 });
 
 test('every rendered photograph carries non-empty alt, width, height and decoding', () => {

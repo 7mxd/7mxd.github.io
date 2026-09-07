@@ -61,6 +61,9 @@ main { max-width: none; padding: 0; }
    hairline in the blank feet of later pages. Without the rail the badge circle
    is just an indent, so it flattens to a plain date. */
 .timeline::before { display: none; }
+.year-group { break-inside: avoid; padding-block: 0.35cm; }
+.year-label { width: auto; height: auto; border: 0; border-radius: 0; background: none;
+  margin: 0 0 0.2cm; font-size: 11pt; }
 .entry { break-inside: avoid; grid-template-columns: auto 1fr; gap: 0.4cm; }
 .entry-badge { width: auto; height: auto; border: 0; border-radius: 0; background: none; }
 .entries { gap: 0.35cm; }

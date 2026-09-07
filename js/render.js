@@ -101,9 +101,8 @@ function renderHero(doc, profile) {
 
   // The ask, as its own element. It was the fourth sentence of an eleven-line
   // About paragraph, which is no place for the one thing the page wants the
-  // reader to act on. Deliberately undecorated: a bordered chip here reads as
-  // one more pill, and a coloured dot is LinkedIn's open-to-work grammar, which
-  // is the register PRODUCT.md rules out.
+  // reader to act on. It sits on a plate — see .hero-status in
+  // css/sections.css for why a plate, and not the dot this once ruled out.
   const status = profile.status
     ? `<p class="hero-status">${escapeHtml(profile.status)}</p>`
     : '';
@@ -172,7 +171,13 @@ function entryMarkup(entry) {
   const dates = entry.dateRange ? `<span class="entry-dates">${escapeHtml(entry.dateRange)}</span>` : '';
   const links = [];
   if (entry.workRef) {
-    links.push(`<a href="#work-${escapeHtml(entry.workRef)}">Read more about this work</a>`);
+    // Name the target when it is not this entry. A role's bullets span
+    // everything it covered, so "Read more about this work" read as a claim
+    // that the whole block was the one project the link opens.
+    const label = entry.workRefTitle
+      ? `Read more: ${escapeHtml(entry.workRefTitle)}`
+      : 'Read more about this work';
+    links.push(`<a href="#work-${escapeHtml(entry.workRef)}">${label}</a>`);
   } else if (entry.link) {
     links.push(`<a href="${escapeHtml(entry.link.url)}" rel="noopener">${escapeHtml(entry.link.label)}</a>`);
   }
@@ -193,16 +198,20 @@ ${note}${renderBlocks(entry.blocks)}${bullets}${more}${gallery(entry.images, 'en
 </li>`;
 }
 
-/** The station on the rail. Month over year, because a year alone left four
- *  2024 entries in an order the rail never explained. `datetime` carries the
- *  machine-readable date; the visible text is what a reader scans. */
+/** A month stop on the rail, under the year station its group is headed by.
+ *  Month and year in one badge was the first attempt: it fit, but two lines of
+ *  small type in a circle read as a label rather than as a marker, and the year
+ *  repeated down every entry in a run. The year belongs to the group; only the
+ *  month changes per entry, so only the month is here.
+ *
+ *  An entry whose source date carries no month — the school diploma is the only
+ *  one — gets no stop rather than an invented one. Its year station is directly
+ *  above it. */
 function badgeMarkup(entry) {
-  if (!entry.badge) return '';
+  if (!entry.badge || !entry.badge.month) return '<span class="entry-badge is-undated"></span>';
   const { month, year } = entry.badge;
-  const iso = month ? `${year}-${String(MONTH_NUMBER[month]).padStart(2, '0')}` : year;
-  const monthPart = month ? `<span class="entry-badge-month">${escapeHtml(month)}</span>` : '';
-  return `<time class="entry-badge" datetime="${escapeHtml(iso)}">`
-    + `${monthPart}<span class="entry-badge-year">${escapeHtml(year)}</span></time>`;
+  const iso = `${year}-${String(MONTH_NUMBER[month]).padStart(2, '0')}`;
+  return `<time class="entry-badge" datetime="${escapeHtml(iso)}">${escapeHtml(month)}</time>`;
 }
 
 const MONTH_NUMBER = {
@@ -211,23 +220,26 @@ const MONTH_NUMBER = {
 };
 
 function renderPath(doc, timeline) {
-  // One flat list, not a section per year. The year groups existed to hang a
-  // year badge off, and the badge is now per entry — keeping the groups would
-  // have meant a heading for a year that no longer labels anything, plus a
-  // second set of paddings for the rail's endpoints to stay coupled to.
-  // buildTimeline still groups, because the span line below reads its ends.
-  const entries = timeline.flatMap((group) => group.entries);
+  // Two sizes of station on one rail: a year opens each run, and each entry
+  // marks its month under it. A flat list of month-and-year badges was tried
+  // and repeated the year down every entry; a year alone left four 2024 entries
+  // in December, September, April and March order with nothing saying so.
+  const groups = timeline.map((group) => `
+<section class="year-group" aria-labelledby="year-${group.year}">
+  <h3 class="year-label" id="year-${group.year}">${group.year}</h3>
+  <ol class="entries">${group.entries.map(entryMarkup).join('')}</ol>
+</section>`).join('');
+
   const span = timeline.length
     ? `<p class="section-note">${timeline[0].year} to ${timeline[timeline.length - 1].year}</p>`
     : '';
 
   // The wrapper exists so a single continuous rail can be drawn behind every
-  // badge (css/sections.css .timeline::before). Drawing it per entry would
+  // station (css/sections.css .timeline::before). Drawing it per group would
   // break the line at each boundary, which is the thing that makes a timeline
   // read as one chronology rather than a stack of lists.
   doc.getElementById('path').innerHTML =
-    `${heading('path', 'The path so far')}${span}`
-    + `<div class="timeline"><ol class="entries">${entries.map(entryMarkup).join('')}</ol></div>`;
+    `${heading('path', 'The path so far')}${span}<div class="timeline">${groups}</div>`;
 }
 
 function renderNumbers(doc, metrics) {
@@ -272,16 +284,33 @@ function renderWork(doc, projects) {
 }
 
 function renderSkills(doc, skills) {
+  // `primary` marks what Ahmed reaches for most. Thirty-three items all set
+  // identically is a keyword dump: Python weighs the same as lubridate and the
+  // eye has nowhere to land. The flag is the whole hierarchy, so keep it to a
+  // few — the point is what stands out, not how much does.
   const groups = skills.categories.map((cat) => {
-    const items = cat.type === 'languages'
-      ? cat.items.map((i) => `<li>${escapeHtml(i.name)} <span class="skill-level">${escapeHtml(i.level)}</span></li>`).join('')
-      : cat.items.map((i) => `<li>${escapeHtml(i.name)}</li>`).join('');
+    const items = cat.items.map((i) => {
+      const level = cat.type === 'languages' && i.level
+        ? ` <span class="skill-level">${escapeHtml(i.level)}</span>`
+        : '';
+      return `<li${i.primary ? ' class="is-primary"' : ''}>${escapeHtml(i.name)}${level}</li>`;
+    }).join('');
     return `<div class="skill-group">
 <h3 class="skill-group-name">${escapeHtml(cat.name)}</h3>
 <ul class="skill-list">${items}</ul>
 </div>`;
   }).join('');
-  doc.getElementById('skills').innerHTML = `${heading('skills', 'Skills')}<div class="skill-groups">${groups}</div>`;
+  // The legend, because emphasis with no stated meaning reads as arbitrary —
+  // the first person to see the bold asked what it meant. Rendered only when
+  // something is actually flagged, so clearing every `primary` in the admin
+  // removes the sentence rather than leaving it explaining nothing.
+  const emphasised = skills.categories.some((cat) => cat.items.some((i) => i.primary));
+  const legend = emphasised
+    ? '<p class="section-note">Bold marks the ones used most.</p>'
+    : '';
+
+  doc.getElementById('skills').innerHTML =
+    `${heading('skills', 'Skills')}${legend}<div class="skill-groups">${groups}</div>`;
 }
 
 /** A URL shown as visible contact text reads better without its scheme or
