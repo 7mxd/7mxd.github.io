@@ -82,16 +82,26 @@
       ]
     },
     {
-      "id": "deans-list",
+      "id": "deans-list-fall-2022",
       "kind": "award",
       "date": "2022-12",
       "title": "Dean's List",
       "org": "Khalifa University",
-      "note": "Fall 2021 and Fall 2022.",
+      "note": "Fall 2022 semester.",
       "link": {
         "url": "https://www.ku.ac.ae/student-life/honors-list",
         "label": "Khalifa University honors list"
       },
+      "images": []
+    },
+    {
+      "id": "deans-list-fall-2021",
+      "kind": "award",
+      "date": "2021-12",
+      "title": "Dean's List",
+      "org": "Khalifa University",
+      "note": "Fall 2021 semester.",
+      "link": null,
       "images": []
     },
     {
