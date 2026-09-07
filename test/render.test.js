@@ -328,3 +328,22 @@ test('the preload offers the browser exactly the candidates the <img> does', () 
   assert.equal(attr('imagesrcset'), rendered.srcset);
   assert.equal(attr('imagesizes'), rendered.sizes);
 });
+
+// The ask was the fourth sentence of an eleven-line About paragraph, which is
+// no place for the one thing the page wants a reader to act on.
+test('the availability line renders as its own undecorated element', () => {
+  const hero = renderFixture().sections.get('hero').innerHTML;
+  assert.ok(DATA.profile.status, 'profile.status is missing from the data');
+  assert.match(hero, /<p class="hero-status">/);
+  assert.ok(hero.includes(DATA.profile.status));
+  // It sits between the pills and the contact links that answer it.
+  assert.ok(hero.indexOf('hero-status') > hero.indexOf('hero-pills'), 'status precedes the pills');
+  assert.ok(hero.indexOf('hero-status') < hero.indexOf('hero-links'), 'status follows the contact links');
+});
+
+test('About renders one paragraph per blank-line-separated block', () => {
+  const expected = DATA.summary.content.split(/\n\s*\n/).filter((p) => p.trim()).length;
+  assert.ok(expected >= 2, 'the summary is still one undivided block');
+  const about = renderFixture().sections.get('about').innerHTML;
+  assert.equal((about.match(/<p class="prose">/g) || []).length, expected);
+});

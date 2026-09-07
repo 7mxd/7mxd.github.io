@@ -88,13 +88,24 @@ function renderHero(doc, profile) {
     : '';
 
   // Pills place a scanner in three seconds without asking them to read a
-  // sentence. They carry no tense, which is why the university belongs here
-  // rather than in the tagline: he graduated in 2023.
+  // sentence. They carry no tense, which is why the degree belongs here rather
+  // than in the tagline (he graduated in 2023) and why the Saal.ai pill is a
+  // closed date range: it is already true, and it stays true after the contract
+  // ends without anyone editing anything.
   const pills = (profile.pills ?? []).length
     ? `<ul class="hero-pills">${profile.pills.map((p) => {
         const attrs = p.lang === 'ar' ? ' lang="ar" dir="rtl"' : '';
         return `<li${attrs}>${escapeHtml(p.label)}</li>`;
       }).join('')}</ul>`
+    : '';
+
+  // The ask, as its own element. It was the fourth sentence of an eleven-line
+  // About paragraph, which is no place for the one thing the page wants the
+  // reader to act on. Deliberately undecorated: a bordered chip here reads as
+  // one more pill, and a coloured dot is LinkedIn's open-to-work grammar, which
+  // is the register PRODUCT.md rules out.
+  const status = profile.status
+    ? `<p class="hero-status">${escapeHtml(profile.status)}</p>`
     : '';
 
   doc.getElementById('hero').innerHTML = `
@@ -105,13 +116,22 @@ ${portrait}
   <p class="hero-role">${escapeHtml(profile.role)}</p>
   <p class="hero-tagline">${escapeHtml(profile.tagline)}</p>
   ${pills}
+  ${status}
   <p class="hero-links">${links}</p>
 </div>`;
 }
 
 function renderAbout(doc, summary) {
-  doc.getElementById('about').innerHTML =
-    `${heading('about', 'About')}<p class="prose">${escapeHtml(summary.content)}</p>`;
+  // Blank lines separate paragraphs. One eleven-line block gives a scanner no
+  // entry point, and the split is authored in the data rather than guessed at
+  // by sentence count.
+  const paragraphs = String(summary.content ?? '')
+    .split(/\n\s*\n/)
+    .map((p) => p.trim())
+    .filter(Boolean)
+    .map((p) => `<p class="prose">${escapeHtml(p)}</p>`)
+    .join('');
+  doc.getElementById('about').innerHTML = `${heading('about', 'About')}${paragraphs}`;
 }
 
 /** The organisation's mark, as a small anchor ahead of its name in the meta

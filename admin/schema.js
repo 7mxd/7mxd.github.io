@@ -56,6 +56,7 @@ export const COLLECTIONS = [
     { name:'pills', label:'Topic pills', type:'list', fields:[
       { name:'label', label:'Label', type:'string', required:true },
       { name:'lang', label:'Language (ar for Arabic)', type:'string' } ] },
+    { name:'status', label:'Availability line', type:'text' },
     { name:'location', label:'Location', type:'string' },
     { name:'portrait', label:'Hero portrait', type:'object', fields: imageFields },
     { name:'contact', label:'Contact', type:'object', fields:[
