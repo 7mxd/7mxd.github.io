@@ -20,7 +20,7 @@ it: *the accent marks the page's skeleton and its identity; ink carries every
 statement Ahmed makes.*
 
 Accent: the Arabic name, every section heading, the hero pills, the skill-group
-and block labels, the year numerals and badge rings, links, bullet glyphs, and
+and block labels, the date badges and their rings, links, bullet glyphs, and
 the benchmark's own-result row.
 
 Ink: the Latin name, the tagline, the availability line, every entry and project
@@ -81,7 +81,8 @@ changed weight and the page's whole structure stopped being beige.
 | `--accent` | `#2959ae` | Arabic name, section headings, pills, links, bullet glyphs, year badges, skill labels | 6.41:1 |
 | `--accent-strong` | `#21488c` | link hover, benchmark row | 8.48:1 |
 | `--rule` | `#dee2ea` | hairlines only, never text | — |
-| `--rule-accent` | `#c4d1e8` | pill and year-badge hairlines only | — |
+| `--rule-accent` | `#c4d1e8` | pill, plate and date-badge hairlines only | — |
+| `--accent-plate` | `#dce7f9` | the availability line's plate, never text | — |
 
 ### Dark
 
@@ -96,6 +97,7 @@ changed weight and the page's whole structure stopped being beige.
 | `--accent-strong` | `#a8c3e6` | 9.89:1 |
 | `--rule` | `#2b3040` | — |
 | `--rule-accent` | `#374561` | — |
+| `--accent-plate` | `#232b42` | — |
 
 `--print-*` tokens live in a second `:root` block and are reassigned onto the
 same names inside `css/print.css`. Print is ink on white regardless of theme.
@@ -172,20 +174,27 @@ No card grids. Sections are separated by a single hairline rule, not by boxes.
   the band merged into the picture and the shirt dissolved into the page. The
   component only ever read as two rings in dark, by accident. Below it: name,
   Arabic name at `dir="rtl"`, role line, tagline, pills, contact links.
+- **Availability.** The one statement on a plate: `--accent-plate` with a
+  `--rule-accent` hairline and a 0.375rem radius, no motion. It was deliberately
+  unmarked, on the reasoning that a chip reads as a fourth pill and a dot is
+  LinkedIn's open-to-work grammar. Unmarked, it did not stop anyone, so it took
+  a surface rather than a badge. The text stays `--ink`: the sentence is a
+  statement Ahmed makes, and the accent is reserved for structure.
 - **Pills.** Outlined, fully rounded, metadata face at `--text-xs`. They state
   facts without tense, which is why the degree lives here rather than in the
   tagline. The Arabic pill switches family and direction. Outlined rather than
   filled so they read as labels, not buttons.
-- **Timeline.** A real `<ol>` grouped into year `<section>`s, drawn against one
-  continuous rail. The rail is a single pseudo-element on the `.timeline`
-  wrapper, not per group, because a line that restarts at each boundary reads as
-  a stack of lists rather than one chronology. Year labels are circular badges
-  sitting on the rail with the page ground behind them, so they occlude the line
-  rather than float beside it; the year is the one place `--accent` appears
-  outside a link. The rail narrows on a phone but never collapses: stacking the
-  year above its entries was what made mobile read as an undifferentiated list,
-  and mobile is the real surface. Bullets carry a small accent dot.
-  Organisation marks render as a small inline chip.
+- **Timeline.** One flat `<ol>` drawn against a continuous rail. The rail is a
+  single pseudo-element on the `.timeline` wrapper, not per entry, because a
+  line that restarts at each boundary reads as a stack of lists rather than one
+  chronology. Every entry carries its own circular badge on the rail, month over
+  year, with the page ground behind it so it occludes the line rather than
+  floating beside it. It was one badge per year until four 2024 entries sat
+  under a single label in December, September, April and March order with
+  nothing on the rail saying so. The rail narrows on a phone but never
+  collapses: stacking the badge above its entry was what made mobile read as an
+  undifferentiated list, and mobile is the real surface. Bullets carry a small
+  accent dot. Organisation marks render as a small inline chip.
 - **Galleries.** One image runs the full measure; two or more sit at most two per
   row with an odd trailing image spanning. Work galleries are a constrained row,
   because the app captures are tall portraits.
@@ -204,7 +213,12 @@ is honoured throughout.
 ## Constraints
 
 - No build step, no bundler, no runtime dependencies. Plain ES modules.
-- CSS plus JS under 80 KB uncompressed, enforced by `test/budget.test.js`.
+- CSS plus JS under **36 KB gzipped**, which is what a reader downloads, with a
+  100 KB uncompressed parse ceiling behind it. Both enforced by
+  `test/budget.test.js`. It was one 80 KB uncompressed number until that became
+  the binding constraint on the project and three pieces of work ended with
+  comments being deleted to fit — a comment gzips to roughly a quarter of
+  itself, so it costs a reader almost nothing and the old count everything.
 - Banned and asserted against: `border-left`/`border-right` accent stripes over
   1px, `background-clip: text`, any teal (`#1d9bb8`, `#1a8fa8`, `#36b6d6`), and
   the token names `--paper`, `--cream`, `--sand`, `--bone`, `--linen`,

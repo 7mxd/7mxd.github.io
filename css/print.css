@@ -1,37 +1,31 @@
-/* A recruiter printing the page should get a clean document.
-   Loaded with media="print" (see index.html), so nothing here needs an
-   @media print wrapper — the whole file only ever applies to print.
+/* A recruiter printing the page should get a clean document. Loaded with
+   media="print", so nothing here needs an @media wrapper.
 
-   The palette below is deliberately not the screen palette: print is a
-   different medium with its own ink-on-paper conventions (plain black text
-   on white, no accent colour). The actual hex values live in
-   css/tokens.css as --print-* tokens, per the Task 9 ruling that hex
-   literals belong only in tokens.css; this file only ever references them
-   through var(), same as every other stylesheet. */
+   The palette is deliberately not the screen one: paper wants plain black on
+   white. The hex values live in css/tokens.css as --print-* tokens, because
+   hex literals belong only there. */
 :root, [data-theme="dark"] {
   /* data-theme stays on <html> while printing, so pin the UA to light here
      or a dark-mode reader prints with dark form controls. */
   color-scheme: light;
   --ground: var(--print-ground);
-  /* The wash is a screen effect and must not reach paper: most printers drop
-     background images by default, but "most" is not a design decision. Killing
-     the image here also kills the token the tint reaches paper through, so the
-     nav bar's color-mix (hidden in print anyway) and anything else built on
-     --ground-tint collapse to plain white with it. */
+  /* The wash is a screen effect. Most printers drop background images, but
+     "most" is not a design decision, so both the image and the tint token it
+     is built from collapse to paper white here. */
   --ground-tint: var(--print-ground);
   --ground-wash: none;
   --ground-raised: var(--print-ground);
   --ink: var(--print-ink);
   --ink-muted: var(--print-ink-muted);
-  /* Every accent decision in this proposal is a text colour, and print maps the
-     accent to --print-ink. So the Arabic name, the section headings, the pills,
-     the year numerals and the skill labels all print as the same black as the
-     prose, and the printed document is byte-for-byte the one it was before —
-     which is the point: the treatment lives entirely in the screen palette. */
+  /* Every accent decision on the page is a text colour, and print maps the
+     accent to --print-ink, so the Arabic name, headings, pills, dates and skill
+     labels all print as the same black as the prose. The blue is a screen
+     treatment and stays one. */
   --accent: var(--print-accent);
   --accent-strong: var(--print-accent);
   --rule: var(--print-rule);
   --rule-accent: var(--print-rule);
+  --accent-plate: var(--print-ground);
   --portrait-ring: var(--print-portrait-ring);
 }
 
@@ -45,11 +39,10 @@ body { font-size: 10.5pt; line-height: 1.4; }
 .skip-link,
 .work-tags { display: none !important; }
 
-/* .entry-more is two different links wearing one class: a "Read more about this
-   work" jump to a section further down the same sheet of paper, and a
-   milestone's link to third-party corroboration — the Khalifa University honors
-   list, which the spec singles out as the one piece of independent evidence on
-   the page. Hiding the class hid both. Hide only the internal jump. */
+/* .entry-more carries two kinds of link: an internal jump to a section further
+   down the same sheet, and outbound links worth the ink — an App Store listing,
+   a website, the Khalifa University honours list the spec calls the page's one
+   piece of independent evidence. Hide only the internal jump. */
 .entry-more:has(a[href^="#"]) { display: none !important; }
 
 main { max-width: none; padding: 0; }
@@ -63,13 +56,13 @@ main { max-width: none; padding: 0; }
    the frame cropped away. */
 .hero-portrait { width: 2.6cm; height: 2.6cm; }
 
-.year-group { break-inside: avoid; padding-block: 0.35cm; }
-/* The rail is one absolutely positioned pseudo-element on the whole timeline,
-   so when break-inside pushes a group to the next sheet its fragment keeps
-   painting to the physical page bottom — an inch of bare hairline in the blank
-   feet of pages 2 and 3. Paper has page numbers; it does not need the rail. */
+/* The rail is one abspos pseudo-element on the whole timeline, so a page break
+   leaves its fragment painting to the physical page bottom — an inch of bare
+   hairline in the blank feet of later pages. Without the rail the badge circle
+   is just an indent, so it flattens to a plain date. */
 .timeline::before { display: none; }
-.entry { break-inside: avoid; }
+.entry { break-inside: avoid; grid-template-columns: auto 1fr; gap: 0.4cm; }
+.entry-badge { width: auto; height: auto; border: 0; border-radius: 0; background: none; }
 .entries { gap: 0.35cm; }
 
 /* Photographs are dropped in print; only the portrait survives. Organisation
@@ -81,26 +74,20 @@ main { max-width: none; padding: 0; }
 
 .work + .work { margin-top: 0.5cm; padding-top: 0.5cm; }
 
-/* A .work article (Selected work) can run longer than a page, so it isn't
-   forced whole onto one page the way a short .entry is — that would trade a
-   mid-paragraph split for a large blank gap on the page before it. Instead,
-   target the specific ways a break reads badly: a heading stranded alone at
-   the foot of a page, a short link row torn from the project it belongs to,
-   or a paragraph leaving a single orphaned/widowed line at the boundary. */
+/* A .work article can run longer than a page, so forcing it whole would trade
+   a mid-paragraph split for a large blank gap before it. Target the breaks that
+   actually read badly instead: a stranded heading, a torn link row, a single
+   orphaned line. */
 .work-title, .work-meta { break-after: avoid; }
 .work-links { break-inside: avoid; }
 .work p, .block-text { orphans: 3; widows: 3; }
 
-/* Both are short, self-contained units — a bordered aside, a three-row
-   table — so forcing them whole never risks the large-blank-gap trade-off
-   that ruled out break-inside: avoid on .work itself; a callout or a
-   benchmark table split across a page reads worse than either being pushed
-   to the next one. */
+/* Both are short, self-contained units, so forcing them whole never risks the
+   blank-gap trade-off that ruled it out for .work. */
 .block-callout, .benchmark { break-inside: avoid; }
 
-/* Print the destination of every link, since a printed page cannot be clicked.
-   The surviving .entry-more link is external by definition — the internal jump
-   is hidden above — so its URL is worth the ink. */
+/* Print the destination of every link, since paper cannot be clicked. The
+   surviving .entry-more links are external by definition. */
 .hero-links a::after,
 .work-links a::after,
 .entry-more a::after,

@@ -107,14 +107,23 @@
   padding-block: 0.15em;
 }
 
-/* The ask. No border, no chip, no coloured dot: a bordered box here reads as a
-   fourth pill and a dot is LinkedIn's open-to-work grammar, which is the
-   register this page is deliberately not in. Presence comes from being its own
-   line at full ink, between the pills and the contact links that answer it. */
+/* The ask, on a plate. This line was deliberately unmarked for a while — the
+   reasoning being that a chip reads as a fourth pill and a dot is LinkedIn's
+   open-to-work grammar, which is not this page's register. Ahmed's judgement,
+   which decides it: unmarked, it did not stop anyone. So it takes a surface
+   rather than a badge, and no motion: a plate is a place on the page, where a
+   pulsing dot is a notification. It stays --ink, because the sentence is a
+   statement he makes and the accent is reserved for structure. */
 .hero-status {
   max-width: var(--measure-prose);
   margin-bottom: var(--space-4);
+  padding: var(--space-3) var(--space-4);
   color: var(--ink);
+  background: var(--accent-plate);
+  border: var(--rule-width) solid var(--rule-accent);
+  /* Not 999px: that would make it a very large pill, which is the reading the
+     comment above rules out. */
+  border-radius: 0.375rem;
 }
 
 .hero-links {
@@ -127,8 +136,8 @@
 
 /* Timeline */
 
-/* One continuous rail behind every year badge. Drawn on the wrapper rather than
-   per group, because a line that restarts at each boundary reads as a stack of
+/* One continuous rail behind every badge. Drawn on the wrapper rather than per
+   entry, because a line that restarts at each boundary reads as a stack of
    lists rather than one chronology. */
 .timeline {
   position: relative;
@@ -137,14 +146,11 @@
 .timeline::before {
   content: "";
   position: absolute;
-  /* Start on the first badge's centre so the badge occludes the line, which
-     is what makes a year read as a station on it, and run to the bottom edge,
-     which is the last entry's last line.
-
-     These two offsets and the zeroed padding on .year-group:first-child and
-     :last-child below are one coupled set. Restore either group's padding and
-     the rail keeps its endpoints while the content moves away from them,
-     which is what put a 128px hole under the last entry. */
+  /* Start on the first badge's centre so the badge occludes the line, which is
+     what makes a date read as a station on it, and run to the bottom edge,
+     which is the last entry's last line. Ending on the last badge's centre
+     instead would need that entry's height, which CSS cannot know here; the
+     short tail below the final station is the cheaper of the two. */
   top: calc(var(--rail) / 2);
   bottom: 0;
   left: calc(var(--rail) / 2);
@@ -152,45 +158,50 @@
   background: var(--rule);
 }
 
-/* The first and last groups stacked their own padding on top of the
-   section's, which is where the tail hole came from. */
-.year-group:first-child { padding-top: 0; }
-.year-group:last-child { padding-bottom: 0; }
+.entries { display: grid; gap: var(--space-8); }
 
-.year-group {
+/* Each entry is a row on the rail: badge column, then the entry itself. */
+.entry {
   display: grid;
   grid-template-columns: var(--rail) 1fr;
   gap: var(--space-6);
-  padding-block: var(--space-8);
+  align-items: start;
 }
+/* Grid children default to min-width:auto, so one long unbroken token in a
+   bullet would push the column wider than the page instead of wrapping. */
+.entry-body { min-width: 0; }
 
 /* The badge sits on the rail and hides the line behind it, which is what makes
-   the year read as a station on the line rather than a label beside it. Its
-   background must therefore be the page ground, not transparent. */
-.year-label {
+   a date read as a station rather than a label beside one. Its background must
+   therefore be the page ground, not transparent. Month over year: a year alone
+   left four 2024 entries in December, September, April and March order with
+   nothing on the rail saying so. */
+.entry-badge {
   position: relative;
   z-index: 1;
   width: var(--rail);
   height: var(--rail);
   display: grid;
-  place-items: center;
+  place-content: center;
+  justify-items: center;
   border-radius: 50%;
-  /* --rule-accent, the same hairline the pills use. The numeral was already
-     accent while its ring was grey, so a badge read as a grey station with a
-     blue number in it; matching them makes the whole badge one object, on a
-     rail that is now blue-grey too. The fill stays --ground: the badge has to
-     occlude the rail, so it can be neither tinted nor translucent. */
+  /* --rule-accent, the same hairline the pills use, so the badge reads as one
+     object rather than a grey ring around a blue date. The fill stays --ground:
+     the badge occludes the rail, so it can be neither tinted nor translucent. */
   border: var(--rule-width) solid var(--rule-accent);
   background: var(--ground);
   font-family: var(--font-meta);
-  font-size: var(--text-xs);
+  font-size: 0.6875rem;
+  line-height: 1.25;
   font-weight: 600;
   letter-spacing: 0.01em;
   color: var(--accent);
   font-variant-numeric: tabular-nums;
 }
-
-.entries { display: grid; gap: var(--space-8); }
+/* The month is the part that changed; the year repeats down a run of entries,
+   so it steps back rather than competing. */
+.entry-badge-month { font-weight: 700; }
+.entry-badge-year { color: var(--ink-muted); }
 
 .entry-title {
   font-size: var(--text-lg);
@@ -265,7 +276,13 @@
   background: var(--accent);
 }
 
+/* A row now, not a single link: a project entry carries the jump into Selected
+   Work plus its live destinations. Without the gap they ran together as one
+   underlined string — "Read more about this workWebsiteApp Store". */
 .entry-more {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
   margin-top: var(--space-3);
   font-family: var(--font-meta);
   font-size: var(--text-sm);
@@ -319,21 +336,10 @@
 .metrics {
   display: grid;
   gap: var(--space-6);
-  /* 8rem (not 11rem) so the four current figures fit four-across at both
-     768 and 1280 rather than breaking 3+1 with an orphan, and fall to a
-     clean 2x2 at 390. .metric-label already caps at 16rem and wraps, so a
-     narrower track doesn't crowd it.
-
-     8rem, not 9rem: --gutter is partly vw-based, so even though main caps
-     at measure-wide (736px) past ~768px wide, the gutter keeps eating
-     further into that fixed box as the viewport keeps growing, all the way
-     up to its own 4rem-per-side ceiling (viewport >= ~1867px). That leaves
-     as little as 608px for this grid in the worst case (736 - 2*4rem).
-     Fitting 4 tracks plus 3 gaps needs floor <= (608 - 3*1.5rem) / 4 = 8.375rem;
-     9rem clears 768px's 674px easily but comes in 5px over budget at
-     1280px's 643px, so the 4th metric wraps there specifically — confirmed
-     by measuring metrics.clientWidth in the actual browser, not by eyeballing
-     it. 8rem clears every case with room to spare. */
+  /* 8rem, not 11rem: four figures fit four-across at 768 and 1280 rather than
+     breaking 3+1 with an orphan, and fall to a clean 2x2 at 390. And not 9rem
+     either: --gutter is partly vw-based, so it keeps eating into the capped
+     736px shell as the viewport grows, leaving as little as 608px here. */
   grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
 }
 /* A bare grid-item wrapper: min-width: 0 keeps a long label from forcing
@@ -580,11 +586,11 @@
 
 /* Narrow screens: the year column stacks above its entries. */
 @media (max-width: 40rem) {
-  /* The rail survives the phone. Stacking the year above its entries was what
+  /* The rail survives the phone. Stacking the badge above its entry was what
      made the timeline read as an undifferentiated list on mobile, which is the
      surface most readers actually arrive on. It only narrows. */
   .timeline { --rail: 2.75rem; }
-  .year-group { gap: var(--space-4); }
+  .entry { gap: var(--space-4); }
 
   .hero { align-items: flex-start; }
   .hero-portrait { width: 8rem; height: 8rem; }

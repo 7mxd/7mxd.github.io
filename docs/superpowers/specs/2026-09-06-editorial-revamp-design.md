@@ -555,6 +555,14 @@ ink on white regardless of the active theme.
 
 Budget: CSS plus JS under 80 KB uncompressed, down from about 101 KB today.
 
+**Amended 2026-09-07.** The budget is now 36 KB gzipped, the size a reader
+actually downloads, with a 100 KB uncompressed ceiling for parse cost. The
+single uncompressed number had become the binding constraint on the work:
+three separate changes ended by deleting explanatory comments to fit, which
+is the budget spending its authority on documentation rather than on weight.
+GitHub Pages serves these files compressed, and prose gzips to roughly a
+quarter of itself.
+
 - Fonts: three families, two of them full text faces, one subsetted to ten
   glyphs. Only the prose regular weight preloaded.
 - Images: sized derivatives, lazy below the fold, explicit dimensions to hold

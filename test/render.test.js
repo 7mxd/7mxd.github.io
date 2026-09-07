@@ -104,10 +104,17 @@ test('every section renders non-empty HTML', () => {
   }
 });
 
-test('exactly 15 timeline entries render', () => {
+test('exactly 16 timeline entries render, each with a date badge', () => {
   const { sections } = renderFixture();
-  const entries = sections.get('path').innerHTML.match(/<li class="entry is-[a-z]+">/g) || [];
-  assert.equal(entries.length, 15);
+  const html = sections.get('path').innerHTML;
+  const entries = html.match(/<li class="entry is-[a-z]+">/g) || [];
+  // 16, not 15: the two Dataiku certificates were one merged entry until each
+  // got its own issuer verification page and its own issue date.
+  assert.equal(entries.length, 16);
+  // Every entry is a station on the rail. An entry with no badge would leave a
+  // gap in the column and read as if the chronology skipped it.
+  const badges = html.match(/<time class="entry-badge" datetime="[^"]+">/g) || [];
+  assert.equal(badges.length, entries.length, 'an entry rendered without a date badge');
 });
 
 test('no photograph appears more than once across the whole page', () => {
@@ -139,7 +146,7 @@ test('the Dean\'s List verification link renders', () => {
 test('the Saal.ai role\'s read-more link targets #work-saal-audit-platform', () => {
   const { sections } = renderFixture();
   const html = sections.get('path').innerHTML;
-  const idx = html.indexOf('Graduate Trainee, Data Science');
+  const idx = html.indexOf('Graduate Trainee');
   assert.ok(idx !== -1, 'Saal.ai graduate trainee entry not found');
   // Slice to the next entry's opening tag (or the end of the list), not the
   // first `</li>` — the entry's own bullet list closes with `</li>` tags of

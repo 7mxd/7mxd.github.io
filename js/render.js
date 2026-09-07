@@ -170,37 +170,64 @@ function entryMarkup(entry) {
     ? `${orgLogoMarkup(entry.orgLogo)}<span class="entry-org">${escapeHtml(entry.org)}</span>`
     : '';
   const dates = entry.dateRange ? `<span class="entry-dates">${escapeHtml(entry.dateRange)}</span>` : '';
-  let more = '';
+  const links = [];
   if (entry.workRef) {
-    more = `<p class="entry-more"><a href="#work-${escapeHtml(entry.workRef)}">Read more about this work</a></p>`;
+    links.push(`<a href="#work-${escapeHtml(entry.workRef)}">Read more about this work</a>`);
   } else if (entry.link) {
-    more = `<p class="entry-more"><a href="${escapeHtml(entry.link.url)}" rel="noopener">${escapeHtml(entry.link.label)}</a></p>`;
+    links.push(`<a href="${escapeHtml(entry.link.url)}" rel="noopener">${escapeHtml(entry.link.label)}</a>`);
   }
+  // A published app that nobody can open from the entry describing it is a
+  // dead end. Labels are interface, not content, so they live here.
+  for (const [key, label] of [['webapp', 'Website'], ['ios', 'App Store'], ['github', 'GitHub']]) {
+    const url = entry.outboundLinks?.[key];
+    if (url) links.push(`<a href="${escapeHtml(url)}" rel="noopener">${label}</a>`);
+  }
+  const more = links.length ? `<p class="entry-more">${links.join('')}</p>` : '';
 
   return `<li class="entry is-${escapeHtml(entry.kind)}">
+${badgeMarkup(entry)}<div class="entry-body">
 <h3 class="entry-title">${escapeHtml(entry.title)}</h3>
 <p class="entry-meta">${org}${dates}</p>
 ${note}${renderBlocks(entry.blocks)}${bullets}${more}${gallery(entry.images, 'entry')}
+</div>
 </li>`;
 }
 
-function renderPath(doc, timeline) {
-  const groups = timeline.map((group) => `
-<section class="year-group" aria-labelledby="year-${group.year}">
-  <h3 class="year-label" id="year-${group.year}">${group.year}</h3>
-  <ol class="entries">${group.entries.map(entryMarkup).join('')}</ol>
-</section>`).join('');
+/** The station on the rail. Month over year, because a year alone left four
+ *  2024 entries in an order the rail never explained. `datetime` carries the
+ *  machine-readable date; the visible text is what a reader scans. */
+function badgeMarkup(entry) {
+  if (!entry.badge) return '';
+  const { month, year } = entry.badge;
+  const iso = month ? `${year}-${String(MONTH_NUMBER[month]).padStart(2, '0')}` : year;
+  const monthPart = month ? `<span class="entry-badge-month">${escapeHtml(month)}</span>` : '';
+  return `<time class="entry-badge" datetime="${escapeHtml(iso)}">`
+    + `${monthPart}<span class="entry-badge-year">${escapeHtml(year)}</span></time>`;
+}
 
+const MONTH_NUMBER = {
+  Jan: 1, Feb: 2, Mar: 3, Apr: 4, May: 5, Jun: 6,
+  Jul: 7, Aug: 8, Sep: 9, Oct: 10, Nov: 11, Dec: 12,
+};
+
+function renderPath(doc, timeline) {
+  // One flat list, not a section per year. The year groups existed to hang a
+  // year badge off, and the badge is now per entry — keeping the groups would
+  // have meant a heading for a year that no longer labels anything, plus a
+  // second set of paddings for the rail's endpoints to stay coupled to.
+  // buildTimeline still groups, because the span line below reads its ends.
+  const entries = timeline.flatMap((group) => group.entries);
   const span = timeline.length
     ? `<p class="section-note">${timeline[0].year} to ${timeline[timeline.length - 1].year}</p>`
     : '';
 
   // The wrapper exists so a single continuous rail can be drawn behind every
-  // year badge (css/sections.css .timeline::before). Drawing it per group would
+  // badge (css/sections.css .timeline::before). Drawing it per entry would
   // break the line at each boundary, which is the thing that makes a timeline
   // read as one chronology rather than a stack of lists.
   doc.getElementById('path').innerHTML =
-    `${heading('path', 'The path so far')}${span}<div class="timeline">${groups}</div>`;
+    `${heading('path', 'The path so far')}${span}`
+    + `<div class="timeline"><ol class="entries">${entries.map(entryMarkup).join('')}</ol></div>`;
 }
 
 function renderNumbers(doc, metrics) {

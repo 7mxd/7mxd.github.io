@@ -11,7 +11,7 @@
       "roles": [
         {
           "id": "saal-graduate-trainee",
-          "title": "Graduate Trainee, Data Science",
+          "title": "Graduate Trainee — Data Science",
           "startDate": "2024-09",
           "endDate": "2026-09",
           "displayDate": "Sep 2024 — Sep 2026",
@@ -19,7 +19,10 @@
           "bullets": [
             "Primary developer of a procurement audit platform that ingests Microsoft Dynamics 365 ERP data from Azure Blob Storage, authoring 28 of its 38 exception checks.",
             "Applied NLP-based matching within the pipeline, combining fuzzy and Levenshtein similarity with a cross-encoder transformer model to flag near-duplicate line item descriptions.",
-            "Developed ETL pipelines in a microservices architecture using Python, Pandas, and MongoDB, and built interactive Power BI and Tableau dashboards for proof-of-concept projects."
+            "Containerised the pipeline with Docker, scheduled it with APScheduler, and added automatic retry with backoff on Azure ingestion.",
+            "On a separate project, developed ETL pipelines in a microservices architecture using Python, Pandas and MongoDB, working with the team through GitHub.",
+            "Built interactive Power BI and Tableau dashboards for proof-of-concept projects.",
+            "Designed ER diagrams, authored technical documentation for multiple use cases, and supported client teams in resolving data availability and update issues."
           ]
         },
         {
