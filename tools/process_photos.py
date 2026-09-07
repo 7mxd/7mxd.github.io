@@ -5,7 +5,7 @@ Run from the repository root:  python tools/process_photos.py
 """
 from pathlib import Path
 
-from PIL import Image
+from PIL import Image, ImageOps
 
 ROOT = Path(__file__).resolve().parent.parent
 PHOTOS = ROOT / "assets" / "photos"
@@ -20,6 +20,7 @@ SOURCES = [
     ("graduation-ceremony-certificate.jpg", "graduation-ceremony-certificate"),
     ("graduation-campus-certificate.jpg", "graduation-campus-certificate"),
     ("honors-day-ceremony.jpg", "honors-day-ceremony"),
+    ("honors-day-deans-list.jpg", "honors-day-deans-list"),
     ("volunteering-meal-packing.jpg", "volunteering-meal-packing"),
     ("egaming-competition-demo.jpg", "egaming-competition-demo"),
     ("stmnt/01-spending-by-category.png", "stmnt-01-spending-by-category"),
@@ -39,6 +40,12 @@ def main():
     DERIVED.mkdir(parents=True, exist_ok=True)
     for rel, stem in SOURCES:
         src = Image.open(PHOTOS / rel)
+        # Apply the EXIF orientation to the pixels BEFORE discarding the EXIF.
+        # Stripping it first shipped any phone photo taken in portrait on its
+        # side: honors-day-deans-list.jpg carries orientation 6, so its stored
+        # pixels are landscape and only the tag says otherwise. Every earlier
+        # source happened to be orientation 1, so this never bit until now.
+        src = ImageOps.exif_transpose(src)
         # Re-creating the image from its pixel data drops every EXIF block.
         clean = Image.new("RGB", src.size)
         clean.paste(src.convert("RGB"))

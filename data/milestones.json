@@ -102,7 +102,17 @@
       "org": "Khalifa University",
       "note": "Fall 2021 semester.",
       "link": null,
-      "images": []
+      "images": [
+        {
+          "src": "assets/photos/derived/honors-day-deans-list-1600.jpg",
+          "srcSmall": "assets/photos/derived/honors-day-deans-list-800.jpg",
+          "alt": "Ahmed holding the blue Dean's List certificate folder at Khalifa University's Honors Day, in front of the Honors Day and Golden Key backdrop",
+          "caption": "Receiving the Fall 2021 Dean's List certificate, Honors Day, May 2023",
+          "width": 1200,
+          "height": 1600,
+          "widthSmall": 600
+        }
+      ]
     },
     {
       "id": "peer-mentor",
