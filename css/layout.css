@@ -121,7 +121,7 @@ main {
   padding: 0 var(--gutter);
 }
 
-.section { padding-block: var(--space-16); }
+.section { padding-block: var(--space-section); }
 .section + .section { border-top: var(--rule-width) solid var(--rule); }
 
 .section-heading {

@@ -28,6 +28,13 @@
   --space-8: 2rem;
   --space-12: 3rem;
   --space-16: clamp(3rem, 2rem + 5vw, 6rem);
+  /* Section boundaries only. --space-16 pins to 96px top AND bottom above
+     1280px, so every boundary was 192px of empty page with a hairline
+     floating at its exact midpoint, belonging to neither section. Capping
+     the ceiling at 4rem takes each desktop boundary from 192px to 128px. Both
+     clamps resolve identically at 640px and below, so the token leaves mobile
+     alone, where the boundary was already right. */
+  --space-section: clamp(3rem, 2rem + 5vw, 4rem);
 
   /* Measure and gutters */
   --measure-prose: 34rem;
@@ -41,7 +48,7 @@
   /* Tells the user agent which form controls, scrollbars and default
      selection colours to render. Without it the UA assumes light, which is
      invisible in light mode and gives dark mode a light scrollbar track down
-     a 9,907px near-black page. */
+     a very long near-black page. */
   color-scheme: light;
 
   /* Light is the default and the primary theme.
@@ -63,10 +70,25 @@
   --rule: #e2e2df;
   /* Behind a third-party organisation mark that ships in one colourway only.
      On the light ground it is not needed, so it is not drawn; in dark mode the
-     three marks here are all dark ink (Khalifa royal blue, Daman navy, Al Nahda
-     green) and would otherwise sit at under 2:1 against #15171f. Never carries
-     text, so it is exempt from the AA check the way --rule is. */
+     marks that need it are Khalifa (2.55:1 bare) and Daman (1.70:1).
+
+     Three constraints, and the value is where they meet. Below --ink, so a
+     decorative third-party chip is never the lightest thing on the page: it
+     sits 14% of luminance under it. Near-zero chroma, which is the palette's
+     stated law and where an earlier warm value at C* 4.47 went wrong. And a
+     plate all three marks read on: Al Nahda 3.08:1, Khalifa 4.98:1, Daman
+     7.36:1. Al Nahda is the one that pays, clearing 3.66:1 unplated, which is
+     the known cost of one rule for three marks rather than a rule per mark.
+     Never carries text, so it is exempt from the AA check the way --rule is. */
   --logo-ground: transparent;
+  /* The hero portrait's ring. It used to be a 5px band of --ground-raised,
+     which is #ffffff in light — byte-identical to the photograph's own studio
+     backdrop — so the band merged into the picture and the shirt dissolved
+     into the page with no boundary at all. It only ever read as the "two
+     rings" DESIGN.md describes in dark, by accident. Decided: the band is
+     the page ground in both themes and the ring is this, a hairline with
+     real contrast, so the component is the same thing in both. */
+  --portrait-ring: #a5a49e;
 }
 
 [data-theme="dark"] {
@@ -78,7 +100,8 @@
   --accent: #90b2df;
   --accent-strong: #a8c3e6;
   --rule: #2a2d3a;
-  --logo-ground: #eceae5;
+  --portrait-ring: #52576b;
+  --logo-ground: #d8d8d6;
 }
 
 /* The page is rendered by JavaScript, so js/theme.js always sets
@@ -89,10 +112,16 @@
   :root {
     --ink-muted: #3d4050;
     --rule: #9a9a94;
+    /* The portrait's hairline used to be --rule, so it was strengthened here
+       with every other hairline. Giving it its own token silently dropped it
+       out of this block, leaving high-contrast readers a weaker ring than
+       before. These track --rule: 2.71:1 light, 3.49:1 dark. */
+    --portrait-ring: #9a9a94;
   }
   [data-theme="dark"] {
     --ink-muted: #c8c8d2;
     --rule: #6a6d7e;
+    --portrait-ring: #6a6d7e;
   }
 }
 
@@ -108,4 +137,9 @@
   --print-ink-muted: #444444;
   --print-accent: #111111;
   --print-rule: #bbbbbb;
+  /* .hero-portrait is the one image print keeps (css/print.css), so its ring
+     needs a paper value or the dark one leaks onto the page: data-theme stays
+     on <html> while printing. .entry-logo is hidden in print, so --logo-ground
+     needs no print value. */
+  --print-portrait-ring: #bbbbbb;
 }
