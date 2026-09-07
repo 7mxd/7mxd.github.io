@@ -1,7 +1,7 @@
 {
   "name": "Ahmed Alawi Radhi",
   "short_name": "AR",
-  "description": "Data scientist in Abu Dhabi building data pipelines and the analysis that runs on them. Applied Mathematics and Statistics, Khalifa University.",
+  "description": "Data scientist in Abu Dhabi. Built a procurement audit platform that reads ERP data and flags exceptions. Applied Mathematics and Statistics, Khalifa University.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#fafaf9",
