@@ -207,9 +207,13 @@ No card grids. Sections are separated by a single hairline rule, not by boxes.
   set in the metadata sans and separated by a middle dot, because in the prose
   serif with only a gap between them they read as a sentence missing its
   punctuation. The handful flagged `primary` in `data/skills.json` are set in
-  semibold — thirty-three items at identical weight is a keyword dump with
-  nowhere for the eye to land, and those are the ones his own summary names. No
-  bars, no percentages. The label column collapses below 40rem.
+  semibold, and they lead their category so order and weight say the same
+  thing. Thirty-three items at identical weight is a keyword dump with nowhere
+  for the eye to land. A one-line legend states what the weight means, rendered
+  only when something is flagged. Muting the rest instead was built and
+  compared: a category holding nothing emphasised goes entirely grey and reads
+  as switched off, so emphasis is added rather than taken away. No bars, no
+  percentages. The label column collapses below 40rem.
 
 ## Motion
 

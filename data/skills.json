@@ -122,11 +122,11 @@
       "items": [
         {
           "name": "Claude Code",
-          "primary": false
+          "primary": true
         },
         {
           "name": "Git and GitHub",
-          "primary": false
+          "primary": true
         },
         {
           "name": "VS Code",

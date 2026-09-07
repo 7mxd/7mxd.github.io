@@ -284,9 +284,10 @@ function renderWork(doc, projects) {
 }
 
 function renderSkills(doc, skills) {
-  // `primary` marks the five tools Ahmed's own summary names. Thirty-three
-  // items all set identically is a keyword dump: Python weighs the same as
-  // lubridate and the eye has nowhere to land. The flag is the whole hierarchy.
+  // `primary` marks what Ahmed reaches for most. Thirty-three items all set
+  // identically is a keyword dump: Python weighs the same as lubridate and the
+  // eye has nowhere to land. The flag is the whole hierarchy, so keep it to a
+  // few — the point is what stands out, not how much does.
   const groups = skills.categories.map((cat) => {
     const items = cat.items.map((i) => {
       const level = cat.type === 'languages' && i.level

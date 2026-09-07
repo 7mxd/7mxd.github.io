@@ -608,8 +608,11 @@
   margin-left: var(--space-2);
   color: var(--ink-muted);
 }
-/* The five his summary names. Everything else stays at full ink — this is
-   emphasis, not demotion; nothing on the list is filler. */
+/* What he reaches for most. Everything else stays at full ink — this is
+   emphasis, not demotion, and nothing on the list is filler. Muting the rest
+   instead was built and compared: it reads calmly until a category holds
+   nothing emphasised, and then the whole row goes grey and looks switched
+   off. */
 .skill-list li.is-primary { font-weight: 600; }
 .skill-level { color: var(--ink-muted); }
 
