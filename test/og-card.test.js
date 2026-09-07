@@ -67,6 +67,29 @@ test('every line the card draws says something checkable', () => {
   assert.ok(role.length > 0);
 });
 
+test('the card was drawn with the page\'s current palette', () => {
+  // The card's colours were three hardcoded RGB triples in the generator. When
+  // the page moved from a warm off-white ground to a cool one, the card went on
+  // drawing the old ground and a link preview stopped matching the page it
+  // opened — the same drift as the description, in pixels instead of words.
+  const tokens = read('css/tokens.css');
+  const root = tokens.slice(tokens.indexOf('{', tokens.indexOf(':root')), tokens.indexOf('}', tokens.indexOf(':root')));
+  assert.ok(sidecar.colours, 'the sidecar records no palette — rerun tools/make_og_image.py');
+  for (const [token, drawn] of Object.entries(sidecar.colours)) {
+    const current = root.match(new RegExp(`--${token}:\\s*(#[0-9a-f]{6})\\s*;`, 'i'));
+    assert.ok(current, `css/tokens.css no longer defines --${token} in :root`);
+    assert.equal(
+      drawn,
+      current[1].toLowerCase(),
+      `the card was drawn with --${token} ${drawn} but the page now uses ${current[1]} `
+      + '— rerun `python tools/make_og_image.py`',
+    );
+  }
+  // The ground specifically, because it is the one a reader sees as "the wrong
+  // colour" before they read a word of it.
+  assert.ok(sidecar.colours['ground-tint'], 'the card no longer records its ground');
+});
+
 test('the dated card and the legacy path both exist', () => {
   // Open Graph images are cached hard per URL, so a redesign at the same path
   // stays invisible on every link already shared. The dated file is what the

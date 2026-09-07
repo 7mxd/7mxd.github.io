@@ -33,6 +33,7 @@ drew; test/og-card.test.js asserts that against the data files, which catches a
 copy edit that shipped without a rerun.
 """
 import json
+import re
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
@@ -40,18 +41,14 @@ from PIL import Image, ImageDraw, ImageFont
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
 
-GROUND = (250, 250, 249)
-INK = (28, 31, 50)
-MUTED = (88, 91, 107)
-
 # Dated, because Open Graph images are cached hard per URL: a redesign at the
-# same path stays invisible on every link already shared. The legacy path is
-# rewritten with the same bytes in the same run, so old shares improve too as
-# their caches expire, rather than being left on a card that no longer matches
-# the page. test/og-card.test.js reads this name back out of this file and
-# asserts index.html points at it, so the two cannot drift.
-CARD_NAME = "og-image-2026-09.png"
-LEGACY_CARD_NAME = "og-image.png"
+# same path stays invisible on every link already shared. Every older path is
+# rewritten with the same bytes in the same run, so links already out in the
+# world improve as their caches expire rather than being stranded on a card
+# that no longer matches the page. test/og-card.test.js reads this name back
+# out of this file and asserts index.html points at it, so the two cannot drift.
+CARD_NAME = "og-image-2026-09-07.png"
+OLDER_CARD_NAMES = ["og-image-2026-09.png", "og-image.png"]
 
 SIZE = (1200, 630)
 CROP_SAFE_WIDTH = 550  # the 630px centre crop, less a little breathing room
@@ -103,7 +100,42 @@ def load(name):
         return json.load(f)
 
 
-def card_lines():
+# The card's colours were three hardcoded RGB triples, so when the page's
+# palette moved from a warm off-white to a cool one the card kept drawing the
+# old ground and a link preview no longer matched the page it opened. They are
+# read from the stylesheet now, and main() records them in the sidecar so
+# test/og-card.test.js fails if the palette moves again without a rerun.
+PALETTE_TOKENS = ("ground-tint", "ink", "ink-muted")
+
+
+def palette():
+    """The light `:root` values the card draws with, read from css/tokens.css.
+
+    --ground-tint rather than --ground: the card is the page's introduction, and
+    on the page the introduction sits on the wash. It is also what the browser
+    chrome and the manifest are pinned to, for the same reason.
+    """
+    css = (ROOT / "css" / "tokens.css").read_text(encoding="utf-8")
+    start = css.index(":root")
+    block = css[css.index("{", start):css.index("}", start)]
+    out = {}
+    for token in PALETTE_TOKENS:
+        found = re.search(rf"--{token}:\s*(#[0-9a-fA-F]{{6}})\s*;", block)
+        if not found:
+            raise SystemExit(
+                f"css/tokens.css no longer defines --{token} in :root as a 6-digit hex. "
+                "The card cannot draw itself without the page's palette."
+            )
+        out[token] = found.group(1).lower()
+    return out
+
+
+def rgb(hex_value):
+    h = hex_value.lstrip("#")
+    return tuple(int(h[i:i + 2], 16) for i in (0, 2, 4))
+
+
+def card_lines(colours):
     """The three lines, derived from the content files.
 
     Returns a list of (text, font_size, colour). The employer line ages
@@ -128,10 +160,12 @@ def card_lines():
     tenure = f"{years[0]}\u2013{end}" if end != years[0] else years[0]
     institution = education["items"][0]["institution"]
 
+    ink = rgb(colours["ink"])
+    muted = rgb(colours["ink-muted"])
     return [
-        (profile["role"], 38, INK),
-        (f"{company}, {tenure} \u00b7 {institution}", 30, MUTED),
-        (profile["status"].rstrip("."), 30, MUTED),
+        (profile["role"], 38, ink),
+        (f"{company}, {tenure} \u00b7 {institution}", 30, muted),
+        (profile["status"].rstrip("."), 30, muted),
     ]
 
 
@@ -209,7 +243,8 @@ def wrap(text, width_of, budget):
 
 
 def main():
-    card = Image.new("RGB", SIZE, GROUND)
+    colours = palette()
+    card = Image.new("RGB", SIZE, rgb(colours["ground-tint"]))
     draw = ImageDraw.Draw(card)
 
     wordmark = Image.open(ROOT / "assets" / "brand" / "logo-wordmark.png")
@@ -223,7 +258,7 @@ def main():
         return box[0], box[2] - box[0]
 
     rows = []
-    for text, size, colour in card_lines():
+    for text, size, colour in card_lines(colours):
         font = load_font(size)
         ascent, descent = font.getmetrics()
         # The font's line box, not the inked height of these particular glyphs.
@@ -275,18 +310,24 @@ def main():
 
     out = ROOT / "assets" / CARD_NAME
     card.save(out, "PNG", optimize=True)
-    card.save(ROOT / "assets" / LEGACY_CARD_NAME, "PNG", optimize=True)
+    for older in OLDER_CARD_NAMES:
+        card.save(ROOT / "assets" / older, "PNG", optimize=True)
 
-    # The sidecar is what test/og-card.test.js compares against data/*.json, so
-    # a copy edit that never regenerated the card fails the suite instead of
-    # shipping a stale picture with a green build. It records the card lines as
-    # authored, not as wrapped: the wrap is layout, the text is content.
+    # The sidecar is what test/og-card.test.js compares against data/*.json and
+    # css/tokens.css, so a copy edit or a palette change that never regenerated
+    # the card fails the suite instead of shipping a stale picture with a green
+    # build. It records the lines as authored, not as wrapped: the wrap is
+    # layout, the text is content.
     sidecar = ROOT / "assets" / "og-image.json"
     with open(sidecar, "w", encoding="utf-8", newline="\n") as f:
-        json.dump({"lines": [t for t, _, _ in card_lines()]}, f, ensure_ascii=False, indent=2)
+        json.dump(
+            {"lines": [t for t, _, _ in card_lines(colours)], "colours": colours},
+            f, ensure_ascii=False, indent=2,
+        )
         f.write("\n")
 
-    print(f"wrote {out.name} and {LEGACY_CARD_NAME}  {out.stat().st_size // 1024}KB")
+    written = ", ".join([out.name] + OLDER_CARD_NAMES)
+    print(f"wrote {written}  {out.stat().st_size // 1024}KB  ground {colours['ground-tint']}")
 
 
 if __name__ == "__main__":

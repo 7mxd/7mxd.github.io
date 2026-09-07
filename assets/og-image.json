@@ -3,5 +3,10 @@
     "Data scientist in Abu Dhabi",
     "Saal.ai, 2024–2026 · Khalifa University",
     "Open to Data Scientist, Quantitative Developer and Data Analyst roles"
-  ]
+  ],
+  "colours": {
+    "ground-tint": "#eaf0fb",
+    "ink": "#1c1f32",
+    "ink-muted": "#585b6b"
+  }
 }
