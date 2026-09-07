@@ -55,10 +55,7 @@ export const COLLECTIONS = [
     // meaningful as 'ar', which switches the pill to the Arabic face and RTL.
     { name:'pills', label:'Topic pills', type:'list', fields:[
       { name:'label', label:'Label', type:'string', required:true },
-      { name:'lang', label:'Language (ar for Arabic)', type:'string' },
-      // ISO date. The pill is hidden until that day arrives — for facts that
-      // are not true yet, like a role ending. Blank means always show.
-      { name:'showFrom', label:'Show from (YYYY-MM-DD, optional)', type:'string' } ] },
+      { name:'lang', label:'Language (ar for Arabic)', type:'string' } ] },
     { name:'status', label:'Availability line', type:'text' },
     { name:'location', label:'Location', type:'string' },
     { name:'portrait', label:'Hero portrait', type:'object', fields: imageFields },

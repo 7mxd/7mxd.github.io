@@ -32,25 +32,6 @@ const GALLERY_SLOTS = {
 /** The hero portrait is 11rem wide, 8rem below the 40rem breakpoint. */
 const PORTRAIT_SIZES = '(max-width: 40rem) 8rem, 11rem';
 
-function isoToday() {
-  const d = new Date();
-  const pad = (n) => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-}
-
-/** Pills whose `showFrom` has not arrived yet are not rendered.
- *
- *  A CV site has facts that only become true on a date. "Ex-Saal.ai" is wrong
- *  until the contract actually ends, and nobody should have to remember to log
- *  in that morning and add it. ISO dates compare correctly as strings, so no
- *  parsing is needed and no timezone is implied beyond the viewer's own day.
- *
- *  A pill with no `showFrom` always shows, which is every pill but one.
- */
-export function visiblePills(pills, today) {
-  return (pills ?? []).filter((p) => !p.showFrom || String(p.showFrom) <= today);
-}
-
 function heading(id, text) {
   return `<h2 class="section-heading" id="${id}-heading">${escapeHtml(text)}</h2>`;
 }
@@ -88,7 +69,7 @@ function gallery(images, context) {
   return `<div class="gallery ${modifier}" data-count="${images.length}">${figures}</div>`;
 }
 
-function renderHero(doc, profile, today) {
+function renderHero(doc, profile) {
   const links = [
     `<a href="mailto:${escapeHtml(profile.contact.email)}">${escapeHtml(profile.contact.email)}</a>`,
     profile.contact.linkedin ? `<a href="${escapeHtml(profile.contact.linkedin.url)}">${escapeHtml(profile.contact.linkedin.label)}</a>` : '',
@@ -106,12 +87,13 @@ function renderHero(doc, profile, today) {
     ? `<img class="hero-portrait" src="${escapeHtml(profile.portrait.src)}"${portraitSrcset} alt="${escapeHtml(profile.portrait.alt)}" width="${Number(profile.portrait.width) || 0}" height="${Number(profile.portrait.height) || 0}" fetchpriority="high" decoding="async">`
     : '';
 
-  const shown = visiblePills(profile.pills, today);
   // Pills place a scanner in three seconds without asking them to read a
-  // sentence. They carry no tense, which is why the university belongs here
-  // rather than in the tagline: he graduated in 2023.
-  const pills = shown.length
-    ? `<ul class="hero-pills">${shown.map((p) => {
+  // sentence. They carry no tense, which is why the degree belongs here rather
+  // than in the tagline (he graduated in 2023) and why the Saal.ai pill is a
+  // closed date range: it is already true, and it stays true after the contract
+  // ends without anyone editing anything.
+  const pills = (profile.pills ?? []).length
+    ? `<ul class="hero-pills">${profile.pills.map((p) => {
         const attrs = p.lang === 'ar' ? ' lang="ar" dir="rtl"' : '';
         return `<li${attrs}>${escapeHtml(p.label)}</li>`;
       }).join('')}</ul>`
@@ -336,12 +318,9 @@ function applyVisibility(doc, settings) {
   }
 }
 
-/** `today` is injected rather than read inside the renderers, so a test can
- *  pin it and so every date-dependent decision in one render agrees with
- *  itself. Format is YYYY-MM-DD in the viewer's own timezone. */
-export function renderAll(doc, data, timeline, { today = isoToday() } = {}) {
+export function renderAll(doc, data, timeline) {
   renderChrome(doc, data);
-  renderHero(doc, data.profile, today);
+  renderHero(doc, data.profile);
   renderAbout(doc, data.summary);
   renderPath(doc, timeline);
   renderNumbers(doc, data.metrics);
