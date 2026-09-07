@@ -202,7 +202,12 @@ test('the Dean\'s List verification link renders', () => {
   const { sections } = renderFixture();
   const html = sections.get('path').innerHTML;
   assert.match(html, /Dean&#39;s List/);
-  assert.match(html, /<a href="https:\/\/www\.ku\.ac\.ae\/student-life\/honors-list" rel="noopener">Khalifa University honors list<\/a>/);
+  // The label is wrapped and preceded by an outbound marker now: the link
+  // leaves the site, and until the icon existed nothing said so.
+  assert.match(
+    html,
+    /<a href="https:\/\/www\.ku\.ac\.ae\/student-life\/honors-list" rel="noopener"><svg class="link-icon is-external"[^>]*>.*?<\/svg><span>Khalifa University honors list<\/span><\/a>/s,
+  );
 });
 
 test('the Saal.ai role\'s read-more link targets #work-saal-audit-platform', () => {
@@ -364,14 +369,17 @@ test('sizes is per-context, not one constant for every gallery', () => {
   // A lone portrait milestone photograph, capped at 30rem tall.
   assert.equal(hint(sections.get('path').innerHTML, 'volunteering-meal-packing').sizes, '287px');
   // A landscape photograph in one half of the education pair.
+  // Below 40rem a multi-image gallery is a swipe strip, so the figure is 72% of
+  // its column rather than the full content width the grid used to give it.
   assert.equal(
     hint(sections.get('path').innerHTML, 'graduation-ceremony').sizes,
-    '(min-width: 40rem) 18rem, calc(100vw - 2.5rem)',
+    '(min-width: 40rem) 18rem, 60vw',
   );
-  // The odd third photograph, which spans both columns.
+  // The odd third photograph, which spans both columns above 40rem and is just
+  // another card in the swipe strip below it.
   assert.equal(
     hint(sections.get('path').innerHTML, 'egaming').sizes,
-    '(min-width: 40rem) 37rem, calc(100vw - 2.5rem)',
+    '(min-width: 40rem) 37rem, 60vw',
   );
   // No two galleries share a single blanket value any more.
   const all = imageHints(allSectionHtml(sections)).map((i) => i.sizes).filter(Boolean);

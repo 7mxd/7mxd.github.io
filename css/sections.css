@@ -134,6 +134,38 @@
   font-size: var(--text-sm);
 }
 
+/* Link icons. The mark and its label are one object: inline-flex so they never
+   wrap apart, and the underline the page uses to mean "link" runs under the
+   text only — an underlined icon reads as a drawing error. */
+.hero-links a,
+.entry-more a,
+.work-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  text-decoration: none;
+}
+.hero-links a span,
+.entry-more a span,
+.work-links a span { text-decoration: underline; }
+
+.link-icon {
+  flex: none;
+  width: 1.05em;
+  height: 1.05em;
+  /* Optical, not geometric: a 24-unit glyph beside 15px type sits a hair high
+     on the baseline it shares. */
+  transform: translateY(0.5px);
+}
+/* The outbound marker is a signal, not a brand: smaller and quieter than a
+   logo, and it follows the label rather than leading it. */
+.link-icon.is-external {
+  width: 0.85em;
+  height: 0.85em;
+  order: 1;
+  opacity: 0.75;
+}
+
 /* Timeline */
 
 /* One continuous rail behind every badge. Drawn on the wrapper rather than per
@@ -636,6 +668,34 @@
   /* The label column costs more than it buys under about 30rem of content
      width, so the category name stacks above its row. */
   .skill-group { grid-template-columns: 1fr; }
+
+  /* Three phone screenshots in a 390px column get about 140px each, at which
+     the app's own interface is unreadable — and stacking them full width makes
+     one project 2,300px tall. A swipe strip keeps them legible and the page
+     short, which is the trade a gallery on a phone actually faces. The partly
+     clipped next figure is the affordance; nothing else announces it. */
+  .gallery.is-grid,
+  .work .gallery.is-grid {
+    display: flex;
+    grid-template-columns: none;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    overscroll-behavior-x: contain;
+    /* Room for the focus ring, which would otherwise be clipped by the
+       scroll container's own overflow. */
+    padding: var(--focus-width);
+    margin: var(--space-4) calc(var(--focus-width) * -1) 0;
+  }
+  .gallery.is-grid > .figure {
+    flex: 0 0 72%;
+    scroll-snap-align: start;
+  }
+  .gallery.is-grid .figure img,
+  .work .gallery.is-grid .figure img {
+    width: 100%;
+    height: auto;
+    max-height: none;
+  }
   .timeline { --rail: 2.75rem; --stop: 1.625rem; }
   .entry { gap: var(--space-4); }
   .year-group { padding-block: var(--space-6); }
