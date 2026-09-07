@@ -562,13 +562,21 @@
 
 /* Skills */
 
-.skill-groups {
+/* Rows, not a card grid. Six categories in an auto-fit grid put every group in
+   its own box of empty space, and the items inside were set in the prose serif
+   with only a gap between them — so "Python R MATLAB Java" read as a sentence
+   with the punctuation missing. As rows with a label column and a hairline
+   between them, the section scans like the rest of the document. */
+.skill-groups { display: grid; }
+.skill-group {
   display: grid;
-  gap: var(--space-8);
-  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  grid-template-columns: 11rem 1fr;
+  gap: var(--space-2) var(--space-6);
+  align-items: baseline;
+  padding-block: var(--space-4);
+  border-top: var(--rule-width) solid var(--rule);
 }
-/* A bare grid-item wrapper, same reasoning as .metric above. */
-.skill-group { min-width: 0; }
+.skill-group:first-child { border-top: 0; padding-top: 0; }
 /* Sub-headings, so they follow .section-heading rather than the metadata they
    sit above. Skills is the one section with no photograph, no link and no
    badge — the flattest, greyest stretch of the page — and these four or five
@@ -586,9 +594,23 @@
 .skill-list {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-1) var(--space-3);
+  /* The metadata face, not the prose serif. These are labels, not sentences,
+     and setting them in the reading face is most of why the section read as
+     a run-on line. */
+  font-family: var(--font-meta);
   font-size: var(--text-sm);
+  gap: var(--space-1) var(--space-2);
 }
+/* The page's own separator, the one the pills and entry meta rows already use.
+   Quiet enough to be punctuation rather than a third column of content. */
+.skill-list li:not(:last-child)::after {
+  content: "·";
+  margin-left: var(--space-2);
+  color: var(--ink-muted);
+}
+/* The five his summary names. Everything else stays at full ink — this is
+   emphasis, not demotion; nothing on the list is filler. */
+.skill-list li.is-primary { font-weight: 600; }
 .skill-level { color: var(--ink-muted); }
 
 /* Contact */
@@ -608,6 +630,9 @@
   /* The rail survives the phone. Stacking the badge above its entry was what
      made the timeline read as an undifferentiated list on mobile, which is the
      surface most readers actually arrive on. It only narrows. */
+  /* The label column costs more than it buys under about 30rem of content
+     width, so the category name stacks above its row. */
+  .skill-group { grid-template-columns: 1fr; }
   .timeline { --rail: 2.75rem; --stop: 1.625rem; }
   .entry { gap: var(--space-4); }
   .year-group { padding-block: var(--space-6); }

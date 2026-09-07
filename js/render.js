@@ -284,10 +284,16 @@ function renderWork(doc, projects) {
 }
 
 function renderSkills(doc, skills) {
+  // `primary` marks the five tools Ahmed's own summary names. Thirty-three
+  // items all set identically is a keyword dump: Python weighs the same as
+  // lubridate and the eye has nowhere to land. The flag is the whole hierarchy.
   const groups = skills.categories.map((cat) => {
-    const items = cat.type === 'languages'
-      ? cat.items.map((i) => `<li>${escapeHtml(i.name)} <span class="skill-level">${escapeHtml(i.level)}</span></li>`).join('')
-      : cat.items.map((i) => `<li>${escapeHtml(i.name)}</li>`).join('');
+    const items = cat.items.map((i) => {
+      const level = cat.type === 'languages' && i.level
+        ? ` <span class="skill-level">${escapeHtml(i.level)}</span>`
+        : '';
+      return `<li${i.primary ? ' class="is-primary"' : ''}>${escapeHtml(i.name)}${level}</li>`;
+    }).join('');
     return `<div class="skill-group">
 <h3 class="skill-group-name">${escapeHtml(cat.name)}</h3>
 <ul class="skill-list">${items}</ul>
