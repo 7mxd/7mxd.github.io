@@ -4,6 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
+<!-- One tag, not two media-keyed ones. The theme is a data-theme attribute the
+     visitor toggles, not the OS preference a media condition sees, so the
+     pre-paint script below and js/theme.js both write this to match the ground
+     actually rendered. The literal here is the light value: what the script
+     resolves to before it runs, and what manifest.json pins.
+
+     It has to be parsed BEFORE that script. It sat below it for one commit,
+     which made the script's querySelector return null and left every dark
+     reader under a light address bar until the module graph resolved.
+     test/index-html.test.js pins the order. -->
+<meta name="theme-color" content="#fafaf9">
+
 <!-- Set the theme before first paint so the page never flashes the wrong ground. -->
 <script>
 (function () {
@@ -49,12 +61,6 @@
 <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
 <link rel="manifest" href="manifest.json">
-<!-- One tag, not two media-keyed ones. The theme is a data-theme attribute
-     the visitor toggles, not the OS preference a media condition sees, so
-     the pre-paint script below and js/theme.js both write this to match the
-     ground actually rendered. The literal here is the light value, which is
-     what the script resolves to before it runs and what manifest.json pins. -->
-<meta name="theme-color" content="#fafaf9">
 <meta name="apple-mobile-web-app-title" content="Ahmed Radhi">
 
 <!-- Hero portrait is eager and preloaded, per the design spec.

@@ -73,8 +73,9 @@ test('a visitor with scripting off gets the message, not the empty skeleton', ()
 test('the manifest theme colour matches the light-primary ground', () => {
   // A #15171f theme colour against a #fafaf9 background paints the browser
   // chrome in the dark palette while the splash screen stays light. Light is
-  // the primary theme, and index.html already declares the dark variant through
-  // a prefers-color-scheme media query, which a manifest cannot express.
+  // the primary theme, and the dark value is written at runtime by the
+  // pre-paint script and js/theme.js — which a manifest cannot do, so it pins
+  // the light one.
   assert.equal(manifest.theme_color, manifest.background_color);
   assert.equal(manifest.theme_color, metaContent('name', 'theme-color'));
 });
@@ -106,10 +107,27 @@ test('every theme-color value agrees with --ground in css/tokens.css', () => {
   assert.equal(metaContent('name', 'theme-color'), grounds.light);
 
   // Both grounds must appear in the pre-paint script and in js/theme.js, so
-  // neither can drift from the palette unnoticed.
+  // neither can drift from the palette unnoticed. Scoped to the script itself,
+  // not the whole file: `html.includes('#fafaf9')` was satisfied by the static
+  // tag alone, so deleting the pre-paint write entirely still passed.
+  const script = html.slice(html.indexOf('<script>'), html.indexOf('</script>'));
   const theme = read('js/theme.js');
   for (const [key, hex] of Object.entries(grounds)) {
-    assert.ok(html.includes(hex), `the pre-paint script never writes the ${key} ground ${hex}`);
+    assert.ok(script.includes(hex), `the pre-paint script never writes the ${key} ground ${hex}`);
     assert.ok(theme.includes(hex), `js/theme.js never writes the ${key} ground ${hex}`);
   }
+});
+
+test('the theme-color tag is parsed before the script that rewrites it', () => {
+  // It shipped below the script for one commit. querySelector returned null,
+  // the guarded write never ran, and the only remaining writer was js/theme.js
+  // — a deferred module — so a dark reader sat under a light address bar until
+  // four modules resolved, and permanently if any of them failed to load. That
+  // is strictly worse than the media-keyed tags this replaced, which at least
+  // resolved at parse time with no JavaScript at all.
+  const tag = html.indexOf('<meta name="theme-color"');
+  const lookup = html.indexOf(`querySelector('meta[name="theme-color"]')`);
+  assert.ok(tag >= 0, 'no theme-color tag');
+  assert.ok(lookup >= 0, 'the pre-paint script no longer looks the tag up');
+  assert.ok(tag < lookup, 'the theme-color tag is parsed after the script that reads it');
 });
