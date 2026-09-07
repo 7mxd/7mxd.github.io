@@ -13,7 +13,7 @@
 
 /* A circle, cropped to the face rather than centred on the frame: the source is
    a 827x1063 portrait, so a square crop centred at 50% 50% would cut the chin.
-   The double ring is one element: a band of the raised surface, then a hairline.
+   The two rings are one element: a band of the page ground, then a hairline.
    No wrapper, no extra markup. */
 .hero-portrait {
   width: 11rem;
@@ -110,9 +110,7 @@
 
 /* One continuous rail behind every year badge. Drawn on the wrapper rather than
    per group, because a line that restarts at each boundary reads as a stack of
-   lists rather than one chronology. It stops short at both ends so the first
-   and last badges terminate it instead of it running off into the rules above
-   and below. */
+   lists rather than one chronology. */
 .timeline {
   position: relative;
   --rail: 3.25rem;
@@ -121,9 +119,13 @@
   content: "";
   position: absolute;
   /* Start on the first badge's centre so the badge occludes the line, which
-     is what makes a year read as a station on it. End at 0, not at the last
-     badge: the timeline's bottom edge is the last entry's last line, and
-     stopping short of it left the chronology looking cut off. */
+     is what makes a year read as a station on it, and run to the bottom edge,
+     which is the last entry's last line.
+
+     These two offsets and the zeroed padding on .year-group:first-child and
+     :last-child below are one coupled set. Restore either group's padding and
+     the rail keeps its endpoints while the content moves away from them,
+     which is what put a 128px hole under the last entry. */
   top: calc(var(--rail) / 2);
   bottom: 0;
   left: calc(var(--rail) / 2);

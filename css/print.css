@@ -45,9 +45,17 @@ main { max-width: none; padding: 0; }
 .section + .section { border-top: 1px solid var(--rule); }
 
 .hero { padding-block: 0 0.6cm; }
-.hero-portrait { width: 2.6cm; }
+/* Both axes: sections.css sets height: 11rem, and a definite height beats
+   aspect-ratio, so setting width alone printed a 98x176 oval with a quarter of
+   the frame cropped away. */
+.hero-portrait { width: 2.6cm; height: 2.6cm; }
 
 .year-group { break-inside: avoid; padding-block: 0.35cm; }
+/* The rail is one absolutely positioned pseudo-element on the whole timeline,
+   so when break-inside pushes a group to the next sheet its fragment keeps
+   painting to the physical page bottom — an inch of bare hairline in the blank
+   feet of pages 2 and 3. Paper has page numbers; it does not need the rail. */
+.timeline::before { display: none; }
 .entry { break-inside: avoid; }
 .entries { gap: 0.35cm; }
 

@@ -65,7 +65,15 @@ photographs.
 same names inside `css/print.css`. Print is ink on white regardless of theme.
 
 `@media (prefers-contrast: more)` darkens `--ink-muted` and strengthens `--rule`
-in both themes.
+and `--portrait-ring` in both themes. Any new hairline token belongs in that
+block too: the portrait's ring was strengthened for free while it was still
+`var(--rule)`, and giving it a name silently dropped it out.
+
+`--logo-ground` is the plate behind a third-party mark that ships in one
+colourway, drawn only in dark mode. It answers to three constraints at once —
+below `--ink` so a decorative chip is never the brightest thing on the page,
+near-zero chroma like every other surface, and light enough that all three
+marks read on it.
 
 ## Typography
 
