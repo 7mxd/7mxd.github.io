@@ -81,12 +81,12 @@
           "primary": true
         },
         {
-          "name": "Studio 3T",
-          "primary": false
-        },
-        {
           "name": "Azure Blob Storage",
           "primary": true
+        },
+        {
+          "name": "Studio 3T",
+          "primary": false
         },
         {
           "name": "Docker",

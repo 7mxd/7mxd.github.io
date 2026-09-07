@@ -128,6 +128,43 @@ test('every entry is a stop on the rail, under a year station', () => {
   assert.equal(undated.length, 1, `expected one undated entry, found ${undated.length}`);
 });
 
+test('the skills legend appears only when something is emphasised', () => {
+  // Weight with no stated meaning reads as arbitrary: the first person to see
+  // the bold asked what it was for. The legend explains it, and it must not
+  // outlive the emphasis it explains.
+  const { sections } = renderFixture();
+  const html = sections.get('skills').innerHTML;
+  assert.match(html, /<p class="section-note">Bold marks the ones used most\.<\/p>/);
+  assert.match(html, /<li class="is-primary">/);
+
+  const flat = {
+    categories: DATA.skills.categories.map((cat) => ({
+      ...cat,
+      items: cat.items.map(({ primary, ...rest }) => rest),
+    })),
+  };
+  const { doc, sections: bare } = buildFixtureDoc();
+  renderAll(doc, { ...DATA, skills: flat }, TIMELINE);
+  const bareHtml = bare.get('skills').innerHTML;
+  assert.equal(/section-note/.test(bareHtml), false, 'the legend survived its emphasis');
+  assert.equal(/is-primary/.test(bareHtml), false);
+});
+
+test('every emphasised skill leads its category', () => {
+  // Order and weight say the same thing. An emphasised item buried mid-list
+  // made the bold look scattered rather than like the head of a run.
+  for (const cat of DATA.skills.categories) {
+    const flags = cat.items.map((i) => Boolean(i.primary));
+    const lastPrimary = flags.lastIndexOf(true);
+    if (lastPrimary === -1) continue;
+    assert.deepEqual(
+      flags.slice(0, lastPrimary + 1),
+      flags.slice(0, lastPrimary + 1).map(() => true),
+      `${cat.name}: an emphasised item does not lead its category`,
+    );
+  }
+});
+
 test('a role links to the work it names, not to "this work"', () => {
   // The role's bullets span the audit platform, a separate ETL project, the
   // dashboards and the documentation. One link reading "Read more about this

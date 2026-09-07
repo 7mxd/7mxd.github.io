@@ -299,7 +299,17 @@ function renderSkills(doc, skills) {
 <ul class="skill-list">${items}</ul>
 </div>`;
   }).join('');
-  doc.getElementById('skills').innerHTML = `${heading('skills', 'Skills')}<div class="skill-groups">${groups}</div>`;
+  // The legend, because emphasis with no stated meaning reads as arbitrary —
+  // the first person to see the bold asked what it meant. Rendered only when
+  // something is actually flagged, so clearing every `primary` in the admin
+  // removes the sentence rather than leaving it explaining nothing.
+  const emphasised = skills.categories.some((cat) => cat.items.some((i) => i.primary));
+  const legend = emphasised
+    ? '<p class="section-note">Bold marks the ones used most.</p>'
+    : '';
+
+  doc.getElementById('skills').innerHTML =
+    `${heading('skills', 'Skills')}${legend}<div class="skill-groups">${groups}</div>`;
 }
 
 /** A URL shown as visible contact text reads better without its scheme or
