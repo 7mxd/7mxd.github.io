@@ -376,10 +376,16 @@ test('sizes is per-context, not one constant for every gallery', () => {
     hint(sections.get('path').innerHTML, 'graduation-ceremony').sizes,
     '(min-width: 40rem) 18rem, 60vw',
   );
-  // The odd third photograph, which spans both columns above 40rem and is just
-  // another card in the swipe strip below it.
+  // The odd trailing photograph spans both columns above 40rem, and is just
+  // another card in the swipe strip below it. Asserted by POSITION, not by
+  // filename: it named `egaming` until the three graduation photographs were
+  // reordered into the sequence they actually happened in, and a test that
+  // breaks when content is reordered is testing the wrong thing.
+  const grad = DATA.education.items.find((e) => e.id === 'khalifa-bsc');
+  assert.equal(grad.images.length % 2, 1, 'the spanning slot only exists for an odd count');
+  const trailing = grad.images[grad.images.length - 1].src;
   assert.equal(
-    hint(sections.get('path').innerHTML, 'egaming').sizes,
+    hint(sections.get('path').innerHTML, trailing).sizes,
     '(min-width: 40rem) 37rem, 60vw',
   );
   // No two galleries share a single blanket value any more.
