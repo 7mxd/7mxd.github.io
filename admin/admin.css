@@ -226,6 +226,17 @@ body { font-family: var(--font-meta); }
   overflow: hidden;
 }
 
+/* "Unsaved" on a rail row, revealed by nav.js's markUnsaved. The word carries
+   the meaning on its own — colour only reinforces it — and --danger is the
+   right register because what is at stake is losing the edit, not a mistake in
+   it. No `display` here on purpose: nav.js toggles the mark with the [hidden]
+   attribute, and an unconditional display would out-cascade the user agent's
+   [hidden] rule and pin the mark on permanently. */
+.nav-dirty {
+  margin-left: var(--space-2);
+  color: var(--danger);
+}
+
 .nav-add {
   display: flex;
   flex-direction: column;

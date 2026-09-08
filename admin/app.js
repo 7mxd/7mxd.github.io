@@ -10,7 +10,7 @@ import { pickAndUpload } from './media.js';
 import { attachPhoto } from './photos.js';
 import { buildTimeline } from '../js/timeline.js';
 import { resolveEntry, newRecordFor, placeRecord, locate } from './timeline-edit.js';
-import { renderNav } from './nav.js';
+import { renderNav, markUnsaved } from './nav.js';
 import { createPreview } from './preview.js';
 
 const $ = (id) => document.getElementById(id);
@@ -154,7 +154,7 @@ async function boot() {
   preview = createPreview($('preview'), buildPreviewBase);
   $('panel').addEventListener('input', () => {
     if (!current) return;
-    dirty[current.name] = true;
+    if (!dirty[current.name]) { dirty[current.name] = true; refreshDirtyMarks(); }
     // A collection whose file failed to load is an empty stand-in — the
     // save handler below already refuses to write it back. Feeding its
     // edits to the preview would let the owner watch a fabricated record
@@ -197,7 +197,13 @@ function buildNav() {
   const entries = buildTimeline({
     experience: models.experience, education: models.education,
     projects: models.projects, milestones: models.milestones,
-  }).flatMap((g) => g.entries).map((entry) => ({ ...entry, kindLabel: kindLabelFor(entry) }));
+  }).flatMap((g) => g.entries).map((entry) => ({
+    ...entry,
+    kindLabel: kindLabelFor(entry),
+    // Which file the row's record lives in, so the nav can mark every row
+    // belonging to a collection with unsaved edits.
+    collection: entry.source?.collection,
+  }));
   const nav = renderNav(document, {
     sections: REMAINING_SECTIONS, entries,
     onSelect: handleSelect,
@@ -207,6 +213,15 @@ function buildNav() {
   mount.innerHTML = '';
   mount.appendChild(nav);
   markActive();
+  refreshDirtyMarks();
+}
+
+/** Which sections hold unpublished work, shown on the rail. Called whenever a
+ *  dirty flag actually changes rather than on every keystroke: the marks are
+ *  toggled in place on the existing buttons, so this costs a querySelectorAll
+ *  over ~25 rows and never rebuilds the nav or moves its scroll. */
+function refreshDirtyMarks() {
+  markUnsaved($('collections'), (name) => !!dirty[name]);
 }
 
 function markActive() {
@@ -323,34 +338,103 @@ function openCollection(name) {
   markActive();
 }
 
+const labelsOf = (cs) => cs.map((c) => c.label).join(', ');
+
+function putErrorText(e) {
+  if (e.conflict) return 'the file changed on GitHub — reload to get the latest before saving';
+  if (e.forbidden) return 'this GitHub account has no write access to the repo';
+  return e.message;
+}
+
+/** Save publishes every collection with unsaved edits, not just the open one.
+ *
+ *  Twelve models share one Save button and switching between them is
+ *  frictionless, so binding the button to the open collection alone lost work
+ *  in the most convincing way possible: edit the tagline in Profile, click a
+ *  certificate on the path, fix a typo, press Save. Milestones publishes,
+ *  Profile does not, nothing says so, and the preview — which reads every
+ *  model — still shows the tagline change, so the strongest signal on the
+ *  page says it is live. beforeunload is then dismissed by someone who did
+ *  just save.
+ *
+ *  COLLECTIONS order, so a batch that fails partway is reproducible rather
+ *  than dependent on which section was opened first. Everything is validated
+ *  before anything is written: publishing four files and stopping at a fifth
+ *  that never validated would leave the site half-updated. */
 $('save').onclick = async () => {
-  if (!current) return;
-  const name = current.name;
-  if (loadErrors[name]) {
-    setStatus(`Cannot save ${current.label} — it failed to load, so this is an empty stand-in. Reload the page after fixing the file on GitHub.`, 'error');
+  // A collection whose file failed to load is an empty stand-in — writing it
+  // back would replace the real file with nothing. It is refused, by name,
+  // exactly as it was before, and left out of the batch.
+  const blocked = COLLECTIONS.filter((c) => dirty[c.name] && loadErrors[c.name]);
+  const targets = COLLECTIONS.filter((c) => dirty[c.name] && !loadErrors[c.name]);
+  const blockedNote = blocked.length
+    ? ` Cannot save ${labelsOf(blocked)} — the file failed to load, so it is an `
+      + 'empty stand-in. Reload the page after fixing it on GitHub.'
+    : '';
+  if (!targets.length) {
+    setStatus(blocked.length ? blockedNote.trim() : 'Nothing to publish — no unsaved changes.',
+      blocked.length ? 'error' : '');
     return;
   }
-  const errs = validateModel(current, models[name]);
-  if (errs.length) {
-    showErrors(document, $('panel'), errs);
-    setStatus(errs.length === 1 ? '1 problem to fix' : `${errs.length} problems to fix`, 'error');
+
+  const failures = targets
+    .map((c) => ({ c, errs: validateModel(c, models[c.name]) }))
+    .filter((f) => f.errs.length);
+  if (failures.length) {
+    // Open the first collection that failed and show its errors at the
+    // fields, the same as the single-collection flow did; name the rest, so
+    // nothing is left to be discovered by pressing Save again.
+    const [first, ...rest] = failures;
+    if (current?.name !== first.c.name) { activeEntryId = null; openCollection(first.c.name); }
+    showErrors(document, $('panel'), first.errs);
+    const n = first.errs.length;
+    setStatus(`${n} problem${n === 1 ? '' : 's'} to fix in ${first.c.label}`
+      + (rest.length ? `. Also to fix: ${labelsOf(rest.map((f) => f.c))}.` : '.'), 'error');
     return;
   }
   showErrors(document, $('panel'), []);
-  setStatus('Saving…'); $('save').disabled = true;
+
+  setStatus(targets.length === 1 ? 'Saving…' : `Saving ${targets.length} sections…`);
+  $('save').disabled = true;
+  const saved = [];
+  let failed = null;
   try {
-    const out = serializeJson(modelToData(current, models[name]));
-    const res = await client.putFile(current.file, out, shas[name], 'admin: update '+name);
-    shas[name] = res.content.sha; dirty[name] = false; setStatus('Published ✓', 'ok');
-    // A save to any of the four timeline files can change a date, a title or
-    // an order — anything The path's own ordering and labels depend on — so
-    // it is rebuilt from the models saved, not just cleared of the dirty flag.
-    if (TIMELINE_COLLECTIONS.has(name)) buildNav();
-  } catch (e) {
-    if (e.conflict) setStatus('Conflict: file changed on GitHub. Reload the section to get the latest before saving.', 'error');
-    else if (e.forbidden) setStatus('This GitHub account has no write access to the repo.', 'error');
-    else setStatus('Save failed: '+e.message, 'error');
+    for (const c of targets) {
+      try {
+        const out = serializeJson(modelToData(c, models[c.name]));
+        const res = await client.putFile(c.file, out, shas[c.name], 'admin: update ' + c.name);
+        shas[c.name] = res.content.sha;
+        dirty[c.name] = false;
+        saved.push(c);
+      } catch (e) {
+        // Stop rather than carry on: a conflict means the repo moved under
+        // this session and a 403 means none of the remaining writes can
+        // succeed either. What matters is that the owner is told exactly
+        // which files went and which did not, never left to guess.
+        failed = { c, e };
+        break;
+      }
+    }
   } finally { $('save').disabled = false; }
+
+  if (!failed) {
+    setStatus(`Published ✓ ${labelsOf(saved)}${blockedNote}`, blocked.length ? 'error' : 'ok');
+  } else {
+    const remaining = targets.slice(targets.indexOf(failed.c) + 1);
+    setStatus(
+      (saved.length ? `Published ${labelsOf(saved)}. ` : '')
+      + `${failed.c.label} failed: ${putErrorText(failed.e)}.`
+      + (remaining.length ? ` Not published: ${labelsOf(remaining)}.` : '')
+      + blockedNote,
+      'error');
+  }
+  // A save to any of the four timeline files can change a date, a title or an
+  // order — anything The path's own ordering and labels depend on — so the
+  // nav is rebuilt from the models saved. buildNav refreshes the unsaved
+  // marks on its way out; when nothing on the timeline moved, they are all
+  // that needs updating.
+  if (saved.some((c) => TIMELINE_COLLECTIONS.has(c.name))) buildNav();
+  else refreshDirtyMarks();
 };
 
 window.addEventListener('beforeunload', (e) => {

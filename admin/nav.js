@@ -10,6 +10,23 @@ import { TIMELINE_KINDS } from './schema.js';
 
 const el = (doc, tag, props = {}) => Object.assign(doc.createElement(tag), props);
 
+/** The "unsaved changes" mark, built hidden on every row and revealed by
+ *  markUnsaved below.
+ *
+ *  A word, not a dot and not a colour: twelve collections share one Save
+ *  button, so which sections still hold unpublished work has to be legible
+ *  before anything is pressed, to a screen reader as well as to an eye. The
+ *  text is inside the button, so it is part of the button's accessible name.
+ *  It is toggled with the `hidden` attribute rather than a class, which is
+ *  also why admin.css gives .nav-dirty no `display` of its own — an
+ *  unconditional one would out-cascade the user agent's [hidden] rule and the
+ *  mark would never go away. */
+function dirtyMark(doc) {
+  const mark = el(doc, 'span', { className: 'nav-dirty', textContent: 'Unsaved' });
+  mark.hidden = true;
+  return mark;
+}
+
 function formatDate(entry) {
   if (!entry.badge) return String(entry.year ?? '');
   return entry.badge.month ? `${entry.badge.month} ${entry.badge.year}` : entry.badge.year;
@@ -37,10 +54,13 @@ function pathGroup(doc, entries, onSelect, onAdd) {
     const li = el(doc, 'li');
     const btn = el(doc, 'button', { type: 'button', className: 'nav-entry' });
     const kindLabel = entry.kindLabel || entry.kind;
-    btn.append(
-      el(doc, 'span', { className: 'nav-entry-meta', textContent: `${formatDate(entry)} · ${kindLabel}` }),
-      el(doc, 'span', { className: 'nav-entry-title', textContent: entry.title }));
+    const meta = el(doc, 'span', { className: 'nav-entry-meta', textContent: `${formatDate(entry)} · ${kindLabel}` });
+    meta.appendChild(dirtyMark(doc));
+    btn.append(meta, el(doc, 'span', { className: 'nav-entry-title', textContent: entry.title }));
     btn.dataset.entryId = entry.id;
+    // Which file this row lives in, so markUnsaved can find every row that a
+    // given collection's unsaved edits belong to without re-resolving it.
+    if (entry.collection) btn.dataset.collection = entry.collection;
     btn.setAttribute('aria-current', 'false');
     btn.addEventListener('click', () => onSelect(entry));
     li.appendChild(btn);
@@ -73,8 +93,10 @@ function sectionsGroup(doc, sections, onSelect) {
   const list = el(doc, 'ul', { className: 'nav-list' });
   for (const section of sections) {
     const li = el(doc, 'li');
-    const btn = el(doc, 'button', { type: 'button', className: 'nav-section', textContent: section.label });
+    const btn = el(doc, 'button', { type: 'button', className: 'nav-section' });
+    btn.append(doc.createTextNode(section.label), dirtyMark(doc));
     btn.dataset.sectionName = section.name;
+    btn.dataset.collection = section.name;
     btn.setAttribute('aria-current', 'false');
     btn.addEventListener('click', () => onSelect(section));
     li.appendChild(btn);
@@ -96,4 +118,19 @@ export function renderNav(doc, { sections, entries, onSelect, onAdd }) {
   frag.appendChild(pathGroup(doc, entries, onSelect, onAdd));
   frag.appendChild(sectionsGroup(doc, sections, onSelect));
   return frag;
+}
+
+/** Reveals the "Unsaved" mark on every row whose collection has unpublished
+ *  edits. `isDirty` is called with a collection name.
+ *
+ *  Switching sections is frictionless and warns about nothing, so before this
+ *  the only trace of an edit in a section you were no longer looking at was
+ *  the preview — which reads every model and therefore showed the change as
+ *  though it were already live. Nothing said otherwise, and the browser's own
+ *  unload warning is dismissed by someone who did just press Save. */
+export function markUnsaved(root, isDirty) {
+  for (const btn of root.querySelectorAll('[data-collection]')) {
+    const mark = btn.querySelector('.nav-dirty');
+    if (mark) mark.hidden = !isDirty(btn.dataset.collection);
+  }
 }
