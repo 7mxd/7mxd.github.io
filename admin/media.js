@@ -5,6 +5,15 @@ import { validateImage, sanitizeFilename } from './lib.js';
 // which resizes, uprights, and derives the five fields a photograph needs.
 const PHOTO_TYPES = ['image/jpeg', 'image/heic', 'image/heif'];
 
+// Shown to whoever pressed Upload on a field that is not the photograph
+// itself — most often the small version, which is derived, not chosen. It used
+// to name admin/photos.js, a file the person reading it will never open; what
+// they need to know is which button to press instead and what happens when
+// they do.
+const PHOTO_ELSEWHERE = 'Photographs are added on the "Photograph (large)" '
+  + 'field. Choosing one there fills in the small version, the width and the '
+  + 'height automatically — they are not typed in by hand.';
+
 export function readFileBase64(file) {
   return new Promise((resolve, reject) => {
     const r = new FileReader();
@@ -14,7 +23,7 @@ export function readFileBase64(file) {
 }
 export async function pickAndUpload(client, file) {
   if (PHOTO_TYPES.includes(file.type)) {
-    throw new Error('Photographs go through admin/photos.js, which resizes them.');
+    throw new Error(PHOTO_ELSEWHERE);
   }
   const v = validateImage({ type: file.type, size: file.size });
   if (!v.ok) throw new Error(v.error);

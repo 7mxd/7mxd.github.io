@@ -1,5 +1,5 @@
 import { blockTypesForScope, fieldsForBlock, newBlock } from './blocks-model.js';
-import { renderField, moveItem } from './fields.js';
+import { moveItem, drawFields, ownsRecord } from './fields.js';
 
 export function renderBlocks(container, blocks, scope, registry, ctx) {
   container.innerHTML = '';
@@ -34,8 +34,11 @@ function blockItem(blocks, i, scope, registry, rerender, ctx) {
     mk('↓', () => moveItem(blocks, i, i + 1)),
     mk('Remove', () => blocks.splice(i, 1)) );
   wrap.appendChild(ctrls);
-  for (const f of fieldsForBlock(registry, block.type)) {
-    wrap.appendChild(renderField(document, f, block, ctx));
-  }
+  // An `image` block is a photograph like any other: picking one writes five
+  // of this block's fields, so the block is the group that redraws them (see
+  // fields.js's ownsRecord).
+  const redraw = () => drawFields(document, wrap, fieldsForBlock(registry, block.type), block, ctx, '');
+  redraw();
+  ownsRecord(wrap, block, redraw);
   return wrap;
 }

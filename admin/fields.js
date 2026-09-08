@@ -65,6 +65,55 @@ const nextId = () => 'field-' + (++uid);
 // screen reader honours, so those three never get an id to point at.
 const GROUP_TYPES = new Set(['object', 'list', 'blocks']);
 
+// Picking a photograph writes five fields at once — src, srcSmall, width,
+// height and widthSmall, all of them by admin/photos.js's attachPhoto — but a
+// control can only ever refresh itself. Its four siblings were built in the
+// same render pass with the values they had then, so without this they keep
+// showing blank, or the previous photograph's numbers, while the path and
+// thumbnail update beside them. Filling them in by hand is the natural
+// response to that, and it is exactly how a wrong `width` attribute ships and
+// how the correct value gets overwritten.
+//
+// An event rather than a callback on `ctx`: ctx is one object shared by the
+// entire form, so a callback on it could only ever mean "re-render
+// everything" and would have no way to know which of the four nesting levels
+// the control sits at. The group that has to redraw is whichever one is
+// nearest the control, and that is precisely what an event that bubbles finds
+// for free — the same reason bump() below already dispatches a bubbling
+// `input` rather than calling back.
+const REWROTE = 'field:rewrote';
+
+/** Say that fields other than the control's own were just written. */
+function announceRewrite(node, record) {
+  node.dispatchEvent(new CustomEvent(REWROTE, { bubbles: true, detail: { record } }));
+}
+
+/** Marks `host` as the group that draws `record`'s fields: a rewrite from
+ *  inside it redraws all of them, and the innermost such group stops the
+ *  event, so a photograph row inside a project redraws the row and not the
+ *  whole project. Focus is put back where it was — an upload driven from the
+ *  keyboard must not drop focus at the top of the document. */
+export function ownsRecord(host, record, draw) {
+  host.addEventListener(REWROTE, (event) => {
+    if (event.detail?.record !== record) return;
+    event.stopPropagation();
+    const active = host.ownerDocument?.activeElement;
+    const path = host.contains?.(active) ? active.closest('.field')?.dataset.path : null;
+    draw();
+    if (!path) return;
+    host.querySelector(`[data-path="${CSS.escape(path)}"]`)
+      ?.querySelector('input:not([type="file"]), textarea, select')?.focus();
+  });
+}
+
+/** Redraw one record's fields inside the group that owns them, leaving
+ *  whatever the caller put there first (a row-controls strip, a legend)
+ *  alone. */
+export function drawFields(doc, host, fields, record, ctx, prefix) {
+  for (const node of host.querySelectorAll(':scope > .field')) node.remove();
+  for (const f of fields || []) host.appendChild(renderField(doc, f, record, ctx, prefix));
+}
+
 /** A labelled control for one field. `ctx` carries { doc, client, registry,
  *  renderBlocks, uploadImage } — everything a field might need and nothing it
  *  builds itself.
@@ -167,7 +216,9 @@ function controlFor(doc, field, record, ctx, id, path) {
       const set = groupSet(doc, field);
       const value = readField(field, record);
       record[field.name] = value;
-      for (const f of field.fields || []) set.appendChild(renderField(doc, f, value, ctx, path));
+      const draw = () => drawFields(doc, set, field.fields, value, ctx, path);
+      draw();
+      ownsRecord(set, value, draw);
       return set;
     }
     case 'list': {
@@ -230,7 +281,9 @@ function listControl(doc, field, record, ctx, path) {
         // not a dotted field, when renderField stamps its data-path.
         row.appendChild(renderField(doc, { ...field.itemField, name: String(i), label: '' }, items, ctx, path));
       } else {
-        for (const f of field.fields || []) row.appendChild(renderField(doc, f, item, ctx, `${path}[${i}]`));
+        const redraw = () => drawFields(doc, row, field.fields, item, ctx, `${path}[${i}]`);
+        redraw();
+        ownsRecord(row, item, redraw);
       }
       host.appendChild(row);
     });
@@ -266,7 +319,12 @@ function imageControl(doc, field, record, ctx, id) {
       await ctx.uploadImage(picker.files[0], record, field);
       inp.value = record[field.name] || '';
       if (record[field.name]) { thumb.src = '../' + record[field.name]; thumb.hidden = false; }
+      // Order matters. `input` goes first, while this node is still in the
+      // tree, so app.js's panel listener marks the collection dirty and feeds
+      // the preview; the rewrite goes second, because the group that answers
+      // it may replace this very node.
       bump(host);
+      announceRewrite(host, record);
     } catch (e) { ctx.onError?.(e); }
   });
   host.append(inp, btn, picker, thumb);

@@ -1,4 +1,4 @@
-import { renderField, blankValue, moveItem } from './fields.js';
+import { renderField, blankValue, moveItem, drawFields, ownsRecord } from './fields.js';
 
 /** One record in a list collection (e.g. an experience entry, a project):
  *  its own add/remove/reorder controls, then one renderField call per
@@ -27,7 +27,15 @@ function itemBox(items, itemFields, i, ctx, collectionLabel, host, rerender, lis
     mk('Remove', 'Remove', () => items.splice(i, 1)));
   box.appendChild(ctrls);
   const prefix = `${listKey}[${i}]`;
-  for (const f of itemFields) box.appendChild(renderField(document, f, items[i], ctx, prefix));
+  // Redrawable, because picking a photograph writes five fields at once and
+  // only one of them belongs to the control that did it — see fields.js's
+  // ownsRecord. A record here is a whole project or company, so the group
+  // holding its photograph rows answers first and this never runs for an
+  // upload; it is here for the case where a top-level record carries an
+  // image field of its own.
+  const redraw = () => drawFields(document, box, itemFields, items[i], ctx, prefix);
+  redraw();
+  ownsRecord(box, items[i], redraw);
   return box;
 }
 
