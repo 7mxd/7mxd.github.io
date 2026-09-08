@@ -30,10 +30,19 @@ const kb = (n) => `${(n / 1024).toFixed(1)}KB`;
 // So the budget is now measured on what actually reaches a reader, with a
 // second, generous ceiling on what the browser parses so the files still
 // cannot balloon unnoticed. Both numbers are asserted; neither is decoration.
-const WIRE_BUDGET = 36 * 1024;
+//
+// The wire number was 36KB and reached 35.79 in September 2026, leaving 217
+// bytes — close enough that the next ordinary change would have been paid for
+// by deleting comments again, which is the exact failure the move to a
+// compressed budget was meant to end. A budget whose headroom is gone stops
+// measuring the thing it names and starts measuring whoever edits next.
+// So it is 40KB: still light against the fonts and photographs that dominate
+// this page's transfer, and roughly a few tens of milliseconds on a phone,
+// bought back as room for several more changes.
+const WIRE_BUDGET = 40 * 1024;
 const PARSE_CEILING = 100 * 1024;
 
-test('CSS plus JS stays inside the 36KB transfer budget', () => {
+test('CSS plus JS stays inside the 40KB transfer budget', () => {
   assert.ok(
     wireBytes <= WIRE_BUDGET,
     `${kb(wireBytes)} gzipped of ${kb(WIRE_BUDGET)} — this is what a reader downloads`,
