@@ -11,7 +11,7 @@ function buildObject(fields, data) {
   const out = {};
   for (const f of fields) {
     const v = data ? data[f.name] : undefined;
-    if (f.type === 'object') out[f.name] = buildObject(f.fields, v || {});
+    if (f.type === 'object') out[f.name] = v === null ? null : buildObject(f.fields, v || {});
     else if (f.type === 'list') out[f.name] = Array.isArray(v) ? v.map(it => itemModel(f, it)) : [];
     else if (f.type === 'blocks') out[f.name] = Array.isArray(v) ? v : [];
     else out[f.name] = v ?? defaultFor(f);
@@ -32,7 +32,7 @@ function cleanObject(fields, model) {
   const out = {};
   for (const f of fields) {
     const v = model ? model[f.name] : undefined;
-    if (f.type === 'object') { const o = cleanObject(f.fields, v || {}); if (Object.keys(o).length) out[f.name] = o; }
+    if (f.type === 'object') { const o = cleanObject(f.fields, v || {}); if (Object.keys(o).length) out[f.name] = o; else if (v === null) out[f.name] = null; }
     else if (f.type === 'list') {
       const list = (Array.isArray(v) ? v : []).map(it => f.itemField ? it : cleanObject(f.fields, it)).filter(it => f.itemField ? (it !== '' && it != null) : Object.keys(it).length);
       if (list.length) out[f.name] = list;

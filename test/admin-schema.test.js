@@ -7,9 +7,9 @@ const VALID_TYPES = new Set(['string','text','number','boolean','select','image'
 const namesOf = (fields) => fields.map(f => f.name);
 const sub = (fields, name) => fields.find(f => f.name === name);
 
-test('all 7 collections present', () => {
+test('all 9 collections present', () => {
   assert.deepEqual(COLLECTIONS.map(c => c.name).sort(),
-    ['education','experience','profile','projects','settings','skills','summary']);
+    ['education','experience','metrics','milestones','profile','projects','settings','skills','summary']);
 });
 test('every field has name/label and a valid type', () => {
   const walk = (fields) => fields.forEach(f => {
@@ -86,7 +86,7 @@ test('projects declare the timeline and anchor fields, with images not a lone im
   assert.ok(!links.includes('android'), 'there is no Android build to link to');
 });
 
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 const REGISTRY = JSON.parse(
   readFileSync(new URL('../data/blocks-registry.json', import.meta.url), 'utf8'));
 
@@ -126,4 +126,13 @@ test('benchmark rows declare the record the site actually renders', () => {
   const rows = REGISTRY.benchmark.fields.find((f) => f.name === 'rows');
   const names = rows.fields.map((f) => f.name).sort();
   assert.deepEqual(names, ['highlight', 'label', 'value']);
+});
+
+test('every data file is managed except the registry, which is schema', () => {
+  const files = readdirSync(new URL('../data/', import.meta.url))
+    .filter((f) => f.endsWith('.json'));
+  const managed = new Set(COLLECTIONS.map((c) => c.file.replace('data/', '')));
+  const unmanaged = files.filter((f) => !managed.has(f));
+  assert.deepEqual(unmanaged.sort(), ['blocks-registry.json'],
+    'a content file nobody can edit is the defect this revamp exists to remove');
 });
