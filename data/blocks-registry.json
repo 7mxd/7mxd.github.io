@@ -28,10 +28,12 @@
     "label": "Image",
     "fields": [
       { "name": "src", "type": "image", "label": "Image", "required": true },
+      { "name": "srcSmall", "type": "image", "label": "Image (small)", "required": false },
       { "name": "alt", "type": "string", "label": "Alt text", "required": true },
       { "name": "caption", "type": "string", "label": "Caption (optional)", "required": false },
       { "name": "width", "type": "number", "label": "Intrinsic width, px", "required": true },
-      { "name": "height", "type": "number", "label": "Intrinsic height, px", "required": true }
+      { "name": "height", "type": "number", "label": "Intrinsic height, px", "required": true },
+      { "name": "widthSmall", "type": "number", "label": "Small width, px", "required": false }
     ]
   },
 
