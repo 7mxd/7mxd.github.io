@@ -34,3 +34,12 @@ test('required inside list items is checked', () => {
   const errs = validateModel(c, buildFormModel(c, { items:[{ title:'' }] }));
   assert.ok(errs.some(e => e.path.includes('items[0].title')));
 });
+
+test('a required scalar missing from a list of scalars is reported with its index', () => {
+  const collection = { kind: 'list', listKey: 'items', itemFields: [
+    { name: 'tags', label: 'Tags', type: 'list',
+      itemField: { name: 'tag', label: 'Tag', type: 'string', required: true } } ] };
+  const errs = validateModel(collection, { items: [{ tags: ['ok', ''] }] });
+  assert.equal(errs.length, 1);
+  assert.equal(errs[0].path, 'items[0].tags[1]');
+});

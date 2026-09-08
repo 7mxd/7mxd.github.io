@@ -74,8 +74,18 @@ const GROUP_TYPES = new Set(['object', 'list', 'blocks']);
  *  label) — distinct from `field.label` simply absent, which falls back to
  *  `field.name`. Whenever a caption is shown for an atomic control, the
  *  control gets a generated id and the label points at it with `htmlFor`, so
- *  the caption is the control's accessible name and not just nearby text. */
-export function renderField(doc, field, record, ctx) {
+ *  the caption is the control's accessible name and not just nearby text.
+ *
+ *  `pathPrefix` composes the full address `validateModel` reports errors
+ *  against — `items[0].roles[2].title` — so a save error can be shown beside
+ *  the control that caused it rather than as one path string in the save
+ *  bar. It is a trailing parameter, not a `ctx` entry: `ctx` is shared
+ *  across the whole form, and a prefix is only ever right for one branch of
+ *  it. A field's own name is joined to it with a dot; a scalar list item
+ *  has no name of its own (its name IS the index — see listControl), and a
+ *  purely numeric name is the sign of that, so it joins with brackets
+ *  instead and appends nothing further. */
+export function renderField(doc, field, record, ctx, pathPrefix = '') {
   const wrap = el(doc, 'div', { className: 'field' });
   const labelText = field.label === '' ? null : (field.label || field.name);
   const id = (field.type !== 'boolean' && !GROUP_TYPES.has(field.type) && labelText != null)
@@ -85,12 +95,23 @@ export function renderField(doc, field, record, ctx) {
     if (id) label.htmlFor = id;
     wrap.appendChild(label);
   }
-  wrap.appendChild(controlFor(doc, field, record, ctx, id));
-  wrap.dataset.path = field.name;
+  const path = composePath(pathPrefix, field.name);
+  wrap.appendChild(controlFor(doc, field, record, ctx, id, path));
+  wrap.dataset.path = path;
   return wrap;
 }
 
-function controlFor(doc, field, record, ctx, id) {
+/** `prefix` is empty at the top of a form, a record path (`items[0]`) one
+ *  level into a list, or a nested field path (`items[0].roles[2]`) deeper
+ *  still. `name` is either an ordinary field name or, for a scalar list
+ *  item, the stringified index that already stands for the whole path
+ *  segment — brackets close it off there instead of a dot opening onto it. */
+function composePath(prefix, name) {
+  if (!prefix) return name;
+  return /^\d+$/.test(name) ? `${prefix}[${name}]` : `${prefix}.${name}`;
+}
+
+function controlFor(doc, field, record, ctx, id, path) {
   switch (field.type) {
     case 'text': case 'code': {
       const ta = el(doc, 'textarea', { value: readField(field, record) });
@@ -127,10 +148,10 @@ function controlFor(doc, field, record, ctx, id) {
       set.appendChild(el(doc, 'legend', { textContent: field.label || field.name }));
       const value = readField(field, record);
       record[field.name] = value;
-      for (const f of field.fields || []) set.appendChild(renderField(doc, f, value, ctx));
+      for (const f of field.fields || []) set.appendChild(renderField(doc, f, value, ctx, path));
       return set;
     }
-    case 'list': return listControl(doc, field, record, ctx);
+    case 'list': return listControl(doc, field, record, ctx, path);
     case 'blocks': {
       const host = el(doc, 'div');
       record[field.name] = readField(field, record);
@@ -148,8 +169,13 @@ function controlFor(doc, field, record, ctx, id) {
 
 /** Add, remove and reorder at every level, for scalars and records alike.
  *  Order is content here: it decides which photograph leads a gallery and takes
- *  the wide slot, and which skills come first in their row. */
-function listControl(doc, field, record, ctx) {
+ *  the wide slot, and which skills come first in their row.
+ *
+ *  This is the one place that knows a list index, so it is the one place
+ *  that composes `[i]` onto a path: a record item's fields carry on from
+ *  `${path}[${i}]` same as any nested field, but a scalar item has no field
+ *  of its own to append — `${path}[${i}]` already IS its whole leaf path. */
+function listControl(doc, field, record, ctx, path) {
   const host = el(doc, 'div', { className: 'list' });
   const items = readField(field, record);
   record[field.name] = items;
@@ -175,9 +201,11 @@ function listControl(doc, field, record, ctx) {
         // A scalar item has no name of its own to key a record by, so the
         // list itself is the record and the index is the key: writeField
         // sets items[i] directly, with no intermediate holder to go stale.
-        row.appendChild(renderField(doc, { ...field.itemField, name: String(i), label: '' }, items, ctx));
+        // The same numeric name tells composePath this is a bracketed leaf,
+        // not a dotted field, when renderField stamps its data-path.
+        row.appendChild(renderField(doc, { ...field.itemField, name: String(i), label: '' }, items, ctx, path));
       } else {
-        for (const f of field.fields || []) row.appendChild(renderField(doc, f, item, ctx));
+        for (const f of field.fields || []) row.appendChild(renderField(doc, f, item, ctx, `${path}[${i}]`));
       }
       host.appendChild(row);
     });

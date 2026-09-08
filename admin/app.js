@@ -4,7 +4,7 @@ import { validateModel } from './validate.js';
 import { serializeJson } from './lib.js';
 import { createClient } from './github.js';
 import { getToken, signIn, signOut } from './auth.js';
-import { renderForm } from './forms.js';
+import { renderForm, showErrors } from './forms.js';
 import { renderBlocks } from './blocks-editor.js';
 import { pickAndUpload } from './media.js';
 import { attachPhoto } from './photos.js';
@@ -240,7 +240,11 @@ function nodeFor(collectionName, record) {
   const top = host?.children[loc.index];
   if (!top) return null;
   if (loc.roleIndex == null) return top;
-  const list = top.querySelector('[data-path="roles"] .list');
+  // `top` is already scoped to this one company, so its roles field's full
+  // path (`items[3].roles`, now that fields.js's renderField stamps the
+  // composed path rather than the bare field name) is matched by its
+  // ending rather than re-deriving the exact prefix here.
+  const list = top.querySelector('[data-path$=".roles"] .list');
   return list?.children[loc.roleIndex] || null;
 }
 
@@ -294,7 +298,12 @@ $('save').onclick = async () => {
     return;
   }
   const errs = validateModel(current, models[name]);
-  if (errs.length) { setStatus(errs[0].path+': '+errs[0].message, 'error'); return; }
+  if (errs.length) {
+    showErrors(document, $('panel'), errs);
+    setStatus(errs.length === 1 ? '1 problem to fix' : `${errs.length} problems to fix`, 'error');
+    return;
+  }
+  showErrors(document, $('panel'), []);
   setStatus('Saving…'); $('save').disabled = true;
   try {
     const out = serializeJson(modelToData(current, models[name]));

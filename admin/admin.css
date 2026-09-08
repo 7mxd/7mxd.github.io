@@ -336,6 +336,13 @@ legend {
 
 .err { color: var(--danger); font-family: var(--font-meta); font-size: var(--text-xs); min-height: 1.2em; }
 
+/* showErrors (forms.js) appends this straight into the .field wrapper it
+   matched, as the last child after the label and control; .field's own flex
+   gap spaces it the same as every other child there, so it needs no margin
+   of its own. Colour alone never carries the error — the control beside it
+   also gets aria-invalid — this is the visible half of that pairing. */
+.field-error { color: var(--danger); font-family: var(--font-meta); font-size: var(--text-xs); }
+
 @media (max-width: 700px) {
   /* Unwrapped, the topbar's six items — brand, who, status, two buttons, plus
      the spacer — do not fit a 390px viewport at their minimum content widths
