@@ -1,11 +1,34 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex" />
   <title>Content Manager · Ahmed's Portfolio</title>
+
+  <!-- Set the theme before first paint so the page never flashes the wrong ground. -->
+  <script>
+  (function () {
+    var stored = null;
+    try { stored = localStorage.getItem('theme'); } catch (e) { stored = null; }
+    var theme = 'light';
+    if (stored === 'light' || stored === 'dark') {
+      theme = stored;
+    } else {
+      try {
+        theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      } catch (e) {
+        theme = 'light';
+      }
+    }
+    document.documentElement.setAttribute('data-theme', theme);
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', theme === 'dark' ? '#1a1f30' : '#eaf0fb');
+  })();
+  </script>
+
   <link rel="stylesheet" href="../css/tokens.css" />
+  <link rel="stylesheet" href="../css/base.css" />
   <link rel="stylesheet" href="admin.css" />
 </head>
 <body>

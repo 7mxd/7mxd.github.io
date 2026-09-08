@@ -83,6 +83,8 @@ changed weight and the page's whole structure stopped being beige.
 | `--rule` | `#dee2ea` | hairlines only, never text | — |
 | `--rule-accent` | `#c4d1e8` | pill, plate and date-badge hairlines only | — |
 | `--accent-plate` | `#dce7f9` | the availability line's plate, never text | — |
+| `--danger` | `#b3261e` | inline field errors | 6.26:1 |
+| `--danger-strong` | `#8e1b16` | save-status failures | 8.67:1 |
 
 ### Dark
 
@@ -98,6 +100,8 @@ changed weight and the page's whole structure stopped being beige.
 | `--rule` | `#2b3040` | — |
 | `--rule-accent` | `#374561` | — |
 | `--accent-plate` | `#232b42` | — |
+| `--danger` | `#f2a49d` | 9.00:1 |
+| `--danger-strong` | `#ffb4ab` | 10.53:1 |
 
 `--print-*` tokens live in a second `:root` block and are reassigned onto the
 same names inside `css/print.css`. Print is ink on white regardless of theme.

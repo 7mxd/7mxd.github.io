@@ -1,30 +1,210 @@
+/* Layout for the content manager. Every colour, font and size below is a
+   token from css/tokens.css (loaded before this file); css/base.css supplies
+   the reset, link and focus-visible rules, and the prefers-reduced-motion and
+   prefers-contrast handling. This file adds structure only — no colour, no
+   font family, no font size of its own. test/admin-css-contract.test.js
+   enforces that.
+
+   The one exception is --admin-*: dimensions the admin needs that the site
+   itself has no concept of, because the site has no sidebar. Declared once
+   here rather than repeated as a magic number; the contract test allows the
+   prefix and nothing else. */
+:root {
+  --admin-sidebar: 14rem;
+}
+
 * { box-sizing: border-box; }
-body { margin:0; font-family: var(--font-sans, system-ui); background: var(--bg, #f7f6f3); color: var(--ink, #171614); }
-.btn { font-family: var(--font-mono, monospace); font-size:.9rem; padding:.5rem 1rem; border:1px solid var(--line,#ddd); border-radius:8px; background:var(--surface,#fff); color:var(--ink,#171614); cursor:pointer; }
-.btn:hover { border-color: var(--accent,#1d9bb8); color: var(--accent,#1d9bb8); }
-.btn.ghost { background:none; }
-.err { color:#b3261e; min-height:1.2em; }
-#login { min-height:100vh; display:grid; place-items:center; }
-.login-card { max-width:28rem; text-align:center; padding:2rem; border:1px solid var(--line,#ddd); border-radius:12px; background:var(--surface,#fff); }
-#topbar { display:flex; align-items:center; gap:1rem; padding:.6rem 1rem; border-bottom:1px solid var(--line,#ddd); position:sticky; top:0; background:var(--bg,#f7f6f3); z-index:5; }
-#topbar .spacer { flex:1; }
-.brand { font-family:var(--font-mono,monospace); font-weight:700; }
-.who { color:var(--muted,#666); font-size:.85rem; }
-.save-status { font-size:.85rem; color:var(--muted,#666); }
-.save-status[data-state="ok"] { color:#1a7f37; }
-.save-status[data-state="error"] { color:#b3261e; }
-.layout { display:grid; grid-template-columns: 14rem 1fr; min-height: calc(100vh - 49px); }
-#collections { border-right:1px solid var(--line,#ddd); padding:1rem .5rem; display:flex; flex-direction:column; gap:.25rem; }
-#collections button { text-align:left; padding:.5rem .75rem; border:0; background:none; border-radius:8px; cursor:pointer; font:inherit; color:var(--ink); }
-#collections button[aria-current="true"] { background:var(--surface,#fff); border:1px solid var(--line,#ddd); }
-#panel { padding:1.5rem; max-width:48rem; }
-.field { margin-bottom:1rem; display:flex; flex-direction:column; gap:.3rem; }
-.field > label { font-size:.85rem; color:var(--muted,#666); font-family:var(--font-mono,monospace); }
-.field input[type=text], .field input:not([type]), .field textarea, .field select { width:100%; padding:.5rem; border:1px solid var(--line,#ddd); border-radius:8px; background:var(--surface,#fff); color:var(--ink); font:inherit; }
-.field textarea { min-height:6rem; resize:vertical; }
-fieldset { border:1px solid var(--line,#ddd); border-radius:10px; margin:0 0 1rem; padding:1rem; }
-legend { font-family:var(--font-mono,monospace); font-size:.8rem; color:var(--muted,#666); padding:0 .4rem; }
-.list-item { border:1px dashed var(--line,#ddd); border-radius:10px; padding:1rem; margin-bottom:.75rem; position:relative; }
-.row-controls { display:flex; gap:.4rem; margin-bottom:.5rem; }
-.thumb { max-width:120px; max-height:80px; border:1px solid var(--line,#ddd); border-radius:6px; display:block; }
-@media (max-width:700px){ .layout{ grid-template-columns:1fr; } #collections{ flex-direction:row; flex-wrap:wrap; border-right:0; border-bottom:1px solid var(--line,#ddd);} }
+
+body { font-family: var(--font-meta); }
+
+/* #login and #app are toggled by the [hidden] content attribute in app.js.
+   An unconditional `display` declaration on either would out-cascade the
+   user agent's `[hidden] { display: none }` rule — normal author
+   declarations beat normal user-agent declarations regardless of selector
+   specificity — so both screens would render at once. Scoping the layout
+   display to :not([hidden]) leaves the attribute in charge of visibility. */
+#login:not([hidden]) {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: var(--space-6);
+}
+
+.login-card {
+  max-width: 26rem;
+  width: 100%;
+  text-align: center;
+  padding: var(--space-8) var(--space-6);
+  border: var(--rule-width) solid var(--rule);
+  background: var(--ground-raised);
+}
+.login-card h1 {
+  font-family: var(--font-meta);
+  font-size: var(--text-lg);
+  margin-bottom: var(--space-3);
+}
+.login-card p {
+  font-family: var(--font-meta);
+  font-size: var(--text-sm);
+  color: var(--ink-muted);
+}
+.login-card .btn { margin: var(--space-4) 0; }
+
+#app:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+#topbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: var(--rule-width) solid var(--rule);
+  position: sticky;
+  top: 0;
+  background: var(--ground);
+  z-index: 5;
+}
+#topbar .spacer { flex: 1; }
+
+.brand {
+  font-family: var(--font-meta);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.who, .save-status {
+  font-family: var(--font-meta);
+  font-size: var(--text-xs);
+  color: var(--ink-muted);
+}
+/* Success takes the accent's own emphasis step, the same one link-hover and
+   the benchmark row use. Error takes the danger family's equivalent step:
+   darker in light, lighter in dark, which is why it is -strong and not the
+   base --danger — this is the more prominent of the two error uses on the
+   page, the topbar status line, versus .err's quieter inline hint below. */
+.save-status[data-state="ok"] { color: var(--accent-strong); }
+.save-status[data-state="error"] { color: var(--danger-strong); }
+
+.btn {
+  font-family: var(--font-meta);
+  font-size: var(--text-sm);
+  padding: var(--space-2) var(--space-4);
+  border: var(--rule-width) solid var(--ink);
+  background: none;
+  color: var(--ink);
+  cursor: pointer;
+}
+.btn:hover { background: var(--ink); color: var(--ground); }
+.btn.ghost { border-color: var(--rule); }
+.btn.ghost:hover { background: none; border-color: var(--accent); color: var(--accent); }
+
+.layout {
+  display: grid;
+  grid-template-columns: var(--admin-sidebar) 1fr;
+  flex: 1;
+  min-height: 0;
+}
+
+#collections {
+  border-right: var(--rule-width) solid var(--rule);
+  padding: var(--space-4) var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+#collections button {
+  text-align: left;
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  background: none;
+  font-family: var(--font-meta);
+  font-size: var(--text-sm);
+  color: var(--ink);
+  cursor: pointer;
+}
+#collections button[aria-current="true"] {
+  background: var(--accent-plate);
+  color: var(--accent);
+}
+
+#panel {
+  padding: var(--space-6);
+  max-width: var(--measure-wide);
+}
+
+.field { margin-bottom: var(--space-4); display: flex; flex-direction: column; gap: var(--space-1); }
+.field > label {
+  font-family: var(--font-meta);
+  font-size: var(--text-xs);
+  color: var(--ink-muted);
+}
+.field input[type="text"], .field input:not([type]), .field textarea, .field select {
+  width: 100%;
+  padding: var(--space-2);
+  border: var(--rule-width) solid var(--rule);
+  background: var(--ground-raised);
+  color: var(--ink);
+  font-family: var(--font-meta);
+  font-size: var(--text-sm);
+}
+.field textarea { min-height: 6rem; resize: vertical; }
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-meta);
+  font-size: var(--text-sm);
+  color: var(--ink);
+}
+
+fieldset {
+  border: var(--rule-width) solid var(--rule);
+  margin: 0 0 var(--space-4);
+  padding: var(--space-4);
+}
+legend {
+  font-family: var(--font-meta);
+  font-size: var(--text-xs);
+  color: var(--ink-muted);
+  padding: 0 var(--space-2);
+}
+
+.list { display: flex; flex-direction: column; gap: var(--space-3); }
+.list-item {
+  border: var(--rule-width) dashed var(--rule);
+  padding: var(--space-4);
+  margin-bottom: var(--space-3);
+  position: relative;
+}
+.row-controls { display: flex; gap: var(--space-2); margin-bottom: var(--space-2); }
+
+.thumb {
+  max-width: 7.5rem;
+  max-height: 5rem;
+  border: var(--rule-width) solid var(--rule);
+  display: block;
+}
+
+.err { color: var(--danger); font-family: var(--font-meta); font-size: var(--text-xs); min-height: 1.2em; }
+
+@media (max-width: 700px) {
+  /* Unwrapped, the topbar's six items — brand, who, status, two buttons, plus
+     the spacer — do not fit a 390px viewport at their minimum content widths
+     and force the whole page to scroll horizontally. Wrapping the row and
+     dropping the least essential item (the signed-in username; sign-in state
+     is otherwise obvious) keeps every control reachable without it. */
+  #topbar { flex-wrap: wrap; row-gap: var(--space-2); }
+  .who { display: none; }
+  .layout { grid-template-columns: 1fr; }
+  #collections {
+    flex-direction: row;
+    flex-wrap: wrap;
+    border-right: 0;
+    border-bottom: var(--rule-width) solid var(--rule);
+  }
+}
