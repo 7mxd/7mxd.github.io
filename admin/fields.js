@@ -90,9 +90,15 @@ export function renderField(doc, field, record, ctx, pathPrefix = '') {
   const labelText = field.label === '' ? null : (field.label || field.name);
   const id = (field.type !== 'boolean' && !GROUP_TYPES.has(field.type) && labelText != null)
     ? nextId() : null;
-  if (field.type !== 'boolean' && labelText != null) {
+  // A group type names itself with the <legend> inside its own <fieldset>
+  // (groupSet below), so it must not also get a <label> here. It used to get
+  // both: Settings showed nine captions twice over, six of them nested two
+  // deep, and Profile — the first screen the admin opens — showed four. The
+  // stray <label> was not merely redundant either, since a group is not a
+  // single labelable element and the label pointed at no control at all.
+  if (id) {
     const label = el(doc, 'label', { textContent: labelText });
-    if (id) label.htmlFor = id;
+    label.htmlFor = id;
     wrap.appendChild(label);
   }
   const path = composePath(pathPrefix, field.name);
@@ -109,6 +115,20 @@ export function renderField(doc, field, record, ctx, pathPrefix = '') {
 function composePath(prefix, name) {
   if (!prefix) return name;
   return /^\d+$/.test(name) ? `${prefix}[${name}]` : `${prefix}.${name}`;
+}
+
+/** The shell a group of controls names itself with. <fieldset>/<legend> is the
+ *  only markup that names a group of controls programmatically, which is why
+ *  all three group types use it and why none of them takes a <label>. The
+ *  object branch already did; list and blocks returned a bare container and
+ *  leaned on renderField's stray label, so making them consistent is what
+ *  lets that label go. This is also the shape the pre-branch renderer had —
+ *  see `git show 9987494:admin/forms.js` — before object grew a duplicate. */
+function groupSet(doc, field) {
+  const set = el(doc, 'fieldset');
+  const caption = field.label === '' ? null : (field.label || field.name);
+  if (caption != null) set.appendChild(el(doc, 'legend', { textContent: caption }));
+  return set;
 }
 
 function controlFor(doc, field, record, ctx, id, path) {
@@ -144,19 +164,24 @@ function controlFor(doc, field, record, ctx, id, path) {
     }
     case 'image': return imageControl(doc, field, record, ctx, id);
     case 'object': {
-      const set = el(doc, 'fieldset');
-      set.appendChild(el(doc, 'legend', { textContent: field.label || field.name }));
+      const set = groupSet(doc, field);
       const value = readField(field, record);
       record[field.name] = value;
       for (const f of field.fields || []) set.appendChild(renderField(doc, f, value, ctx, path));
       return set;
     }
-    case 'list': return listControl(doc, field, record, ctx, path);
+    case 'list': {
+      const set = groupSet(doc, field);
+      set.appendChild(listControl(doc, field, record, ctx, path));
+      return set;
+    }
     case 'blocks': {
+      const set = groupSet(doc, field);
       const host = el(doc, 'div');
       record[field.name] = readField(field, record);
       ctx.renderBlocks(host, record[field.name], field.scope, ctx.registry, ctx);
-      return host;
+      set.appendChild(host);
+      return set;
     }
     default: {
       const inp = el(doc, 'input', { type: 'text', value: readField(field, record) });
