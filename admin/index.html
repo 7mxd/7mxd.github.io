@@ -27,9 +27,14 @@
   })();
   </script>
 
+  <!-- This page answers at both /admin and /admin/, and the host redirects
+       neither, so anything naming a file inside admin/ is written from the
+       root. Written relative, "admin.css" is /admin/admin.css from one URL
+       and /admin.css from the other. The two below need no such help: ../
+       clamps at the root, so they resolve the same way from both. -->
   <link rel="stylesheet" href="../css/tokens.css" />
   <link rel="stylesheet" href="../css/base.css" />
-  <link rel="stylesheet" href="admin.css" />
+  <link rel="stylesheet" href="/admin/admin.css" />
 </head>
 <body>
   <section id="login" hidden>
@@ -64,6 +69,9 @@
     </div>
   </section>
 
-  <script type="module" src="app.js"></script>
+  <!-- Root-absolute for the reason the stylesheet above is: a 404 here is not
+       a missing script, it is a blank page, since both sections start hidden
+       and this module is what reveals one. -->
+  <script type="module" src="/admin/app.js"></script>
 </body>
 </html>
