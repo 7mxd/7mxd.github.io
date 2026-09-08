@@ -129,10 +129,16 @@ function buildPreviewBase() {
   return data;
 }
 
+// Below the 700px breakpoint the rail, the form and the preview each take the
+// whole screen and this says which one is showing. The rail is in the group
+// because at phone width it was a permanent 41% of the viewport above a
+// squeezed form — see the media query in admin/admin.css. Above the
+// breakpoint the toggle is display:none and this attribute changes nothing.
+const MOBILE_VIEWS = [['path', 'view-path-btn'], ['form', 'view-form-btn'], ['preview', 'view-preview-btn']];
+
 function setMobileView(view) {
   document.body.dataset.mobileView = view;
-  $('view-form-btn').setAttribute('aria-pressed', String(view === 'form'));
-  $('view-preview-btn').setAttribute('aria-pressed', String(view === 'preview'));
+  for (const [name, id] of MOBILE_VIEWS) $(id).setAttribute('aria-pressed', String(view === name));
 }
 
 async function boot() {
@@ -162,8 +168,7 @@ async function boot() {
     // the iframe keeps showing whatever it last rendered instead.
     if (!loadErrors[current.name]) preview.update(current.name, modelToData(current, models[current.name]));
   });
-  $('view-form-btn').onclick = () => setMobileView('form');
-  $('view-preview-btn').onclick = () => setMobileView('preview');
+  for (const [name, id] of MOBILE_VIEWS) $(id).onclick = () => setMobileView(name);
   setMobileView('form');
   buildNav();
   openCollection('profile');
@@ -258,10 +263,16 @@ function handleSelect(item) {
     const { collection, record } = resolved;
     activeEntryId = item.id;
     openCollection(collection);
+    // Before scrollToRecord, not after: at phone width the rail is a full
+    // screen of its own, so picking something on it has to hand the screen
+    // back to the form — and a panel still display:none has no geometry to
+    // scroll. Above the breakpoint both are visible and this changes nothing.
+    setMobileView('form');
     scrollToRecord(collection, record);
   } else {
     activeEntryId = null;
     openCollection(item.name);
+    setMobileView('form');
   }
 }
 
@@ -273,6 +284,7 @@ function handleAdd(kindKey) {
   dirty[kind.collection] = true;
   activeEntryId = null;
   openCollection(kind.collection);
+  setMobileView('form');
   focusRecord(kind.collection, record);
   buildNav();
 }

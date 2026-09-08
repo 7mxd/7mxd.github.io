@@ -426,22 +426,36 @@ legend {
      is otherwise obvious) keeps every control reachable without it. */
   #topbar { flex-wrap: wrap; row-gap: var(--space-2); }
   .who { display: none; }
-  .layout { grid-template-columns: 1fr; }
-  #collections {
-    flex-direction: row;
-    flex-wrap: wrap;
-    border-right: 0;
-    border-bottom: var(--rule-width) solid var(--rule);
-  }
+  /* One row for the switch, one for whatever it selected. `display: none`
+     takes the other two regions out of the grid entirely, so there are always
+     exactly two grid items and 1fr means "the rest of the screen". */
+  .layout { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+  #collections { border-right: 0; }
+  #preview-pane { border-left: 0; }
 
-  /* The form and the preview no longer fit side by side, so only one shows
-     at a time — never both, never neither. admin/app.js's setMobileView
-     stamps which one on <body> and moves aria-pressed between the two
+  /* The path, the form and the preview do not fit side by side, so exactly
+     one shows at a time — never two, never none. admin/app.js's setMobileView
+     stamps which one on <body> and moves aria-pressed between the three
      buttons below, so the switch is announced the same way any other
      pressed/unpressed control is, not left to be inferred from what changed
-     on screen. */
+     on screen.
+
+     The rail joined this group at the end of the project. It used to sit
+     above the form permanently, as a wrapping ROW — a rule inherited
+     unchanged from when it held six short file-name buttons. Rendered at
+     390x780 with the real navigation, that cost 324px, 41% of the phone
+     viewport, to show four of twenty-three entries, and squeezed the form
+     everyone actually types in into 339px underneath. The row direction did
+     not wrap anything either: The path's group is full width, so the sections
+     group beside it collapsed to its own content width, 116px, and the
+     selected row's plate ended a third of the way across while every row
+     above it ran the full width. Full screen each, one at a time, is both
+     more room and one less thing that looks wrong. */
   .view-toggle {
     display: flex;
+    /* Always the first row: it is the switch, and DOM order would otherwise
+       put it under whichever region is showing. */
+    order: -1;
     gap: var(--space-2);
     padding: var(--space-2) var(--space-4);
     border-bottom: var(--rule-width) solid var(--rule);
@@ -451,7 +465,8 @@ legend {
     border-color: var(--accent);
     color: var(--accent);
   }
-  #panel, #preview-pane { display: none; }
+  #collections, #panel, #preview-pane { display: none; }
+  body[data-mobile-view="path"] #collections { display: flex; }
   body[data-mobile-view="form"] #panel { display: block; }
   body[data-mobile-view="preview"] #preview-pane { display: block; }
 }
