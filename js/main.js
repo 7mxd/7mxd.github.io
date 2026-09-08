@@ -52,6 +52,13 @@ async function boot() {
     if (main) {
       main.innerHTML = '<p class="load-error">The page content could not be loaded. Please refresh.</p>';
     }
+  } finally {
+    // Marks the moment this page's own first render — success or failure —
+    // has landed. The admin's live preview (admin/preview.js) loads this
+    // same page in an iframe and must not paint an edit before this point,
+    // or this render would land after it and silently overwrite it.
+    document.documentElement.dataset.rendered = 'true';
+    document.dispatchEvent(new Event('site:rendered'));
   }
 }
 
