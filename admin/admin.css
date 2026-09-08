@@ -285,8 +285,20 @@ body { font-family: var(--font-meta); }
    ceiling above it — so the box still rendered at its native ~58px
    regardless of the smaller min-height. An explicit height overrides that
    default sizing outright; min-height stays alongside it as the floor
-   resize:vertical cannot be dragged past. */
-.list-item .field textarea { height: 2.5rem; min-height: 2.5rem; }
+   resize:vertical cannot be dragged past.
+
+   The selector is the scalar item itself, not `.list-item .field`. Three
+   places build a .list-item — fields.js's nested lists, forms.js's collection
+   rows and blocks-editor.js's blocks — so scoping to the row reached every
+   textarea in every list collection and every block: ten description and
+   callout blocks between 160 and 455 characters, four of them on one project,
+   plus every code block, every raw HTML block and every milestone note, all
+   edited through a box one line high (measured in Edge: 40px each). A scalar
+   row in a list of scalars is the one case this was written for, and it is
+   exactly the case whose data-path ends in a bracket: fields.js gives such a
+   row the list index as its whole path segment, while a record's own field
+   always ends in a field name. */
+.field[data-path$="]"] textarea { height: 2.5rem; min-height: 2.5rem; }
 
 .check {
   display: flex;
