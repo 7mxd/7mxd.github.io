@@ -12,6 +12,16 @@ export const QUALITY = 0.82;
 
 /** Scale so the long edge meets the cap, never enlarging. */
 export function targetSize(width, height, cap) {
+  // A zero, negative, or non-finite dimension means the file was never really
+  // decoded as an image — the realistic cause is a file that isn't actually a
+  // photograph, or one the browser couldn't decode. That number would
+  // otherwise flow straight into the width/height attributes the browser
+  // reserves layout space with, shipping exactly the layout shift the five
+  // required fields exist to prevent.
+  if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) {
+    throw new Error('This file has no usable image dimensions. It may not really be a '
+      + 'photograph, or this browser could not decode it — try a different file.');
+  }
   const long = Math.max(width, height);
   if (long <= cap) return { width, height };
   const scale = cap / long;
@@ -19,7 +29,15 @@ export function targetSize(width, height, cap) {
 }
 
 export function derivedPaths(filename) {
-  const slug = sanitizeFilename(filename).replace(/\.[^.]+$/, '');
+  const stripped = sanitizeFilename(filename).replace(/\.[^.]+$/, '');
+  // A filename that is punctuation only (no letter or digit survives
+  // sanitizeFilename's slugging — "!!!.jpg", "...jpg", "----.jpg") used to
+  // strip down to an empty slug, so every such photograph wrote the same
+  // bare "-1600.jpg" and silently overwrote whichever one uploaded last.
+  // Falling back to a fixed name removes the empty-string case; attachPhoto's
+  // own collision handling is what keeps two *different* fallback uploads
+  // from then colliding with each other, the same as any other repeated slug.
+  const slug = stripped || 'photo';
   return {
     slug,
     large: `assets/photos/derived/${slug}-1600.jpg`,
@@ -62,13 +80,46 @@ const toBase64 = (buf) => {
   return btoa(s);
 };
 
+async function pathExists(client, path) {
+  try { await client.getFile(path); return true; } catch (_) { return false; }
+}
+
+/** derivedPaths is a pure function of the filename alone, so two different
+ *  photographs that happen to share a filename — an ordinary thing for a
+ *  camera to do, and the admin's own test fixture (`IMG_2481 (1).HEIC`) is
+ *  that shape — resolve to the same slug and would otherwise silently
+ *  overwrite each other's derivatives. Telling "the owner re-uploading a
+ *  replacement into this exact field" apart from "an unrelated photo that
+ *  happens to collide" needs the record being edited and the server's
+ *  existing files, so it lives here rather than in derivedPaths. */
+async function resolvePaths(file, record, client) {
+  const candidate = derivedPaths(file.name);
+  // The record already points at this exact path: the owner is replacing the
+  // photo in this field, which is what "re-upload" means. Overwrite it.
+  if (record.src === candidate.large) return candidate;
+  // Nobody's using this slug yet — safe to claim it as-is.
+  if (!(await pathExists(client, candidate.large))) return candidate;
+  // The slug is taken by something else. Do not overwrite a stranger's
+  // photograph; find the first numbered variant that's free and use it for
+  // both derivatives, so the pair stays together under one new slug.
+  let n = 2;
+  for (;;) {
+    const slug = `${candidate.slug}-${n}`;
+    const large = `assets/photos/derived/${slug}-1600.jpg`;
+    if (!(await pathExists(client, large))) {
+      return { slug, large, small: `assets/photos/derived/${slug}-800.jpg` };
+    }
+    n += 1;
+  }
+}
+
 export async function attachPhoto(file, record, field, client) {
   const bitmap = await bitmapUpright(file);
   if (bitmap.__orientationUnknown) {
     throw new Error('This browser cannot read the photo\'s rotation. '
       + 'Rotate it in Photos first, then upload.');
   }
-  const paths = derivedPaths(file.name);
+  const paths = await resolvePaths(file, record, client);
   const large = await encode(bitmap, CAPS[0]);
   const small = await encode(bitmap, CAPS[1]);
 
