@@ -18,6 +18,16 @@ export function blankValue(field) {
     }
     case 'boolean': return false;
     case 'blocks': return [];
+    // A <select> shows nothing at all for a value no option carries, and the
+    // blank value for a select is the empty string, which no option carries.
+    // So a new milestone's Kind and a new skills category's Display type
+    // rendered blank, and cleanObject then dropped the key on save — a
+    // milestone with no kind, a category with no type. A new record starts on
+    // a real option instead. (Only new records: this is blankValue, which
+    // builds what Add creates. buildFormModel, which reads an existing file,
+    // is deliberately untouched — inventing a value there would write it into
+    // a file that never had it.)
+    case 'select': return field.options?.[0]?.value ?? '';
     default: return '';
   }
 }
@@ -149,10 +159,29 @@ export function renderField(doc, field, record, ctx, pathPrefix = '') {
   if (id) {
     const label = el(doc, 'label', { textContent: labelText });
     label.htmlFor = id;
+    // The pre-branch renderer appended " *" to a required caption and this
+    // one dropped it, so nothing said which fields Save would refuse until it
+    // refused. The asterisk is back, but it is not the signal: it is
+    // aria-hidden, and the control below carries the `required` attribute,
+    // which is what a screen reader actually announces. An asterisk alone is
+    // a convention a sighted reader has learned, not information.
+    if (field.required) {
+      const star = el(doc, 'span', { className: 'req', textContent: '*' });
+      star.setAttribute('aria-hidden', 'true');
+      label.appendChild(star);
+    }
     wrap.appendChild(label);
   }
   const path = composePath(pathPrefix, field.name);
-  wrap.appendChild(controlFor(doc, field, record, ctx, id, path));
+  const control = controlFor(doc, field, record, ctx, id, path);
+  // The half of the required marker a screen reader reads. Set on the element
+  // rather than as aria-required so the browser exposes it natively; there is
+  // no <form> around any of this, so it gates nothing and blocks no submit —
+  // Save validates through admin/validate.js exactly as before. An image
+  // field hands back a wrapper rather than a form control, so it sets this on
+  // its own text input instead (see imageControl).
+  if (field.required && id && 'required' in control) control.required = true;
+  wrap.appendChild(control);
   wrap.dataset.path = path;
   return wrap;
 }
@@ -215,8 +244,19 @@ function controlFor(doc, field, record, ctx, id, path) {
     case 'image': return imageControl(doc, field, record, ctx, id);
     case 'object': {
       const set = groupSet(doc, field);
+      // readField never returns null: a null object field reads as a blank
+      // object so the controls below have somewhere to write. Assigning that
+      // blank object straight back onto the record turned `"link": null` into
+      // `{}` on the first render, before a single key was pressed —
+      // cleanObject's null guard then never fired and the key was dropped from
+      // the file on the next save, for the five milestones that carry it. So
+      // the record is left exactly as it was, and the blank object is attached
+      // only if something is actually typed into it: the first `input` from
+      // anywhere inside this fieldset, which is also what every nested
+      // control, checkbox, select, list and upload already dispatches.
       const value = readField(field, record);
-      record[field.name] = value;
+      const attach = () => { if (record[field.name] !== value) record[field.name] = value; };
+      set.addEventListener('input', attach);
       const draw = () => drawFields(doc, set, field.fields, value, ctx, path);
       draw();
       ownsRecord(set, value, draw);
@@ -314,6 +354,7 @@ function imageControl(doc, field, record, ctx, id) {
   const rule = uploadRule(field.accept);
   const inp = el(doc, 'input', { type: 'text', value: readField(field, record) });
   if (id) inp.id = id;
+  if (field.required) inp.required = true;
   inp.addEventListener('input', () => writeField(field, record, inp.value));
   const thumb = el(doc, 'img', { className: 'thumb' });
   const showThumb = () => {

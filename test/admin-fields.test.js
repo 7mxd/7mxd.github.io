@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readField, writeField, blankValue, moveItem } from '../admin/fields.js';
+import { COLLECTIONS, getCollection } from '../admin/schema.js';
 
 test('a number field writes a Number, never the input string', () => {
   // Image width and height become HTML attributes the browser reserves space
@@ -75,6 +76,39 @@ test('blankValue matches the shape the field declares', () => {
   assert.strictEqual(blankValue({ type: 'boolean' }), false);
   assert.strictEqual(blankValue({ type: 'number' }), '');
   assert.strictEqual(blankValue({ type: 'string' }), '');
+});
+
+// A <select> shows nothing at all for a value no option carries, and '' is
+// what no option carries. So a new milestone's Kind and a new skills
+// category's Display type rendered blank (Edge: value "", selectedIndex -1),
+// and cleanObject then dropped the key on save — a milestone with no kind.
+test('a new record starts a select on a real option, never blank', () => {
+  const kind = getCollection('milestones').itemFields.find((f) => f.name === 'kind');
+  assert.equal(blankValue(kind), 'certification');
+  const type = getCollection('skills').itemFields.find((f) => f.name === 'type');
+  assert.equal(blankValue(type), 'tags');
+  // Through the path the Add button actually takes: a whole blank record.
+  const record = blankValue({ type: 'object', fields: getCollection('skills').itemFields });
+  assert.equal(record.type, 'tags');
+});
+
+test('every select anyone can add has an option to start on', () => {
+  // blankValue can only pick a real option if there is one to pick.
+  const seen = [];
+  const walk = (fields, where) => {
+    for (const f of fields ?? []) {
+      if (f.type === 'select') seen.push([`${where}.${f.name}`, (f.options || []).length]);
+      walk(f.fields, `${where}.${f.name}`);
+      if (f.itemField) walk([f.itemField], `${where}.${f.name}`);
+    }
+  };
+  for (const c of COLLECTIONS) walk(c.kind === 'single' ? c.fields : c.itemFields, c.name);
+  for (const [type, entry] of Object.entries(REGISTRY)) {
+    if (type.startsWith('_')) continue;
+    walk(entry.fields, `block:${type}`);
+  }
+  assert.ok(seen.length >= 3, 'no selects found at all — the walk is wrong');
+  for (const [where, count] of seen) assert.ok(count > 0, `${where} is a select with no options`);
 });
 
 test('a new record in a list of records has every declared key', () => {

@@ -262,12 +262,26 @@ body { font-family: var(--font-meta); }
 }
 
 .field { margin-bottom: var(--space-4); display: flex; flex-direction: column; gap: var(--space-1); }
-.field > label {
+/* :not(.check) because a checkbox's caption is also a <label> and also a
+   direct child of .field — and `.field > label` out-specifies `.check`, so
+   without this every checkbox caption rendered muted and extra small instead
+   of the ink at small size .check asks for, and .check's own colour and size
+   were simply dead. */
+.field > label:not(.check) {
   font-family: var(--font-meta);
   font-size: var(--text-xs);
   color: var(--ink-muted);
 }
-.field input[type="text"], .field input:not([type]), .field textarea, .field select {
+/* The asterisk on a required field's caption. It is aria-hidden and the
+   control itself carries `required`, so nothing here is the only signal —
+   this is the visible half of a pair, the same way .field-error is. */
+.req {
+  margin-left: var(--space-1);
+  color: var(--danger);
+}
+/* input[type="number"] was in none of these: every order, width and height
+   field rendered as a bare user-agent control among tokenised ones. */
+.field input[type="text"], .field input[type="number"], .field input:not([type]), .field textarea, .field select {
   width: 100%;
   padding: var(--space-2);
   border: var(--rule-width) solid var(--rule);

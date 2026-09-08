@@ -23,6 +23,49 @@ import { validateModel } from '../admin/validate.js';
 const repoFile = (rel) => new URL(`../${rel}`, import.meta.url);
 const readJson = (rel) => JSON.parse(readFileSync(repoFile(rel), 'utf8'));
 
+// The renderer is the third thing on the path from a file to a saved file, and
+// it was the only one this test could not see: model -> data alone cannot
+// catch a mutation that happens while the form is being drawn. It caught one
+// as soon as it could — controlFor's object branch assigned readField's result
+// back onto the record, so `"link": null` became `{}` on the very first
+// render, cleanObject's null guard stopped firing, and the key vanished from
+// five milestones on the next save with nothing typed.
+//
+// The fake below is the handful of members admin/fields.js, forms.js and
+// blocks-editor.js actually touch — not a DOM, no jsdom, no dependency, in
+// keeping with this project's rule that admin tests run in Node. It is a
+// deliberately dumb stand-in: it can be built into and read back, and that is
+// all this test needs.
+class FakeNode {
+  constructor(tag) {
+    this.tagName = String(tag).toUpperCase();
+    this.childNodes = [];
+    this.dataset = {};
+    this.className = '';
+  }
+  get children() { return this.childNodes.filter((n) => n instanceof FakeNode); }
+  appendChild(n) { this.childNodes.push(n); return n; }
+  append(...ns) { for (const n of ns) this.childNodes.push(n); }
+  set innerHTML(v) { if (v === '') this.childNodes = []; }
+  get innerHTML() { return ''; }
+  setAttribute() {}
+  addEventListener() {}
+  querySelectorAll() { return []; }
+  remove() {}
+}
+globalThis.document = {
+  createElement: (t) => new FakeNode(t),
+  createTextNode: (t) => ({ text: t }),
+};
+
+const { renderForm } = await import('../admin/forms.js');
+const { renderBlocks } = await import('../admin/blocks-editor.js');
+const RENDER_CTX = {
+  registry: readJson('data/blocks-registry.json'),
+  renderBlocks,
+  uploadImage: async () => {},
+};
+
 for (const collection of COLLECTIONS) {
   test(`${collection.name}: a save with no edits returns ${collection.file} unchanged`, () => {
     const original = readJson(collection.file);
@@ -32,6 +75,18 @@ for (const collection of COLLECTIONS) {
       original,
       `saving ${collection.file} through the admin would change it. Every field ` +
         'in the file must be declared in admin/schema.js, or it is dropped.',
+    );
+  });
+
+  test(`${collection.name}: drawing the form changes nothing a save would write`, () => {
+    const original = readJson(collection.file);
+    const model = buildFormModel(collection, original);
+    renderForm(new FakeNode('main'), collection, model, RENDER_CTX);
+    assert.deepEqual(
+      modelToData(collection, model),
+      original,
+      `opening ${collection.file} in the admin and saving it, with nothing ` +
+        'typed, would change the file. The render must read the model, never write it.',
     );
   });
 
