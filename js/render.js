@@ -358,8 +358,13 @@ function renderSkills(doc, skills) {
   // few — the point is what stands out, not how much does.
   const groups = skills.categories.map((cat) => {
     const items = cat.items.map((i) => {
+      // Parenthesised, which is how Ahmed's own CV sets these. "Arabic Native"
+      // ran the pair together as two equal words, and the row read as six
+      // items rather than three with their levels. Bold would separate them
+      // too, but bold already means "used most" here — the legend above says
+      // so — and a second meaning for it would undo that.
       const level = cat.type === 'languages' && i.level
-        ? ` <span class="skill-level">${escapeHtml(i.level)}</span>`
+        ? ` <span class="skill-level">(${escapeHtml(i.level)})</span>`
         : '';
       return `<li${i.primary ? ' class="is-primary"' : ''}>${escapeHtml(i.name)}${level}</li>`;
     }).join('');
