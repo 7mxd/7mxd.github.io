@@ -156,3 +156,35 @@ test('no two records share an id, so source.id addresses exactly one', () => {
   const ids = groups.flatMap((g) => g.entries).map((e) => e.source.id);
   assert.equal(new Set(ids).size, ids.length, 'duplicate id across the timeline');
 });
+
+test('source.id points to a record that actually exists in the named collection', () => {
+  // Build the set of valid IDs in each collection file. For nested structures
+  // (like roles inside companies), include both parent and nested IDs.
+  const validIds = {
+    experience: new Set(
+      (REAL.experience.items ?? []).flatMap((company) => [
+        ...(company.roles ?? []).map((role) => role.id),
+      ])
+    ),
+    education: new Set(
+      (REAL.education.items ?? []).map((item) => item.id)
+    ),
+    projects: new Set(
+      (REAL.projects.items ?? []).map((item) => item.id)
+    ),
+    milestones: new Set(
+      (REAL.milestones.items ?? []).map((item) => item.id)
+    ),
+  };
+
+  const groups = buildTimeline(REAL);
+  const entries = groups.flatMap((g) => g.entries);
+  for (const e of entries) {
+    const validSet = validIds[e.source.collection];
+    assert.ok(validSet, `unknown collection: ${e.source.collection}`);
+    assert.ok(
+      validSet.has(e.source.id),
+      `entry ${e.id}: source ${e.source.collection}/${e.source.id} does not exist in the data`
+    );
+  }
+});
