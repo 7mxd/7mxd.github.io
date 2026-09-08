@@ -188,3 +188,16 @@ export const COLLECTIONS = [
 export const UNMANAGED_DATA_FILES = ['blocks-registry.json'];
 
 export function getCollection(name) { return COLLECTIONS.find(c => c.name === name); }
+
+/** What "add an entry" offers, and where each one lands. The admin is organised
+ *  around the timeline rather than the files, so this is the only place that
+ *  knows a certificate lives in milestones.json and a job is a role nested
+ *  inside a company. */
+export const TIMELINE_KINDS = [
+  { key:'job', label:'Job', collection:'experience', defaults:{} },
+  { key:'education', label:'Education', collection:'education', defaults:{} },
+  { key:'project', label:'Project', collection:'projects', defaults:{ timeline:true } },
+  { key:'certification', label:'Certificate', collection:'milestones', defaults:{ kind:'certification' } },
+  { key:'award', label:'Award', collection:'milestones', defaults:{ kind:'award' } },
+  { key:'volunteering', label:'Volunteering', collection:'milestones', defaults:{ kind:'volunteering' } },
+];

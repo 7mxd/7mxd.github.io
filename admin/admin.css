@@ -53,7 +53,7 @@ body { font-family: var(--font-meta); }
 #app:not([hidden]) {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100vh;
 }
 
 #topbar {
@@ -109,12 +109,18 @@ body { font-family: var(--font-meta); }
   min-height: 0;
 }
 
+/* The path can run past thirty rows once every job, course, project and
+   certificate is on it — far more than the flat file list this replaced ever
+   held. Scoping the scroll to the sidebar itself, instead of the whole page,
+   keeps the open record in #panel on screen while reaching for an entry or
+   Add entry further down the rail. */
 #collections {
   border-right: var(--rule-width) solid var(--rule);
   padding: var(--space-4) var(--space-2);
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
+  overflow-y: auto;
 }
 #collections button {
   text-align: left;
@@ -131,9 +137,51 @@ body { font-family: var(--font-meta); }
   color: var(--accent);
 }
 
+/* nav.js draws two .nav-group blocks into #collections: The path (every
+   timeline entry, in site order) and the remaining sections. Buttons inside
+   either one are plain #collections buttons above, styling and
+   aria-current alike — this only adds the group and list scaffolding
+   #collections's own flat button list never needed. */
+.nav-group:not(:last-child) { margin-bottom: var(--space-4); }
+.nav-heading {
+  font-family: var(--font-meta);
+  font-size: var(--text-xs);
+  color: var(--ink-muted);
+  margin: 0 0 var(--space-2);
+  padding: 0 var(--space-3);
+}
+.nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.nav-list button { width: 100%; }
+
+.nav-add {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  font-family: var(--font-meta);
+  font-size: var(--text-xs);
+  color: var(--ink-muted);
+}
+.nav-add select {
+  font-family: var(--font-meta);
+  font-size: var(--text-sm);
+  padding: var(--space-2);
+  border: var(--rule-width) solid var(--rule);
+  background: var(--ground-raised);
+  color: var(--ink);
+}
+
 #panel {
   padding: var(--space-6);
   max-width: var(--measure-wide);
+  overflow-y: auto;
 }
 
 .field { margin-bottom: var(--space-4); display: flex; flex-direction: column; gap: var(--space-1); }

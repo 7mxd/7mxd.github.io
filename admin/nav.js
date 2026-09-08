@@ -1,0 +1,95 @@
+/** The admin's own navigation: a list of what is actually on the timeline,
+ *  in the order the timeline itself puts it, instead of a list of files.
+ *
+ *  Pure DOM construction, deliberately uncovered by tests (see
+ *  admin/timeline-edit.js's header for why) — the logic worth testing, what
+ *  a click resolves to and what "Add entry" produces, lives there. `doc` is
+ *  threaded through rather than reading `document` directly so a later live
+ *  preview can render this same nav into a second document. */
+import { TIMELINE_KINDS } from './schema.js';
+
+const el = (doc, tag, props = {}) => Object.assign(doc.createElement(tag), props);
+
+/** Interface labels: what kind of thing a row is, not anything Ahmed wrote.
+ *  buildTimeline() only stamps the coarse kind (role/education/project/
+ *  milestone) onto a composed entry — the finer milestone kind (certificate,
+ *  award, volunteering) lives on the record behind it. Re-deriving that here
+ *  would mean resolving every row just to label it, which is exactly the
+ *  "one implementation of the composition" rule admin/timeline-edit.js
+ *  exists to keep. "Milestone" is close enough for a nav row. */
+const KIND_LABELS = { role: 'Job', education: 'Education', project: 'Project', milestone: 'Milestone' };
+
+function formatDate(entry) {
+  if (!entry.badge) return String(entry.year ?? '');
+  return entry.badge.month ? `${entry.badge.month} ${entry.badge.year}` : entry.badge.year;
+}
+
+function pathGroup(doc, entries, onSelect, onAdd) {
+  const group = el(doc, 'div', { className: 'nav-group' });
+  group.appendChild(el(doc, 'h2', { className: 'nav-heading', textContent: 'The path' }));
+
+  const list = el(doc, 'ul', { className: 'nav-list' });
+  for (const entry of entries) {
+    const li = el(doc, 'li');
+    const btn = el(doc, 'button', {
+      type: 'button',
+      className: 'nav-entry',
+      textContent: `${formatDate(entry)} · ${entry.title} · ${KIND_LABELS[entry.kind] || entry.kind}`,
+    });
+    btn.dataset.entryId = entry.id;
+    btn.setAttribute('aria-current', 'false');
+    btn.addEventListener('click', () => onSelect(entry));
+    li.appendChild(btn);
+    list.appendChild(li);
+  }
+  group.appendChild(list);
+
+  // A <label> wrapping its control needs no id to point at — the browser
+  // already treats the select as the label's accessible control.
+  const add = el(doc, 'label', { className: 'nav-add' });
+  add.appendChild(el(doc, 'span', { textContent: 'Add entry' }));
+  const select = el(doc, 'select');
+  select.appendChild(el(doc, 'option', { value: '', textContent: 'Choose a kind…', selected: true, disabled: true }));
+  for (const kind of TIMELINE_KINDS) {
+    select.appendChild(el(doc, 'option', { value: kind.key, textContent: kind.label }));
+  }
+  select.addEventListener('change', () => {
+    if (!select.value) return;
+    onAdd(select.value);
+    select.value = '';
+  });
+  add.appendChild(select);
+  group.appendChild(add);
+
+  return group;
+}
+
+function sectionsGroup(doc, sections, onSelect) {
+  const group = el(doc, 'div', { className: 'nav-group' });
+  const list = el(doc, 'ul', { className: 'nav-list' });
+  for (const section of sections) {
+    const li = el(doc, 'li');
+    const btn = el(doc, 'button', { type: 'button', className: 'nav-section', textContent: section.label });
+    btn.dataset.sectionName = section.name;
+    btn.setAttribute('aria-current', 'false');
+    btn.addEventListener('click', () => onSelect(section));
+    li.appendChild(btn);
+    list.appendChild(li);
+  }
+  group.appendChild(list);
+  return group;
+}
+
+/** Draws the nav into a fragment: The path (every timeline entry, in site
+ *  order, plus Add entry) followed by the sections that aren't on it.
+ *  `onSelect` is called with whichever item was clicked — a timeline entry
+ *  (carrying `.source`) or a section descriptor (`{ name, label }`); telling
+ *  those apart and opening the right collection is app.js's job, since
+ *  that's also where resolveEntry and the one-model-per-collection state
+ *  live. `onAdd` is called with a TIMELINE_KINDS key. */
+export function renderNav(doc, { sections, entries, onSelect, onAdd }) {
+  const frag = doc.createDocumentFragment();
+  frag.appendChild(pathGroup(doc, entries, onSelect, onAdd));
+  frag.appendChild(sectionsGroup(doc, sections, onSelect));
+  return frag;
+}
