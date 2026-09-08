@@ -35,6 +35,16 @@ test('an oauth success with no token is reported', () => {
   assert.equal(r.reason, 'no-token');
 });
 
+test('a wrong-origin message claiming to be our own OAuth success is fatal', () => {
+  // The exact shape of the original outage: the callback posts the real
+  // oauth:success payload, but to the wrong origin. This is the one
+  // wrong-origin case that must abort sign-in loudly rather than be ignored.
+  const event = { origin: 'https://evil.example', data: good };
+  const r = classifyAuthMessage(event, ORIGIN);
+  assert.equal(r.reason, 'wrong-origin');
+  assert.equal(isFatalAuthFailure(event, r), true);
+});
+
 test('an unrelated foreign message is not a fatal classification', () => {
   // Any script, browser extension, or embedded frame can postMessage to this
   // window. A wrong-origin verdict alone must not abort a legitimate sign-in
