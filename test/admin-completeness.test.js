@@ -45,8 +45,12 @@ for (const collection of COLLECTIONS) {
     const declared = new Set(declaredPaths(fields));
 
     const present = [...new Set(records.flatMap((r) => keyPaths(r)))];
-    // `blocks` contents are declared by the registry, not the schema.
-    const missing = present.filter((p) => !declared.has(p) && !p.startsWith('blocks.') && p !== 'type');
+    // `blocks` contents are declared by the registry, not the schema. This has
+    // to be a segment check rather than a prefix check: a role's blocks live
+    // at `roles.blocks.*`, not at the top of the path, so `startsWith('blocks.')`
+    // would miss them and call editable keys uneditable the moment a role
+    // actually has a block in it.
+    const missing = present.filter((p) => !declared.has(p) && !p.split('.').includes('blocks'));
     assert.deepEqual(missing, [],
       `${collection.file} has keys the admin cannot edit: ${missing.join(', ')}`);
   });
