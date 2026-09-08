@@ -11,21 +11,22 @@ import { escapeHtml, renderBlocks, imageMarkup, srcsetAttr } from './blocks.js';
  *    entry, half of a pair   268px at 1280, 283px at 768   -> 18rem
  *    Selected Work column    193px (the height cap binds, see below)
  *
- *  `capPx` is the CSS max-height on the image. For a portrait photograph that
- *  cap binds before the slot width does, which pins the rendered width to a
- *  fixed number — no media query needed, and no viewport at which it is wrong.
- *  css/sections.css caps .gallery.is-single at 30rem and .work .gallery at
- *  26rem; a slot with no cap carries 0. */
+ *  `capPx` is the CSS max-height on the image, in pixels. For a portrait
+ *  photograph that cap binds before the slot width does, which pins the
+ *  rendered width to a fixed number — no media query needed, and no viewport at
+ *  which it is wrong. It is --photo-cap from css/tokens.css, one number for
+ *  every gallery; test/render.test.js reads the token and fails if these drift
+ *  from it, because a stale capPx silently asks the browser for the wrong file. */
 const GALLERY_SLOTS = {
   entry: {
-    single: { sizes: '(min-width: 40rem) 37rem, calc(100vw - 2.5rem)', maxPx: 592, capPx: 480 },
-    full:   { sizes: '(min-width: 40rem) 37rem, 60vw', maxPx: 592, capPx: 0 },
-    column: { sizes: '(min-width: 40rem) 18rem, 60vw', maxPx: 288, capPx: 0 },
+    single: { sizes: '(min-width: 40rem) 37rem, calc(100vw - 2.5rem)', maxPx: 592, capPx: 384 },
+    full:   { sizes: '(min-width: 40rem) 37rem, 60vw', maxPx: 592, capPx: 384 },
+    column: { sizes: '(min-width: 40rem) 18rem, 60vw', maxPx: 288, capPx: 384 },
   },
   work: {
-    single: { sizes: '(min-width: 40rem) 42rem, calc(100vw - 2.5rem)', maxPx: 674, capPx: 416 },
-    full:   { sizes: '(min-width: 40rem) 13rem, 70vw', maxPx: 208, capPx: 416 },
-    column: { sizes: '(min-width: 40rem) 13rem, 70vw', maxPx: 208, capPx: 416 },
+    single: { sizes: '(min-width: 40rem) 42rem, calc(100vw - 2.5rem)', maxPx: 674, capPx: 384 },
+    full:   { sizes: '(min-width: 40rem) 13rem, 70vw', maxPx: 208, capPx: 384 },
+    column: { sizes: '(min-width: 40rem) 13rem, 70vw', maxPx: 208, capPx: 384 },
   },
 };
 

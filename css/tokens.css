@@ -42,6 +42,16 @@
   --measure-nav: 58rem;
   --gutter: clamp(1.25rem, 0.5rem + 3vw, 4rem);
 
+  /* Every photograph's height ceiling, wherever it appears. One number rather
+     than three: the timeline capped singles at 30rem and Selected Work at
+     26rem, and grid photographs had no ceiling at all, so a portrait rendered
+     480px tall beside a landscape at 379 and the column alternated between
+     wide-and-short and narrow-and-tall. 24rem is the height a landscape
+     naturally reaches at the reading measure, so both shapes now land on the
+     same line and only their widths differ — which is the most two different
+     aspect ratios can agree on without cropping one of them. */
+  --photo-cap: 24rem;
+
   --rule-width: 1px;
   --focus-width: 2px;
 
