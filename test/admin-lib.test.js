@@ -12,7 +12,7 @@ test('serializeJson is 2-space with trailing newline', () => {
 test('sanitizeFilename lowercases, dashes spaces, keeps extension', () => {
   assert.equal(sanitizeFilename('My Logo (1).PNG'), 'my-logo-1.png');
 });
-test('validateImage accepts png under 2MB', () => {
+test('validateImage accepts png under 12MB', () => {
   assert.deepEqual(validateImage({type:'image/png', size: 500000}), {ok:true});
 });
 test('validateImage rejects disallowed type', () => {
@@ -20,6 +20,6 @@ test('validateImage rejects disallowed type', () => {
   assert.equal(r.ok, false); assert.match(r.error, /type/i);
 });
 test('validateImage rejects oversize', () => {
-  const r = validateImage({type:'image/png', size: 3*1024*1024});
-  assert.equal(r.ok, false); assert.match(r.error, /2 ?MB|large/i);
+  const r = validateImage({type:'image/png', size: 13*1024*1024});
+  assert.equal(r.ok, false); assert.match(r.error, /12 ?MB|large/i);
 });

@@ -1,0 +1,89 @@
+/** Everything tools/process_photos.py does, in the browser, so a photograph can
+ *  be added from a phone with no developer step.
+ *
+ *  The original is deliberately not committed. It costs the Python tool the
+ *  ability to regenerate an admin-added photograph if the sizes ever change;
+ *  it saves uploading four megabytes over mobile data before a save completes.
+ *  That is a UX decision before it is a storage one. */
+import { sanitizeFilename } from './lib.js';
+
+export const CAPS = [1600, 800];
+export const QUALITY = 0.82;
+
+/** Scale so the long edge meets the cap, never enlarging. */
+export function targetSize(width, height, cap) {
+  const long = Math.max(width, height);
+  if (long <= cap) return { width, height };
+  const scale = cap / long;
+  return { width: Math.round(width * scale), height: Math.round(height * scale) };
+}
+
+export function derivedPaths(filename) {
+  const slug = sanitizeFilename(filename).replace(/\.[^.]+$/, '');
+  return {
+    slug,
+    large: `assets/photos/derived/${slug}-1600.jpg`,
+    small: `assets/photos/derived/${slug}-800.jpg`,
+  };
+}
+
+/** Apply the EXIF rotation to the pixels before anything else touches them.
+ *  Stripping metadata first is exactly the bug tools/process_photos.py carried
+ *  until September 2026: it rebuilt from raw pixels and threw the orientation
+ *  tag away with everything else, so a portrait phone photo shipped sideways. */
+async function bitmapUpright(file) {
+  try {
+    return await createImageBitmap(file, { imageOrientation: 'from-image' });
+  } catch (_) {
+    // Feature-detect rather than ship a sideways photograph silently.
+    const bmp = await createImageBitmap(file);
+    bmp.__orientationUnknown = true;
+    return bmp;
+  }
+}
+
+async function encode(bitmap, cap) {
+  const { width, height } = targetSize(bitmap.width, bitmap.height, cap);
+  const canvas = new OffscreenCanvas(width, height);
+  const ctx = canvas.getContext('2d');
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(bitmap, 0, 0, width, height);
+  // Re-encoding through a canvas drops every metadata block, which is the same
+  // guarantee the Python tool gets by rebuilding from raw pixels.
+  const blob = await canvas.convertToBlob({ type: 'image/jpeg', quality: QUALITY });
+  return { blob, width, height };
+}
+
+const toBase64 = (buf) => {
+  let s = '';
+  const bytes = new Uint8Array(buf);
+  for (let i = 0; i < bytes.length; i += 1) s += String.fromCharCode(bytes[i]);
+  return btoa(s);
+};
+
+export async function attachPhoto(file, record, field, client) {
+  const bitmap = await bitmapUpright(file);
+  if (bitmap.__orientationUnknown) {
+    throw new Error('This browser cannot read the photo\'s rotation. '
+      + 'Rotate it in Photos first, then upload.');
+  }
+  const paths = derivedPaths(file.name);
+  const large = await encode(bitmap, CAPS[0]);
+  const small = await encode(bitmap, CAPS[1]);
+
+  for (const [path, out] of [[paths.large, large], [paths.small, small]]) {
+    let sha = null;
+    try { sha = (await client.getFile(path)).sha; } catch (_) { sha = null; }
+    const b64 = toBase64(await out.blob.arrayBuffer());
+    await client.putBinary(path, b64, sha, `admin: add ${path.split('/').pop()}`);
+  }
+
+  // The site requires all five; typing them by hand is how they go wrong.
+  record.src = paths.large;
+  record.srcSmall = paths.small;
+  record.width = large.width;
+  record.height = large.height;
+  record.widthSmall = small.width;
+  return paths.large;
+}

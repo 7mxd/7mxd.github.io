@@ -7,6 +7,7 @@ import { getToken, signIn, signOut } from './auth.js';
 import { renderForm } from './forms.js';
 import { renderBlocks } from './blocks-editor.js';
 import { pickAndUpload } from './media.js';
+import { attachPhoto } from './photos.js';
 import { buildTimeline } from '../js/timeline.js';
 import { resolveEntry, newRecordFor, placeRecord, locate } from './timeline-edit.js';
 import { renderNav } from './nav.js';
@@ -258,9 +259,18 @@ function openCollection(name) {
   current = getCollection(name);
   const ctx = {
     registry, client, renderBlocks,
-    // Task 10 replaces this with attachPhoto, which derives web-sized copies.
+    // A photograph's large source is always named `src` — in both
+    // admin/schema.js's imageFields and the block registry's `image` block —
+    // so route on the field name: `src` gets resized, uprighted, and has all
+    // five fields (src, srcSmall, width, height, widthSmall) filled by
+    // attachPhoto; everything else (a logo's default/light/dark, an SVG)
+    // goes through pickAndUpload unchanged.
     uploadImage: async (file, record, field) => {
-      record[field.name] = await pickAndUpload(client, file);
+      if (field.name === 'src') {
+        await attachPhoto(file, record, field, client);
+      } else {
+        record[field.name] = await pickAndUpload(client, file);
+      }
     },
     onError: (e) => setStatus('Upload failed: ' + e.message, 'error'),
   };

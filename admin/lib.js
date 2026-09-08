@@ -1,5 +1,9 @@
 const IMG_TYPES = ['image/png', 'image/jpeg', 'image/svg+xml', 'image/webp'];
-const MAX_IMG = 2 * 1024 * 1024;
+// A phone photograph is routinely 3-5 MB and the old 2 MB cap rejected them —
+// including the 2.1 MB Honors Day picture added in September 2026. The
+// committed output is bounded by the resize, not by the source, so the input
+// limit only needs to stop something absurd.
+const MAX_IMG = 12 * 1024 * 1024;
 
 export function toBase64(str) {
   if (typeof Buffer !== 'undefined') return Buffer.from(str, 'utf8').toString('base64');
@@ -20,6 +24,6 @@ export function sanitizeFilename(name) {
 }
 export function validateImage({ type, size }) {
   if (!IMG_TYPES.includes(type)) return { ok: false, error: `Unsupported type ${type}. Allowed: PNG, JPEG, SVG, WebP.` };
-  if (size > MAX_IMG) return { ok: false, error: 'Image too large (max 2MB).' };
+  if (size > MAX_IMG) return { ok: false, error: `Image too large (max ${MAX_IMG / (1024 * 1024)}MB).` };
   return { ok: true };
 }
