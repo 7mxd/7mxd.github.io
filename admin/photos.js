@@ -80,8 +80,51 @@ const toBase64 = (buf) => {
   return btoa(s);
 };
 
-async function pathExists(client, path) {
-  try { await client.getFile(path); return true; } catch (_) { return false; }
+// A collision candidate can only ever be too many numbered variants deep if
+// something is very wrong (a stuck loop, a client that never reports a path
+// as free); this is "stop and tell the owner" territory, not a number a real
+// photograph library should ever reach.
+const MAX_SLUG_VARIANTS = 50;
+
+/** getFile's real contract (admin/github.js): a missing file *resolves* with
+ *  `sha: null` — it does not throw for "not found". It throws only for a
+ *  genuine failure (a non-404 error status, or the fetch itself failing).
+ *  Reading a thrown error as "the path is free" would silently resume the
+ *  overwriting this whole check exists to prevent, so it is not caught here:
+ *  it propagates, re-wrapped with a message that names the path and points
+ *  at the underlying cause. */
+async function pathIsTaken(client, path) {
+  let sha;
+  try {
+    ({ sha } = await client.getFile(path));
+  } catch (e) {
+    throw new Error(`Could not check whether "${path}" already exists (${e.message}). `
+      + 'Try uploading again.');
+  }
+  return sha != null;
+}
+
+function pathsForSlug(slug) {
+  return {
+    slug,
+    large: `assets/photos/derived/${slug}-1600.jpg`,
+    small: `assets/photos/derived/${slug}-800.jpg`,
+  };
+}
+
+/** The slug a committed large-derivative path was built from, or null if the
+ *  path isn't shaped like one (a blank field, or a hand-typed path). */
+function slugOfLargePath(path) {
+  const m = typeof path === 'string' && /^assets\/photos\/derived\/(.+)-1600\.jpg$/.exec(path);
+  return m ? m[1] : null;
+}
+
+/** True when `existingSlug` is the exact slug a filename produces, or a
+ *  numbered variant of it assigned by an earlier collision (`slug-2`,
+ *  `slug-3`, ...). Slugs are sanitizeFilename output: lowercase letters,
+ *  digits, and hyphens only, so embedding one in a RegExp needs no escaping. */
+function sameSlugFamily(existingSlug, slug) {
+  return existingSlug === slug || new RegExp(`^${slug}-\\d+$`).test(existingSlug);
 }
 
 /** derivedPaths is a pure function of the filename alone, so two different
@@ -94,23 +137,31 @@ async function pathExists(client, path) {
  *  existing files, so it lives here rather than in derivedPaths. */
 async function resolvePaths(file, record, client) {
   const candidate = derivedPaths(file.name);
-  // The record already points at this exact path: the owner is replacing the
-  // photo in this field, which is what "re-upload" means. Overwrite it.
-  if (record.src === candidate.large) return candidate;
+  const currentSlug = slugOfLargePath(record.src);
+  // The field's current photo already lives under this filename's slug
+  // family — the plain slug, or a numbered variant an earlier collision
+  // assigned it. That's a replace, not a new upload: keep using exactly the
+  // variant it already occupies. Recomputing from the filename alone would
+  // only ever produce the *unsuffixed* candidate, which a stale collision may
+  // still have left occupied by someone else — bumping this record's own
+  // photo to yet another suffix and orphaning the pair it already has.
+  if (currentSlug && sameSlugFamily(currentSlug, candidate.slug)) {
+    return pathsForSlug(currentSlug);
+  }
   // Nobody's using this slug yet — safe to claim it as-is.
-  if (!(await pathExists(client, candidate.large))) return candidate;
+  if (!(await pathIsTaken(client, candidate.large))) return candidate;
   // The slug is taken by something else. Do not overwrite a stranger's
   // photograph; find the first numbered variant that's free and use it for
   // both derivatives, so the pair stays together under one new slug.
-  let n = 2;
-  for (;;) {
+  for (let n = 2; n <= MAX_SLUG_VARIANTS; n += 1) {
     const slug = `${candidate.slug}-${n}`;
-    const large = `assets/photos/derived/${slug}-1600.jpg`;
-    if (!(await pathExists(client, large))) {
-      return { slug, large, small: `assets/photos/derived/${slug}-800.jpg` };
+    if (!(await pathIsTaken(client, `assets/photos/derived/${slug}-1600.jpg`))) {
+      return pathsForSlug(slug);
     }
-    n += 1;
   }
+  throw new Error(`Could not find a free name for "${file.name}" — every variant of `
+    + `"${candidate.slug}" up to -${MAX_SLUG_VARIANTS} is already taken. Rename the file `
+    + 'and try again.');
 }
 
 export async function attachPhoto(file, record, field, client) {
