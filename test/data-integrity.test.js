@@ -136,15 +136,21 @@ test('graph and cluster configuration is removed from settings', () => {
 });
 
 // Spec section 4: the numbers strip carries "quantities that appear nowhere
-// else on the page". All four shipped in the prose as well — 28/38 twice more,
-// the six Delegation of Authority controls in Selected Work, 35+ currencies in
-// the Stmnt description, nine freshmen in the mentoring milestone — which is
-// the no-duplication rule regressing inside the section built to honour it.
-test('the numbers strip still carries all four of its figures', () => {
+// else on the page". Three ship in the prose as well — 28/38 twice more, 35+
+// currencies in the Stmnt description, nine freshmen in the mentoring
+// milestone — which is the no-duplication rule regressing inside the section
+// built to honour it. A fourth figure, the six Delegation of Authority
+// controls, was dropped from the strip: it and the exception-check figure
+// above it were the same job counted twice, and "six" does not calibrate the
+// way the other three do — there is no stated denominator, currency, or class
+// size to measure it against. The Selected Work prose still names the control
+// set without the count.
+test('the numbers strip still carries its figures', () => {
   const inStrip = JSON.stringify(metrics);
-  for (const strip of [/28 \/ 38/, /Delegation of Authority/, /35\+/, /freshmen/]) {
+  for (const strip of [/28 \/ 38/, /35\+/, /freshmen/]) {
     assert.match(inStrip, strip, 'the strip lost a figure');
   }
+  assert.doesNotMatch(inStrip, /Delegation of Authority/, 'the retired figure is back in the strip');
 });
 
 // The no-duplication rule this replaces once forbade a strip figure from
@@ -159,7 +165,6 @@ test('no figure is told twice at the same depth: timeline prose vs Selected Work
   const workProse = JSON.stringify(projects);
   const figures = [
     { name: '28 of 38 exception checks', re: /\b(28|twenty-eight)\b/i },
-    { name: 'six Delegation of Authority controls', re: /\bsix\b/i },
     { name: '35+ currencies', re: /\b(35|thirty-five)\b/i },
     { name: 'nine freshmen', re: /\bnine\b/i },
   ];

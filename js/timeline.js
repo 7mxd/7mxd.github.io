@@ -34,6 +34,10 @@ function entry(fields) {
   return {
     id: fields.id,
     kind: fields.kind,
+    // Finer than `kind`, and only a milestone ever sets it — a certificate, an
+    // award, a day of volunteering. render.js's kindLabel() reads this before
+    // falling back to `kind` for everyone else.
+    milestoneKind: fields.milestoneKind ?? null,
     sortDate: fields.sortDate,
     year: fields.year,
     badge: badgeOf(fields.sortDate),
@@ -120,7 +124,7 @@ function fromMilestones(milestones) {
     const year = yearOf(item.date);
     if (year === null) continue;
     out.push(entry({
-      id: item.id, kind: 'milestone', sortDate: item.date, year, order: item.order,
+      id: item.id, kind: 'milestone', milestoneKind: item.kind, sortDate: item.date, year, order: item.order,
       title: item.title, org: item.org, note: item.note, images: item.images,
       link: item.link,
       source: { collection: 'milestones', id: item.id },

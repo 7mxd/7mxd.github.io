@@ -9,6 +9,7 @@ import { renderBlocks } from './blocks-editor.js';
 import { pickAndUpload } from './media.js';
 import { attachPhoto } from './photos.js';
 import { buildTimeline } from '../js/timeline.js';
+import { kindLabel } from '../js/render.js';
 import { resolveEntry, newRecordFor, placeRecord, locate } from './timeline-edit.js';
 import { renderNav, markUnsaved } from './nav.js';
 import { createPreview } from './preview.js';
@@ -40,16 +41,6 @@ const loadErrors = {};
 // Which specific path entry (if any) is the open one, for aria-current.
 // Null when the open view is a whole-collection section rather than one row.
 let activeEntryId = null;
-
-// Interface labels: what kind of thing a row is, not anything Ahmed wrote.
-// buildTimeline() only stamps the coarse kind (role/education/project/
-// milestone) onto a composed entry — the finer milestone kind (certificate,
-// award, volunteering) lives on the record behind it. Resolving every
-// milestone row once, here, when the nav is (re)built is cheap — a find over
-// well under thirty records — and keeps nav.js from needing to know that a
-// milestone's real kind lives one hop away in a different file.
-const KIND_LABELS = { role: 'Job', education: 'Education', project: 'Project' };
-const MILESTONE_LABELS = { certification: 'Certificate', award: 'Award', volunteering: 'Volunteering' };
 
 // Structural interface labels, not content: "Selected work" and "About" are
 // how the nav names these sections, distinct from the panel legend text
@@ -188,22 +179,6 @@ async function boot() {
   }
 }
 
-/** The display label for one row's kind. A milestone's own kind
- *  (certification/award/volunteering) only lives on the record, not on the
- *  entry buildTimeline composed, so labelling it precisely means resolving
- *  it — safe to do here even for an entry whose collection failed to load
- *  (resolveEntry then throws and this just falls back to "Milestone" rather
- *  than surfacing an error a user didn't ask for by looking at the nav). */
-function kindLabelFor(entry) {
-  if (entry.kind !== 'milestone') return KIND_LABELS[entry.kind] || entry.kind;
-  try {
-    const { record } = resolveEntry(entry, models);
-    return MILESTONE_LABELS[record.kind] || 'Milestone';
-  } catch (e) {
-    return 'Milestone';
-  }
-}
-
 /** Builds the timeline fresh from the four collections' own live models —
  *  not a separate fetch — so an edit already sitting in memory (a changed
  *  date, a newly added entry) shows up in the nav without a reload. */
@@ -213,7 +188,9 @@ function buildNav() {
     projects: models.projects, milestones: models.milestones,
   }).flatMap((g) => g.entries).map((entry) => ({
     ...entry,
-    kindLabel: kindLabelFor(entry),
+    // js/render.js's kindLabel reads milestoneKind straight off the composed
+    // entry now, so no per-row lookup back into `models` is needed here.
+    kindLabel: kindLabel(entry),
     // Which file the row's record lives in, so the nav can mark every row
     // belonging to a collection with unsaved edits.
     collection: entry.source?.collection,

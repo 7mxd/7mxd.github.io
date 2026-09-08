@@ -108,6 +108,30 @@ test('a milestone verification link survives composition', () => {
   assert.deepEqual(out[0].entries[0].link, link);
 });
 
+test('a milestone carries its own finer kind, not just the coarse "milestone"', () => {
+  // render.js's kindLabel() needs this to tell a certificate from an award
+  // from a day of volunteering — fromMilestones is the one place that still
+  // has the record's own `kind` in hand.
+  const out = buildTimeline({
+    ...empty,
+    milestones: { items: [{ id: 'cert', kind: 'certification', date: '2024-04', title: 'C', org: 'O', note: '', images: [] }] },
+  });
+  assert.equal(out[0].entries[0].kind, 'milestone');
+  assert.equal(out[0].entries[0].milestoneKind, 'certification');
+});
+
+test('a role, education entry, and project all carry milestoneKind: null', () => {
+  const out = buildTimeline({
+    ...empty,
+    education: { items: [{ id: 'edu', institution: 'KU', degree: 'BSc', endDate: '2023-05', displayDate: 'd', images: [], blocks: [] }] },
+    experience: withRole(),
+    projects: { items: [{ id: 'proj', title: 'P', timeline: true, startDate: '2023-05', displayDate: 'd', blocks: [], images: [], tags: [], links: {} }] },
+  });
+  for (const e of out.flatMap((g) => g.entries)) {
+    assert.equal(e.milestoneKind, null, `${e.id} (${e.kind}) should carry no milestoneKind`);
+  }
+});
+
 test('entries without a link carry null rather than undefined', () => {
   const out = buildTimeline({ ...empty, experience: withRole() });
   assert.equal(out[0].entries[0].link, null);
