@@ -16,12 +16,3 @@ export async function pickAndUpload(client, file) {
   await client.putBinary(path, base64, sha, 'admin: upload ' + sanitizeFilename(file.name));
   return path;
 }
-export function attachImageField(inputEl, model, fieldName, client, thumbEl) {
-  const picker = document.createElement('input'); picker.type = 'file'; picker.accept = 'image/*'; picker.style.display='none';
-  picker.addEventListener('change', async () => {
-    if (!picker.files[0]) return;
-    try { const path = await pickAndUpload(client, picker.files[0]); inputEl.value = path; model[fieldName] = path; if (thumbEl){ thumbEl.src = '../'+path; thumbEl.hidden=false; } }
-    catch (e) { alert('Upload failed: ' + e.message); }
-  });
-  return picker;
-}

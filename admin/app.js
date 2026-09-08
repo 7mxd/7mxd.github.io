@@ -6,7 +6,7 @@ import { createClient } from './github.js';
 import { getToken, signIn, signOut } from './auth.js';
 import { renderForm } from './forms.js';
 import { renderBlocks } from './blocks-editor.js';
-import { attachImageField } from './media.js';
+import { pickAndUpload } from './media.js';
 
 const $ = (id) => document.getElementById(id);
 let client = null, registry = null, current = null, model = null, sha = null, dirty = false;
@@ -49,7 +49,14 @@ async function selectCollection(name) {
     sha = file.sha;
     const data = file.content ? JSON.parse(file.content) : (current.kind==='list'? {[current.listKey]:[]} : {});
     model = buildFormModel(current, data);
-    const ctx = { registry, client, renderBlocks, attachImageField };
+    const ctx = {
+      registry, client, renderBlocks,
+      // Task 10 replaces this with attachPhoto, which derives web-sized copies.
+      uploadImage: async (file, record, field) => {
+        record[field.name] = await pickAndUpload(client, file);
+      },
+      onError: (e) => setStatus('Upload failed: ' + e.message, 'error'),
+    };
     renderForm($('panel'), current, model, ctx);
     setStatus('');
     dirty = false;

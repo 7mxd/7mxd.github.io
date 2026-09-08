@@ -1,4 +1,5 @@
 import { blockTypesForScope, fieldsForBlock, newBlock } from './blocks-model.js';
+import { renderField, moveItem } from './fields.js';
 
 export function renderBlocks(container, blocks, scope, registry, ctx) {
   container.innerHTML = '';
@@ -29,48 +30,12 @@ function blockItem(blocks, i, scope, registry, rerender, ctx) {
     return b;
   };
   ctrls.append(
-    mk('↑', () => { if (i > 0) [blocks[i-1], blocks[i]] = [blocks[i], blocks[i-1]]; }),
-    mk('↓', () => { if (i < blocks.length-1) [blocks[i+1], blocks[i]] = [blocks[i], blocks[i+1]]; }),
+    mk('↑', () => moveItem(blocks, i, i - 1)),
+    mk('↓', () => moveItem(blocks, i, i + 1)),
     mk('Remove', () => blocks.splice(i, 1)) );
   wrap.appendChild(ctrls);
   for (const f of fieldsForBlock(registry, block.type)) {
-    const field = document.createElement('div'); field.className = 'field';
-    const lab = document.createElement('label'); lab.textContent = f.label || f.name; field.appendChild(lab);
-    if (f.type === 'list') {
-      const ta = document.createElement('textarea'); ta.value = (block[f.name] || []).join('\n');
-      ta.addEventListener('input', () => block[f.name] = ta.value.split('\n').filter(Boolean));
-      field.appendChild(ta);
-    } else if (f.type === 'code' || f.type === 'text') {
-      const ta = document.createElement('textarea'); ta.value = block[f.name] || '';
-      ta.addEventListener('input', () => block[f.name] = ta.value); field.appendChild(ta);
-    } else if (f.type === 'number') {
-      // Written as a Number, not the input's string: the image block's width
-      // and height become HTML attributes the browser uses to reserve space.
-      const inp = document.createElement('input'); inp.type = 'number'; inp.value = block[f.name] ?? '';
-      inp.addEventListener('input', () => { block[f.name] = inp.value === '' ? '' : Number(inp.value); });
-      field.appendChild(inp);
-    } else if (f.type === 'select' && Array.isArray(f.options)) {
-      const sel = document.createElement('select');
-      sel.innerHTML = f.options.map(o => `<option value="${o.value}">${o.label}</option>`).join('');
-      sel.value = block[f.name] || '';
-      sel.addEventListener('change', () => { block[f.name] = sel.value; });
-      field.appendChild(sel);
-    } else if (f.type === 'image') {
-      const inp = document.createElement('input'); inp.type = 'text'; inp.value = block[f.name] || '';
-      inp.addEventListener('input', () => { block[f.name] = inp.value; });
-      field.appendChild(inp);
-      if (ctx && ctx.client && ctx.attachImageField) {
-        const thumb = document.createElement('img'); thumb.className = 'thumb'; thumb.hidden = !block[f.name]; if (block[f.name]) thumb.src = '../' + block[f.name];
-        const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'btn ghost'; btn.textContent = 'Upload image';
-        const picker = ctx.attachImageField(inp, block, f.name, ctx.client, thumb);
-        btn.onclick = () => picker.click();
-        field.append(btn, picker, thumb);
-      }
-    } else {
-      const inp = document.createElement('input'); inp.type = 'text'; inp.value = block[f.name] || '';
-      inp.addEventListener('input', () => block[f.name] = inp.value); field.appendChild(inp);
-    }
-    wrap.appendChild(field);
+    wrap.appendChild(renderField(document, f, block, ctx));
   }
   return wrap;
 }

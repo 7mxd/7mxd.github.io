@@ -89,3 +89,27 @@ test('moveItem reorders and clamps', () => {
   assert.deepEqual(moveItem(['a', 'b', 'c'], 0, -1), ['a', 'b', 'c']);
   assert.deepEqual(moveItem(['a', 'b', 'c'], 2, 3), ['a', 'b', 'c']);
 });
+
+import { fieldsForBlock, newBlock } from '../admin/blocks-model.js';
+import { readFileSync } from 'node:fs';
+const REGISTRY = JSON.parse(
+  readFileSync(new URL('../data/blocks-registry.json', import.meta.url), 'utf8'));
+
+test('a new benchmark block starts with the shape its rows declare', () => {
+  const block = newBlock(REGISTRY, 'benchmark');
+  assert.deepEqual(block.rows, []);
+  const rows = fieldsForBlock(REGISTRY, 'benchmark').find((f) => f.name === 'rows');
+  assert.deepEqual(blankValue({ type: 'object', fields: rows.fields }),
+    { label: '', value: '', highlight: false });
+});
+
+test('every field type in the registry is one the renderer implements', () => {
+  const IMPLEMENTED = new Set(['string', 'text', 'code', 'url', 'number',
+    'boolean', 'select', 'image', 'object', 'list', 'blocks']);
+  for (const [type, entry] of Object.entries(REGISTRY)) {
+    if (type.startsWith('_')) continue;
+    for (const f of entry.fields || []) {
+      assert.ok(IMPLEMENTED.has(f.type), `${type}.${f.name} is type ${f.type}`);
+    }
+  }
+});
