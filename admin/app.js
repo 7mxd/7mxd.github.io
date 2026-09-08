@@ -11,9 +11,10 @@ import { attachPhoto } from './photos.js';
 import { buildTimeline } from '../js/timeline.js';
 import { resolveEntry, newRecordFor, placeRecord, locate } from './timeline-edit.js';
 import { renderNav } from './nav.js';
+import { createPreview } from './preview.js';
 
 const $ = (id) => document.getElementById(id);
-let client = null, registry = null, current = null;
+let client = null, registry = null, current = null, preview = null;
 
 // The four files the timeline composes from, plus everywhere else the
 // timeline's own entries also live (projects, under Selected work). Every
@@ -115,6 +116,25 @@ async function loadAll() {
   });
 }
 
+/** The full ten-key site dataset js/data.js's validateSiteData names
+ *  (profile, summary, settings, experience, education, projects,
+ *  milestones, metrics, skills, registry), assembled from every
+ *  collection's own live model — the same objects the forms edit, kept in
+ *  `models` above — plus the block registry. Nothing here is fetched again:
+ *  loadAll() already put everything in memory, so the preview reads exactly
+ *  what the forms are editing and can never see a stale copy of it. */
+function buildPreviewBase() {
+  const data = { registry };
+  for (const c of COLLECTIONS) data[c.name] = modelToData(c, models[c.name]);
+  return data;
+}
+
+function setMobileView(view) {
+  document.body.dataset.mobileView = view;
+  $('view-form-btn').setAttribute('aria-pressed', String(view === 'form'));
+  $('view-preview-btn').setAttribute('aria-pressed', String(view === 'preview'));
+}
+
 async function boot() {
   $('signin').onclick = async () => { try { await signIn(); location.reload(); } catch(e){ $('login-error').textContent = e.message; } };
   $('signout').onclick = () => { signOut(); location.reload(); };
@@ -131,7 +151,20 @@ async function boot() {
       if (r.ok) { const u = await r.json(); document.getElementById('who').textContent = u.login ? '@' + u.login : ''; }
     } catch(_) {}
   })();
-  $('panel').addEventListener('input', () => { if (current) dirty[current.name] = true; });
+  preview = createPreview($('preview'), buildPreviewBase);
+  $('panel').addEventListener('input', () => {
+    if (!current) return;
+    dirty[current.name] = true;
+    // A collection whose file failed to load is an empty stand-in — the
+    // save handler below already refuses to write it back. Feeding its
+    // edits to the preview would let the owner watch a fabricated record
+    // fill in as though it were the real page, so it's left out here too;
+    // the iframe keeps showing whatever it last rendered instead.
+    if (!loadErrors[current.name]) preview.update(current.name, modelToData(current, models[current.name]));
+  });
+  $('view-form-btn').onclick = () => setMobileView('form');
+  $('view-preview-btn').onclick = () => setMobileView('preview');
+  setMobileView('form');
   buildNav();
   openCollection('profile');
   const failed = Object.keys(loadErrors);

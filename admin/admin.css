@@ -14,6 +14,10 @@
      instead of six short file names — most titles now clear two lines
      instead of three or four. */
   --admin-sidebar: 18rem;
+  /* The preview column. Fixed rather than 1fr alongside the form: the site
+     it renders is a single ~46rem measure, and letting it grow with a wide
+     monitor would just pad that measure with more margin, not more page. */
+  --admin-preview: 30rem;
 }
 
 * { box-sizing: border-box; }
@@ -107,9 +111,29 @@ body { font-family: var(--font-meta); }
 
 .layout {
   display: grid;
-  grid-template-columns: var(--admin-sidebar) 1fr;
+  grid-template-columns: var(--admin-sidebar) 1fr var(--admin-preview);
   flex: 1;
   min-height: 0;
+}
+
+/* Hidden above the breakpoint: the form and the preview both show at once,
+   so there is nothing to switch between. Below it, exactly one of #panel and
+   #preview-pane is visible at a time and this is what switches it — see the
+   media query at the bottom of this file. */
+.view-toggle { display: none; }
+
+/* The live render of the real page, kept in step with the form by
+   admin/app.js and admin/preview.js. A grid item stretches to the row's
+   full height by default, same as #collections and #panel beside it, so the
+   iframe's own height: 100% is enough to fill the column. */
+#preview-pane {
+  border-left: var(--rule-width) solid var(--rule);
+}
+#preview {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
 }
 
 /* The path can run past thirty rows once every job, course, project and
@@ -358,4 +382,25 @@ legend {
     border-right: 0;
     border-bottom: var(--rule-width) solid var(--rule);
   }
+
+  /* The form and the preview no longer fit side by side, so only one shows
+     at a time — never both, never neither. admin/app.js's setMobileView
+     stamps which one on <body> and moves aria-pressed between the two
+     buttons below, so the switch is announced the same way any other
+     pressed/unpressed control is, not left to be inferred from what changed
+     on screen. */
+  .view-toggle {
+    display: flex;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    border-bottom: var(--rule-width) solid var(--rule);
+  }
+  .view-toggle .btn[aria-pressed="true"] {
+    background: var(--accent-plate);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  #panel, #preview-pane { display: none; }
+  body[data-mobile-view="form"] #panel { display: block; }
+  body[data-mobile-view="preview"] #preview-pane { display: block; }
 }

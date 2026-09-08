@@ -52,7 +52,14 @@
     </header>
     <div class="layout">
       <nav id="collections" aria-label="Content navigation"></nav>
+      <div class="view-toggle" role="group" aria-label="View">
+        <button type="button" id="view-form-btn" class="btn ghost" aria-pressed="true">Form</button>
+        <button type="button" id="view-preview-btn" class="btn ghost" aria-pressed="false">Preview</button>
+      </div>
       <main id="panel"></main>
+      <aside id="preview-pane" aria-label="Preview">
+        <iframe id="preview" src="/" title="Preview of the site"></iframe>
+      </aside>
     </div>
   </section>
 
