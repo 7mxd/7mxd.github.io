@@ -25,6 +25,13 @@ let client = null, registry = null, current = null, preview = null;
 const models = {};
 const shas = {};
 const dirty = {};
+// Bumped on every edit to a collection (the panel's own `input` listener
+// below, plus handleAdd — the two places `models` is mutated outside a load).
+// The save loop reads it before serializing a collection and again after its
+// PUT resolves: an edit typed during that await bumps it, and a serial that
+// moved says the snapshot just written is already stale, so the dirty flag
+// must survive the clear that would otherwise follow.
+const editSerial = {};
 // Collection name (or '*registry*') -> error message, for a file that failed
 // to fetch or to parse. loadAll() never lets one bad file take the other
 // eleven down with it; this is how the gap left in its place gets surfaced
@@ -113,6 +120,7 @@ async function loadAll() {
       loadErrors[c.name] = e.message || String(e);
     }
     dirty[c.name] = false;
+    editSerial[c.name] = 0;
   });
 }
 
@@ -160,6 +168,7 @@ async function boot() {
   preview = createPreview($('preview'), buildPreviewBase);
   $('panel').addEventListener('input', () => {
     if (!current) return;
+    editSerial[current.name] = (editSerial[current.name] || 0) + 1;
     if (!dirty[current.name]) { dirty[current.name] = true; refreshDirtyMarks(); }
     // A collection whose file failed to load is an empty stand-in — the
     // save handler below already refuses to write it back. Feeding its
@@ -281,6 +290,7 @@ function handleAdd(kindKey) {
   if (!kind) return;
   const record = newRecordFor(kindKey, {});
   placeRecord(kindKey, record, models);
+  editSerial[kind.collection] = (editSerial[kind.collection] || 0) + 1;
   dirty[kind.collection] = true;
   activeEntryId = null;
   openCollection(kind.collection);
@@ -400,6 +410,12 @@ $('save').onclick = async () => {
     // nothing is left to be discovered by pressing Save again.
     const [first, ...rest] = failures;
     if (current?.name !== first.c.name) { activeEntryId = null; openCollection(first.c.name); }
+    // Save can be pressed from the Preview or Path view, not just Form — the
+    // button isn't gated by the mobile toggle the way the panel is. Below
+    // 700px the panel these errors attach to, and the control they focus, sit
+    // in a view that's display:none until this switches it, same as
+    // handleSelect and handleAdd already do before touching the panel.
+    setMobileView('form');
     showErrors(document, $('panel'), first.errs);
     const n = first.errs.length;
     setStatus(`${n} problem${n === 1 ? '' : 's'} to fix in ${first.c.label}`
@@ -415,10 +431,17 @@ $('save').onclick = async () => {
   try {
     for (const c of targets) {
       try {
+        // Captured before the write, not after: an edit landing during the
+        // await below bumps this, and the write in flight was serialized from
+        // the model as it stood before that edit — so the edit was never
+        // sent. Clearing dirty on an unchanged serial would tell the rest of
+        // the app the file is clean when the newest keystroke is still only
+        // on screen.
+        const serial = editSerial[c.name];
         const out = serializeJson(modelToData(c, models[c.name]));
         const res = await client.putFile(c.file, out, shas[c.name], 'admin: update ' + c.name);
         shas[c.name] = res.content.sha;
-        dirty[c.name] = false;
+        if (editSerial[c.name] === serial) dirty[c.name] = false;
         saved.push(c);
       } catch (e) {
         // Stop rather than carry on: a conflict means the repo moved under
@@ -432,7 +455,11 @@ $('save').onclick = async () => {
   } finally { $('save').disabled = false; }
 
   if (!failed) {
-    setStatus(`Published ✓ ${labelsOf(saved)}${blockedNote}`, blocked.length ? 'error' : 'ok');
+    // blockedNote already opens with its own leading space ("Cannot save…")
+    // but no sentence before it ends in a terminator — labelsOf(saved) is
+    // just a name list — so without this period the two run together as
+    // "Published ✓ Profile Cannot save Summary — …".
+    setStatus(`Published ✓ ${labelsOf(saved)}${blocked.length ? '.' : ''}${blockedNote}`, blocked.length ? 'error' : 'ok');
   } else {
     const remaining = targets.slice(targets.indexOf(failed.c) + 1);
     setStatus(

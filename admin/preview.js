@@ -116,7 +116,12 @@ export function createPreview(iframe, getBase, { timeout = READY_TIMEOUT } = {})
   // a failure notice twenty seconds in.
   stallTimer = setTimeout(showUnavailable, timeout);
 
-  iframe.addEventListener('load', watchDocument);
+  // `watching` marks a document claimed, not the module's whole lifetime: a
+  // `load` means the frame just navigated to a new document, so the claim on
+  // whatever came before it is void. Nothing here actually navigates the
+  // iframe away once it starts, but the flag should track the document it
+  // was named for rather than outlive it on a technicality.
+  iframe.addEventListener('load', () => { watching = false; watchDocument(); });
   // …and again, right now, because `load` may already have fired. admin/app.js
   // constructs the preview only after loadAll()'s ten authenticated,
   // never-cached GitHub calls resolve, while <iframe src="/"> begins

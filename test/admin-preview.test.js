@@ -98,6 +98,27 @@ test('the initial about:blank document is not mistaken for the site', async () =
   assert.equal(asked, true, 'the real document, arriving on load, was never watched');
 });
 
+test('a frame that navigates away before rendering is re-claimed on its next load', async () => {
+  // watchDocument() sets `watching = true` once it claims a document and
+  // never clears it, so a first document that never dispatches site:rendered
+  // before the frame moves on leaves the module thinking a claim is still
+  // live. A second, real load event must still get through — the claim
+  // tracks the document, not the module's lifetime.
+  const { iframe } = fakeIframe(fakeDocument({ rendered: false }));
+  let asked = false;
+  const preview = createPreview(iframe, () => { asked = true; return new Promise(() => {}); },
+    { timeout: 5000 });
+  preview.update('metrics', { items: [] });
+  await sleep(320);
+  assert.equal(asked, false, 'setup: the first document must not already read as rendered');
+
+  // Navigate away before the first document ever announced site:rendered.
+  iframe.contentDocument = fakeDocument({ rendered: true });
+  iframe.dispatchEvent(new Event('load'));
+  await sleep(50);
+  assert.equal(asked, true, 'the second document, arriving on its own load, was never re-claimed');
+});
+
 test('readiness that never arrives becomes a visible state, not a silent stall', async () => {
   const { iframe, pane } = fakeIframe(fakeDocument({ rendered: false }));
   createPreview(iframe, async () => ({}), { timeout: 20 });
