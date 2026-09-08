@@ -154,8 +154,14 @@ body { font-family: var(--font-meta); }
 .field textarea { min-height: 6rem; resize: vertical; }
 /* A standalone summary field earns the 6rem above; a one-line bullet inside a
    list row does not — five of them read as five heavy cards rather than a
-   list. Same resize handle, a much shorter rest height. */
-.list-item .field textarea { min-height: 2.5rem; }
+   list. Same resize handle, a much shorter rest height. min-height alone
+   does not get there: a <textarea> with no rows attribute defaults to an
+   intrinsic two-row size, and min-height is only a floor under that, not a
+   ceiling above it — so the box still rendered at its native ~58px
+   regardless of the smaller min-height. An explicit height overrides that
+   default sizing outright; min-height stays alongside it as the floor
+   resize:vertical cannot be dragged past. */
+.list-item .field textarea { height: 2.5rem; min-height: 2.5rem; }
 
 .check {
   display: flex;
@@ -201,13 +207,16 @@ legend {
    controls rather than primary actions, and pushed to the right so a
    leading label (blocks-editor.js's block-type <strong>) has the left edge
    to itself, whether or not that label is actually present — the auto
-   margin lands on whichever button comes first either way. */
+   margin lands on whichever button comes first either way. The strip's own
+   padding and margin are kept to the smallest space token: with no label,
+   this row is nothing but the buttons and a hairline, and it should cost no
+   more height than they need. */
 .row-controls {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
-  padding-bottom: var(--space-2);
-  margin-bottom: var(--space-2);
+  gap: var(--space-1);
+  padding-bottom: var(--space-1);
+  margin-bottom: var(--space-1);
   border-bottom: var(--rule-width) solid var(--rule);
 }
 .row-controls strong {
@@ -221,6 +230,26 @@ legend {
   font-size: var(--text-xs);
 }
 .row-controls .btn:first-of-type { margin-left: auto; }
+
+/* fields.js appends this button straight into the .list host, after the
+   rows. In a column flex container the default cross-axis stretch would
+   make it as wide as the rows it sits under, reading as a primary action on
+   par with Save — align-self opts it out of that stretch instead, sizing it
+   to its own label. Its border and hover both drop to the row controls'
+   quieter register (a hairline, not --ink; an accent outline on hover, not
+   an ink fill) so a repeated, secondary "add another row" reads as exactly
+   that, never as the one consequential action on the page. */
+.list > .btn {
+  align-self: flex-start;
+  border-color: var(--rule);
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--text-xs);
+}
+.list > .btn:hover {
+  background: none;
+  border-color: var(--accent);
+  color: var(--accent);
+}
 
 .thumb {
   max-width: 7.5rem;
