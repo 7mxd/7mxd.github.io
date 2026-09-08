@@ -194,7 +194,7 @@ export function getCollection(name) { return COLLECTIONS.find(c => c.name === na
  *  knows a certificate lives in milestones.json and a job is a role nested
  *  inside a company. */
 export const TIMELINE_KINDS = [
-  { key:'job', label:'Job', collection:'experience', defaults:{} },
+  { key:'job', label:'Experience', collection:'experience', defaults:{} },
   { key:'education', label:'Education', collection:'education', defaults:{} },
   { key:'project', label:'Project', collection:'projects', defaults:{ timeline:true } },
   { key:'certification', label:'Certificate', collection:'milestones', defaults:{ kind:'certification' } },
