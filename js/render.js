@@ -258,10 +258,11 @@ function entryMarkup(entry) {
     ? `${orgLogoMarkup(entry.orgLogo)}<span class="entry-org">${escapeHtml(entry.org)}</span>`
     : '';
   const dates = entry.dateRange ? `<span class="entry-dates">${escapeHtml(entry.dateRange)}</span>` : '';
+  // Leads the meta row rather than trailing it. At the end of a row whose
+  // length varies with the employer's name and the date range, the label
+  // landed in a different place on every entry, and a column that moves is a
+  // column you cannot scan — which was the whole point of adding it.
   const kind = `<span class="entry-kind">${escapeHtml(kindLabel(entry))}</span>`;
-  // Grouped so a narrow row wraps them as one unit, not the kind stranded
-  // alone on the next line.
-  const datesKind = `<span class="entry-meta-sub">${dates}${kind}</span>`;
   const links = [];
   if (entry.workRef) {
     // Name the target when it is not this entry. A role's bullets span
@@ -285,7 +286,7 @@ function entryMarkup(entry) {
   return `<li class="entry is-${escapeHtml(entry.kind)}">
 ${badgeMarkup(entry)}<div class="entry-body">
 <h3 class="entry-title">${escapeHtml(entry.title)}</h3>
-<p class="entry-meta">${org}${datesKind}</p>
+<p class="entry-meta">${kind}${org}${dates}</p>
 ${note}${renderBlocks(entry.blocks)}${bullets}${more}${gallery(entry.images, 'entry')}
 </div>
 </li>`;
