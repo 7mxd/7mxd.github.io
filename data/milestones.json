@@ -6,12 +6,10 @@
       "date": "2024-12",
       "title": "Supervised Machine Learning: Regression and Classification",
       "org": "DeepLearning.AI",
-      "note": "",
       "link": {
         "url": "https://coursera.org/share/2b689ab65972eff9afaf47aabb7fcc48",
         "label": "Verify"
-      },
-      "images": []
+      }
     },
     {
       "id": "cert-dataiku-ml-practitioner",
@@ -19,12 +17,10 @@
       "date": "2024-04",
       "title": "Dataiku ML Practitioner",
       "org": "Dataiku Academy",
-      "note": "",
       "link": {
         "url": "https://verify.skilljar.com/c/ktmfhc5ta85n",
         "label": "Verify"
       },
-      "images": [],
       "order": 1
     },
     {
@@ -33,12 +29,10 @@
       "date": "2024-04",
       "title": "Dataiku Core Designer",
       "org": "Dataiku Academy",
-      "note": "",
       "link": {
         "url": "https://verify.skilljar.com/c/vo8fob4zqahf",
         "label": "Verify"
       },
-      "images": [],
       "order": 2
     },
     {
@@ -91,8 +85,7 @@
       "link": {
         "url": "https://www.ku.ac.ae/student-life/honors-list",
         "label": "Khalifa University honors list"
-      },
-      "images": []
+      }
     },
     {
       "id": "deans-list-fall-2021",
@@ -121,8 +114,7 @@
       "title": "Lead Peer Mentor",
       "org": "Khalifa University",
       "note": "Mentored a cohort of first-year students through Fall 2022 and Spring 2023.",
-      "link": null,
-      "images": []
+      "link": null
     },
     {
       "id": "python-workshop",
@@ -130,12 +122,10 @@
       "date": "2022-06",
       "title": "Python for Data Analysis Workshop",
       "org": "Khalifa University",
-      "note": "",
       "link": {
         "url": "https://drive.google.com/file/d/1IzXwQ8lx2Rj2VwG3-iEwWIf4-S-GVEpx/view",
         "label": "Verify"
-      },
-      "images": []
+      }
     },
     {
       "id": "mawhibatna",
@@ -144,8 +134,7 @@
       "title": "Mawhibatna Program volunteer",
       "org": "Sandooq Al Watan",
       "note": "Helped organise and run the programme day to day.",
-      "link": null,
-      "images": []
+      "link": null
     }
   ]
 }

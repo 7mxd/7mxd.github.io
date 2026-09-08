@@ -305,6 +305,18 @@
    grey clause. Shared by the Selected Work meta row below. */
 .entry-org, .work-org { color: var(--ink); font-weight: 500; }
 .entry-dates, .work-dates { font-variant-numeric: tabular-nums; }
+/* Dates and the kind wrap as one unit at a narrow width, not two — else a
+   date that still fits can strand "· Job" alone on the next line. */
+.entry-meta-sub { display: inline-flex; flex-wrap: wrap; gap: var(--space-3); }
+/* The type label, e.g. "Certificate": plain metadata like the date beside it,
+   with the page's own quiet separator (see .skill-list) ahead of it whenever
+   something already precedes it — a date in the same sub-group (role,
+   education, project), or, when a milestone carries no date, the org one
+   level up. */
+.entry-kind:not(:first-child)::before,
+.entry-meta > .entry-meta-sub:not(:first-child) > .entry-kind:first-child::before {
+  content: "· "; color: var(--ink-muted);
+}
 
 .entry-note {
   font-family: var(--font-meta);
@@ -391,16 +403,29 @@
 .metrics {
   display: grid;
   gap: var(--space-6);
-  /* 8rem, not 11rem: four figures fit four-across at 768 and 1280 rather than
-     breaking 3+1 with an orphan, and fall to a clean 2x2 at 390. And not 9rem
-     either: --gutter is partly vw-based, so it keeps eating into the capped
-     736px shell as the viewport grows, leaving as little as 608px here. */
+  /* 8rem, not 11rem: three figures fit three-across at 768 and 1280 rather
+     than breaking 2+1 with an orphan, and fall to a clean 2-then-1 at 390
+     (the last one spans below, see the media query under .metric). And not
+     9rem either: --gutter is partly vw-based, so it keeps eating into the
+     capped 736px shell as the viewport grows, leaving as little as 608px
+     here. */
   grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
 }
 /* A bare grid-item wrapper: min-width: 0 keeps a long label from forcing
    the auto-fit track wider than the viewport, which is what would open a
    horizontal scrollbar. All other styling is on its children below. */
 .metric { min-width: 0; }
+/* Measured in headless Edge, not guessed: with three items .metrics holds 3
+   columns until its content box drops below 432px, which is 476px of
+   viewport (29.75rem) and below once --gutter is subtracted twice. Below
+   that the third figure is a leftover orphan; span it full-width there only
+   — at 768/1280 three items already fill three columns evenly.
+   :nth-child(odd) keys this to an odd count rather than to "third", so a
+   future fourth metric (even, filling 2x2) does not pick up a span it does
+   not need. */
+@media (max-width: 29.75rem) {
+  .metric:last-child:nth-child(odd) { grid-column: 1 / -1; }
+}
 .metric-value {
   font-size: var(--text-xl);
   font-weight: 600;

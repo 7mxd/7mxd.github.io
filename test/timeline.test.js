@@ -1,7 +1,14 @@
 // test/timeline.test.js
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { buildTimeline } from '../js/timeline.js';
+
+const load = (n) => JSON.parse(readFileSync(new URL(`../data/${n}.json`, import.meta.url), 'utf8'));
+const REAL = {
+  experience: load('experience'), education: load('education'),
+  projects: load('projects'), milestones: load('milestones'),
+};
 
 const empty = { experience: { items: [] }, education: { items: [] }, projects: { items: [] }, milestones: { items: [] } };
 
@@ -101,6 +108,30 @@ test('a milestone verification link survives composition', () => {
   assert.deepEqual(out[0].entries[0].link, link);
 });
 
+test('a milestone carries its own finer kind, not just the coarse "milestone"', () => {
+  // render.js's kindLabel() needs this to tell a certificate from an award
+  // from a day of volunteering — fromMilestones is the one place that still
+  // has the record's own `kind` in hand.
+  const out = buildTimeline({
+    ...empty,
+    milestones: { items: [{ id: 'cert', kind: 'certification', date: '2024-04', title: 'C', org: 'O', note: '', images: [] }] },
+  });
+  assert.equal(out[0].entries[0].kind, 'milestone');
+  assert.equal(out[0].entries[0].milestoneKind, 'certification');
+});
+
+test('a role, education entry, and project all carry milestoneKind: null', () => {
+  const out = buildTimeline({
+    ...empty,
+    education: { items: [{ id: 'edu', institution: 'KU', degree: 'BSc', endDate: '2023-05', displayDate: 'd', images: [], blocks: [] }] },
+    experience: withRole(),
+    projects: { items: [{ id: 'proj', title: 'P', timeline: true, startDate: '2023-05', displayDate: 'd', blocks: [], images: [], tags: [], links: {} }] },
+  });
+  for (const e of out.flatMap((g) => g.entries)) {
+    assert.equal(e.milestoneKind, null, `${e.id} (${e.kind}) should carry no milestoneKind`);
+  }
+});
+
 test('entries without a link carry null rather than undefined', () => {
   const out = buildTimeline({ ...empty, experience: withRole() });
   assert.equal(out[0].entries[0].link, null);
@@ -127,4 +158,57 @@ test('an impossible month is dropped, but 01 and 12 are kept', () => {
 
 test('an empty payload produces an empty timeline, not an error', () => {
   assert.deepEqual(buildTimeline(empty), []);
+});
+
+test('every composed entry says which file and record it came from', () => {
+  // The admin resolves a timeline row back to the record behind it. Without
+  // this it would have to reimplement composition, which is the drift the
+  // shared-code rule exists to prevent.
+  const groups = buildTimeline(REAL);
+  const entries = groups.flatMap((g) => g.entries);
+  assert.ok(entries.length > 0);
+  const collections = new Set(['experience', 'education', 'projects', 'milestones']);
+  for (const e of entries) {
+    assert.ok(e.source, `${e.id} has no source`);
+    assert.ok(collections.has(e.source.collection), `${e.id}: ${e.source.collection}`);
+    assert.equal(e.source.id, e.id, `${e.id}: source.id must address the record`);
+  }
+});
+
+test('no two records share an id, so source.id addresses exactly one', () => {
+  const groups = buildTimeline(REAL);
+  const ids = groups.flatMap((g) => g.entries).map((e) => e.source.id);
+  assert.equal(new Set(ids).size, ids.length, 'duplicate id across the timeline');
+});
+
+test('source.id points to a record that actually exists in the named collection', () => {
+  // Build the set of valid IDs in each collection file. For nested structures
+  // (like roles inside companies), include both parent and nested IDs.
+  const validIds = {
+    experience: new Set(
+      (REAL.experience.items ?? []).flatMap((company) => [
+        ...(company.roles ?? []).map((role) => role.id),
+      ])
+    ),
+    education: new Set(
+      (REAL.education.items ?? []).map((item) => item.id)
+    ),
+    projects: new Set(
+      (REAL.projects.items ?? []).map((item) => item.id)
+    ),
+    milestones: new Set(
+      (REAL.milestones.items ?? []).map((item) => item.id)
+    ),
+  };
+
+  const groups = buildTimeline(REAL);
+  const entries = groups.flatMap((g) => g.entries);
+  for (const e of entries) {
+    const validSet = validIds[e.source.collection];
+    assert.ok(validSet, `unknown collection: ${e.source.collection}`);
+    assert.ok(
+      validSet.has(e.source.id),
+      `entry ${e.id}: source ${e.source.collection}/${e.source.id} does not exist in the data`
+    );
+  }
 });

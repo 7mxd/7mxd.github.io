@@ -228,6 +228,24 @@ function orgLogoMarkup(logo) {
   return `<span class="entry-logo is-plated"><img src="${escapeHtml(only)}" alt="" loading="lazy" decoding="async"></span>`;
 }
 
+/** What kind of thing a path entry is, in words rather than a colour legend —
+ *  shades of one accent hue are the hardest coding to distinguish, colour
+ *  alone fails a colour-blind reader and print alike, and a legend makes the
+ *  reader look up and back down. Keyed by the four structural kinds plus a
+ *  milestone's own finer kind (js/timeline.js's `milestoneKind`); no entry
+ *  for "milestone" itself since kindLabel() below resolves through that
+ *  instead. Exported so admin/app.js's nav imports this rather than keeping
+ *  a second copy. */
+export const KIND_LABELS = {
+  role: 'Job', education: 'Education', project: 'Project',
+  certification: 'Certificate', award: 'Award', volunteering: 'Volunteering',
+};
+
+export function kindLabel(entry) {
+  if (entry.kind === 'milestone') return KIND_LABELS[entry.milestoneKind] || entry.milestoneKind || 'Milestone';
+  return KIND_LABELS[entry.kind] || entry.kind;
+}
+
 function entryMarkup(entry) {
   const bullets = entry.bullets.length
     ? `<ul class="entry-bullets">${entry.bullets.map((b) => `<li>${escapeHtml(b)}</li>`).join('')}</ul>`
@@ -237,6 +255,10 @@ function entryMarkup(entry) {
     ? `${orgLogoMarkup(entry.orgLogo)}<span class="entry-org">${escapeHtml(entry.org)}</span>`
     : '';
   const dates = entry.dateRange ? `<span class="entry-dates">${escapeHtml(entry.dateRange)}</span>` : '';
+  const kind = `<span class="entry-kind">${escapeHtml(kindLabel(entry))}</span>`;
+  // Grouped so a narrow row wraps them as one unit, not the kind stranded
+  // alone on the next line.
+  const datesKind = `<span class="entry-meta-sub">${dates}${kind}</span>`;
   const links = [];
   if (entry.workRef) {
     // Name the target when it is not this entry. A role's bullets span
@@ -260,7 +282,7 @@ function entryMarkup(entry) {
   return `<li class="entry is-${escapeHtml(entry.kind)}">
 ${badgeMarkup(entry)}<div class="entry-body">
 <h3 class="entry-title">${escapeHtml(entry.title)}</h3>
-<p class="entry-meta">${org}${dates}</p>
+<p class="entry-meta">${org}${datesKind}</p>
 ${note}${renderBlocks(entry.blocks)}${bullets}${more}${gallery(entry.images, 'entry')}
 </div>
 </li>`;

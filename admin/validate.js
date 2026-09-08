@@ -5,6 +5,13 @@ function checkFields(fields, model, prefix, errs) {
     if (f.required && (v === '' || v == null)) errs.push({ path, message: `${f.label} is required` });
     if (f.type === 'object') checkFields(f.fields, v || {}, path, errs);
     if (f.type === 'list' && !f.itemField && Array.isArray(v)) v.forEach((it, i) => checkFields(f.fields, it, `${path}[${i}]`, errs));
+    if (f.type === 'list' && f.itemField && Array.isArray(v)) {
+      v.forEach((item, i) => {
+        if (f.itemField.required && (item === '' || item == null)) {
+          errs.push({ path: `${path}[${i}]`, message: `${f.itemField.label} is required` });
+        }
+      });
+    }
   }
 }
 export function validateModel(collection, model) {

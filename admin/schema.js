@@ -157,14 +157,47 @@ export const COLLECTIONS = [
       // identically is a keyword dump with nowhere for the eye to land; this
       // is the section's only hierarchy, so keep it to a few. Emphasised items
       // must lead their category — test/render.test.js enforces it.
-      { name:'primary', label:'Emphasise in the list', type:'boolean' } ] } ] }
+      { name:'primary', label:'Emphasise in the list', type:'boolean' } ] } ] },
+
+  { name:'milestones', file:'data/milestones.json', label:'Milestones', kind:'list', listKey:'items', itemFields:[
+    { name:'id', label:'Id (timeline key)', type:'string', required:true },
+    { name:'kind', label:'Kind', type:'select', options:[
+      {label:'Certification', value:'certification'},
+      {label:'Award', value:'award'},
+      {label:'Volunteering', value:'volunteering'} ] },
+    { name:'date', label:'Date (YYYY-MM)', type:'string', required:true },
+    { name:'title', label:'Title', type:'string', required:true },
+    { name:'org', label:'Organisation', type:'string' },
+    { name:'note', label:'Note', type:'text' },
+    orderField,
+    { name:'link', label:'Verification link', type:'object', fields:[
+      { name:'url', label:'URL', type:'string' },
+      { name:'label', label:'Label', type:'string' } ] },
+    imagesField ] },
+
+  { name:'metrics', file:'data/metrics.json', label:'Numbers', kind:'list', listKey:'items', itemFields:[
+    { name:'value', label:'Value', type:'string', required:true },
+    { name:'label', label:'What it counts', type:'string', required:true } ] }
 ];
 
-/** Content files the admin deliberately does not manage yet. milestones and
- *  metrics arrived with the editorial revamp and are the first item of the
- *  admin revamp that follows it; blocks-registry is the admin's own schema for
- *  block types, edited by hand. Named here so test/admin-roundtrip.test.js can
- *  tell "deliberately unmanaged" from "someone forgot a collection". */
-export const UNMANAGED_DATA_FILES = ['blocks-registry.json', 'metrics.json', 'milestones.json'];
+/** Content files the admin does not manage because they are schema, not content.
+ *  blocks-registry defines the types available inside blocks fields; it is
+ *  edited by hand when new block templates are needed. Named here so
+ *  test/admin-roundtrip.test.js can tell "deliberately unmanaged" from
+ *  "someone forgot a collection". */
+export const UNMANAGED_DATA_FILES = ['blocks-registry.json'];
 
 export function getCollection(name) { return COLLECTIONS.find(c => c.name === name); }
+
+/** What "add an entry" offers, and where each one lands. The admin is organised
+ *  around the timeline rather than the files, so this is the only place that
+ *  knows a certificate lives in milestones.json and a job is a role nested
+ *  inside a company. */
+export const TIMELINE_KINDS = [
+  { key:'job', label:'Job', collection:'experience', defaults:{} },
+  { key:'education', label:'Education', collection:'education', defaults:{} },
+  { key:'project', label:'Project', collection:'projects', defaults:{ timeline:true } },
+  { key:'certification', label:'Certificate', collection:'milestones', defaults:{ kind:'certification' } },
+  { key:'award', label:'Award', collection:'milestones', defaults:{ kind:'award' } },
+  { key:'volunteering', label:'Volunteering', collection:'milestones', defaults:{ kind:'volunteering' } },
+];

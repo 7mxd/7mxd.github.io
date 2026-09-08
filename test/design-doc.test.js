@@ -37,6 +37,12 @@ function contrast(a, b) {
 const LIGHT = blockTokens(':root');
 const DARK = blockTokens('[data-theme="dark"]');
 const COLOURS = ['ground', 'ground-raised', 'ink', 'ink-muted', 'accent', 'accent-strong', 'rule'];
+// --danger and --danger-strong exist for the admin (see admin/admin.css) and
+// are checked against DESIGN.md only, not against CLAUDE.md's shorter palette
+// summary, so they extend COLOURS here rather than joining it: joining it
+// would also fold them into the CLAUDE.md test below and demand a CLAUDE.md
+// edit to keep it green.
+const DESIGN_ONLY_COLOURS = [...COLOURS, 'danger', 'danger-strong'];
 
 // A design document that disagrees with the stylesheet is worse than no design
 // document: it sends the next reader, human or agent, to change the wrong thing.
@@ -44,7 +50,7 @@ const COLOURS = ['ground', 'ground-raised', 'ink', 'ink-muted', 'accent', 'accen
 // css/tokens.css and both documents kept describing the retired palette,
 // including its contrast figures. An audit lens found it, not a test.
 test('DESIGN.md quotes the live light palette', () => {
-  for (const name of COLOURS) {
+  for (const name of DESIGN_ONLY_COLOURS) {
     assert.ok(
       design.includes(LIGHT[name]),
       `DESIGN.md never mentions the light --${name} value ${LIGHT[name]}`,
@@ -53,7 +59,7 @@ test('DESIGN.md quotes the live light palette', () => {
 });
 
 test('DESIGN.md quotes the live dark palette', () => {
-  for (const name of COLOURS) {
+  for (const name of DESIGN_ONLY_COLOURS) {
     assert.ok(
       design.includes(DARK[name]),
       `DESIGN.md never mentions the dark --${name} value ${DARK[name]}`,

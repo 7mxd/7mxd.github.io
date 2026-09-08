@@ -34,6 +34,10 @@ function entry(fields) {
   return {
     id: fields.id,
     kind: fields.kind,
+    // Finer than `kind`, and only a milestone ever sets it — a certificate, an
+    // award, a day of volunteering. render.js's kindLabel() reads this before
+    // falling back to `kind` for everyone else.
+    milestoneKind: fields.milestoneKind ?? null,
     sortDate: fields.sortDate,
     year: fields.year,
     badge: badgeOf(fields.sortDate),
@@ -50,6 +54,9 @@ function entry(fields) {
     link: fields.link ?? null,
     outboundLinks: fields.outboundLinks ?? null,
     workRefTitle: null,
+    /** Which file and record this row was composed from. The admin needs it to
+     *  open the right form; the site ignores it. */
+    source: fields.source ?? null,
     note: fields.note ?? '',
   };
 }
@@ -66,6 +73,7 @@ function fromExperience(experience) {
         location: company.location, dateRange: role.displayDate,
         bullets: role.bullets, images: role.images, blocks: role.blocks,
         workRef: role.workRef,
+        source: { collection: 'experience', id: role.id },
       }));
     }
   }
@@ -82,6 +90,7 @@ function fromEducation(education) {
       title: item.degree, org: item.institution, orgLogo: item.logo ?? null,
       location: item.location, dateRange: item.displayDate,
       note: item.grade, images: item.images, blocks: item.blocks,
+      source: { collection: 'education', id: item.id },
     }));
   }
   return out;
@@ -103,6 +112,7 @@ function fromProjects(projects) {
       bullets: item.timelineBullets,
       outboundLinks: item.links,
       workRef: item.id,
+      source: { collection: 'projects', id: item.id },
     }));
   }
   return out;
@@ -114,9 +124,10 @@ function fromMilestones(milestones) {
     const year = yearOf(item.date);
     if (year === null) continue;
     out.push(entry({
-      id: item.id, kind: 'milestone', sortDate: item.date, year, order: item.order,
+      id: item.id, kind: 'milestone', milestoneKind: item.kind, sortDate: item.date, year, order: item.order,
       title: item.title, org: item.org, note: item.note, images: item.images,
       link: item.link,
+      source: { collection: 'milestones', id: item.id },
     }));
   }
   return out;

@@ -40,7 +40,11 @@ const AA = 4.5;
 // "the background may carry chroma toward the accent" a bounded permission
 // rather than an unbounded one: the tint can only get as blue as AA allows.
 const GROUNDS = ['ground', 'ground-tint', 'ground-raised'];
-const TEXT = ['ink', 'ink-muted', 'accent', 'accent-strong'];
+// --danger and --danger-strong are checked for contrast here like every other
+// text colour, but deliberately left out of the hue-family test below: an
+// error colour is red by definition, not a tint of the accent, so it has
+// nothing to say to a hue check.
+const TEXT = ['ink', 'ink-muted', 'accent', 'accent-strong', 'danger', 'danger-strong'];
 
 test('light theme text tokens pass AA against every ground, wash included', () => {
   const t = blockTokens(':root');

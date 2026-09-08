@@ -1,30 +1,472 @@
+/* Layout for the content manager. Every colour, font and size below is a
+   token from css/tokens.css (loaded before this file); css/base.css supplies
+   the reset, link and focus-visible rules, and the prefers-reduced-motion and
+   prefers-contrast handling. This file adds structure only — no colour, no
+   font family, no font size of its own. test/admin-css-contract.test.js
+   enforces that.
+
+   The one exception is --admin-*: dimensions the admin needs that the site
+   itself has no concept of, because the site has no sidebar. Declared once
+   here rather than repeated as a magic number; the contract test allows the
+   prefix and nothing else. */
+:root {
+  /* Widened from 14rem once The path started carrying real entry titles
+     instead of six short file names — most titles now clear two lines
+     instead of three or four. */
+  --admin-sidebar: 18rem;
+  /* The preview column. Fixed rather than 1fr alongside the form: the site
+     it renders is a single ~46rem measure, and letting it grow with a wide
+     monitor would just pad that measure with more margin, not more page. */
+  --admin-preview: 30rem;
+}
+
 * { box-sizing: border-box; }
-body { margin:0; font-family: var(--font-sans, system-ui); background: var(--bg, #f7f6f3); color: var(--ink, #171614); }
-.btn { font-family: var(--font-mono, monospace); font-size:.9rem; padding:.5rem 1rem; border:1px solid var(--line,#ddd); border-radius:8px; background:var(--surface,#fff); color:var(--ink,#171614); cursor:pointer; }
-.btn:hover { border-color: var(--accent,#1d9bb8); color: var(--accent,#1d9bb8); }
-.btn.ghost { background:none; }
-.err { color:#b3261e; min-height:1.2em; }
-#login { min-height:100vh; display:grid; place-items:center; }
-.login-card { max-width:28rem; text-align:center; padding:2rem; border:1px solid var(--line,#ddd); border-radius:12px; background:var(--surface,#fff); }
-#topbar { display:flex; align-items:center; gap:1rem; padding:.6rem 1rem; border-bottom:1px solid var(--line,#ddd); position:sticky; top:0; background:var(--bg,#f7f6f3); z-index:5; }
-#topbar .spacer { flex:1; }
-.brand { font-family:var(--font-mono,monospace); font-weight:700; }
-.who { color:var(--muted,#666); font-size:.85rem; }
-.save-status { font-size:.85rem; color:var(--muted,#666); }
-.save-status[data-state="ok"] { color:#1a7f37; }
-.save-status[data-state="error"] { color:#b3261e; }
-.layout { display:grid; grid-template-columns: 14rem 1fr; min-height: calc(100vh - 49px); }
-#collections { border-right:1px solid var(--line,#ddd); padding:1rem .5rem; display:flex; flex-direction:column; gap:.25rem; }
-#collections button { text-align:left; padding:.5rem .75rem; border:0; background:none; border-radius:8px; cursor:pointer; font:inherit; color:var(--ink); }
-#collections button[aria-current="true"] { background:var(--surface,#fff); border:1px solid var(--line,#ddd); }
-#panel { padding:1.5rem; max-width:48rem; }
-.field { margin-bottom:1rem; display:flex; flex-direction:column; gap:.3rem; }
-.field > label { font-size:.85rem; color:var(--muted,#666); font-family:var(--font-mono,monospace); }
-.field input[type=text], .field input:not([type]), .field textarea, .field select { width:100%; padding:.5rem; border:1px solid var(--line,#ddd); border-radius:8px; background:var(--surface,#fff); color:var(--ink); font:inherit; }
-.field textarea { min-height:6rem; resize:vertical; }
-fieldset { border:1px solid var(--line,#ddd); border-radius:10px; margin:0 0 1rem; padding:1rem; }
-legend { font-family:var(--font-mono,monospace); font-size:.8rem; color:var(--muted,#666); padding:0 .4rem; }
-.list-item { border:1px dashed var(--line,#ddd); border-radius:10px; padding:1rem; margin-bottom:.75rem; position:relative; }
-.row-controls { display:flex; gap:.4rem; margin-bottom:.5rem; }
-.thumb { max-width:120px; max-height:80px; border:1px solid var(--line,#ddd); border-radius:6px; display:block; }
-@media (max-width:700px){ .layout{ grid-template-columns:1fr; } #collections{ flex-direction:row; flex-wrap:wrap; border-right:0; border-bottom:1px solid var(--line,#ddd);} }
+
+body { font-family: var(--font-meta); }
+
+/* #login and #app are toggled by the [hidden] content attribute in app.js.
+   An unconditional `display` declaration on either would out-cascade the
+   user agent's `[hidden] { display: none }` rule — normal author
+   declarations beat normal user-agent declarations regardless of selector
+   specificity — so both screens would render at once. Scoping the layout
+   display to :not([hidden]) leaves the attribute in charge of visibility. */
+#login:not([hidden]) {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: var(--space-6);
+}
+
+.login-card {
+  max-width: 26rem;
+  width: 100%;
+  text-align: center;
+  padding: var(--space-8) var(--space-6);
+  border: var(--rule-width) solid var(--rule);
+  background: var(--ground-raised);
+}
+.login-card h1 {
+  font-family: var(--font-meta);
+  font-size: var(--text-lg);
+  margin-bottom: var(--space-3);
+}
+.login-card p {
+  font-family: var(--font-meta);
+  font-size: var(--text-sm);
+  color: var(--ink-muted);
+}
+.login-card .btn { margin: var(--space-4) 0; }
+
+#app:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+#topbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: var(--rule-width) solid var(--rule);
+  position: sticky;
+  top: 0;
+  background: var(--ground);
+  z-index: 5;
+}
+#topbar .spacer { flex: 1; }
+
+.brand {
+  font-family: var(--font-meta);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.who, .save-status {
+  font-family: var(--font-meta);
+  font-size: var(--text-xs);
+  color: var(--ink-muted);
+}
+/* Success takes the accent's own emphasis step, the same one link-hover and
+   the benchmark row use. Error takes the danger family's equivalent step:
+   darker in light, lighter in dark, which is why it is -strong and not the
+   base --danger — this is the more prominent of the two error uses on the
+   page, the topbar status line, versus .err's quieter inline hint below. */
+.save-status[data-state="ok"] { color: var(--accent-strong); }
+.save-status[data-state="error"] { color: var(--danger-strong); }
+
+.btn {
+  font-family: var(--font-meta);
+  font-size: var(--text-sm);
+  padding: var(--space-2) var(--space-4);
+  border: var(--rule-width) solid var(--ink);
+  background: none;
+  color: var(--ink);
+  cursor: pointer;
+}
+.btn:hover { background: var(--ink); color: var(--ground); }
+.btn.ghost { border-color: var(--rule); }
+.btn.ghost:hover { background: none; border-color: var(--accent); color: var(--accent); }
+
+.layout {
+  display: grid;
+  grid-template-columns: var(--admin-sidebar) 1fr var(--admin-preview);
+  flex: 1;
+  min-height: 0;
+}
+
+/* Hidden above the breakpoint: the form and the preview both show at once,
+   so there is nothing to switch between. Below it, exactly one of #panel and
+   #preview-pane is visible at a time and this is what switches it — see the
+   media query at the bottom of this file. */
+.view-toggle { display: none; }
+
+/* The live render of the real page, kept in step with the form by
+   admin/app.js and admin/preview.js. A grid item stretches to the row's
+   full height by default, same as #collections and #panel beside it, so the
+   iframe's own height: 100% is enough to fill the column. */
+#preview-pane {
+  border-left: var(--rule-width) solid var(--rule);
+}
+/* :not([hidden]) for the same reason #login and #app above carry it: when the
+   preview never becomes ready, admin/preview.js hides the frame and puts a
+   notice in its place, and an unconditional `display` here would out-cascade
+   the user agent's [hidden] rule and leave the dead frame on screen under it. */
+#preview:not([hidden]) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+/* The bounded wait expiring. A preview that never arrives otherwise looks
+   exactly like one that is up to date — the same published page, sitting
+   still — so the pane says which it is, in words, and gets out of the way. */
+.preview-unavailable {
+  margin: 0;
+  padding: var(--space-6);
+  font-family: var(--font-meta);
+  font-size: var(--text-sm);
+  color: var(--ink-muted);
+}
+
+/* The path can run past thirty rows once every job, course, project and
+   certificate is on it — far more than the flat file list this replaced ever
+   held. Scoping the scroll to the sidebar itself, instead of the whole page,
+   keeps the open record in #panel on screen while reaching for an entry or
+   Add entry further down the rail. */
+#collections {
+  border-right: var(--rule-width) solid var(--rule);
+  padding: var(--space-4) var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  overflow-y: auto;
+}
+#collections button {
+  text-align: left;
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  background: none;
+  font-family: var(--font-meta);
+  font-size: var(--text-sm);
+  color: var(--ink);
+  cursor: pointer;
+}
+#collections button[aria-current="true"] {
+  background: var(--accent-plate);
+  color: var(--accent);
+}
+
+/* nav.js draws two .nav-group blocks into #collections: The path (every
+   timeline entry, in site order) and the remaining sections. Buttons inside
+   either one are plain #collections buttons above, styling and
+   aria-current alike — this only adds the group and list scaffolding
+   #collections's own flat button list never needed. */
+.nav-group:not(:last-child) { margin-bottom: var(--space-4); }
+.nav-heading {
+  font-family: var(--font-meta);
+  font-size: var(--text-xs);
+  color: var(--ink-muted);
+  margin: 0 0 var(--space-2);
+  padding: 0 var(--space-3);
+}
+.nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.nav-list button { width: 100%; }
+
+/* A path row is two lines, not one run-on string: a meta line (date, kind)
+   above the title, so nineteen-plus rows of similar length have something
+   other than a middot to scan by. The meta line only ever gets ink-muted —
+   never the accent, which the site's own palette rule reserves for the
+   page's skeleton and identity, not for a date — and it stays that colour
+   even when the row is selected, since #collections button[aria-current]
+   only recolours text with no colour of its own; the title has none, so it
+   inherits the selected accent same as before this row grew a second line. */
+.nav-entry {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.nav-entry-meta {
+  font-family: var(--font-meta);
+  font-size: var(--text-xs);
+  color: var(--ink-muted);
+}
+.nav-entry-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* "Unsaved" on a rail row, revealed by nav.js's markUnsaved. The word carries
+   the meaning on its own — colour only reinforces it — and --danger is the
+   right register because what is at stake is losing the edit, not a mistake in
+   it. No `display` here on purpose: nav.js toggles the mark with the [hidden]
+   attribute, and an unconditional display would out-cascade the user agent's
+   [hidden] rule and pin the mark on permanently. */
+.nav-dirty {
+  margin-left: var(--space-2);
+  color: var(--danger);
+}
+
+.nav-add {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  font-family: var(--font-meta);
+  font-size: var(--text-xs);
+  color: var(--ink-muted);
+}
+.nav-add select {
+  font-family: var(--font-meta);
+  font-size: var(--text-sm);
+  padding: var(--space-2);
+  border: var(--rule-width) solid var(--rule);
+  background: var(--ground-raised);
+  color: var(--ink);
+}
+
+#panel {
+  padding: var(--space-6);
+  max-width: var(--measure-wide);
+  overflow-y: auto;
+}
+
+.field { margin-bottom: var(--space-4); display: flex; flex-direction: column; gap: var(--space-1); }
+/* :not(.check) because a checkbox's caption is also a <label> and also a
+   direct child of .field — and `.field > label` out-specifies `.check`, so
+   without this every checkbox caption rendered muted and extra small instead
+   of the ink at small size .check asks for, and .check's own colour and size
+   were simply dead. */
+.field > label:not(.check) {
+  font-family: var(--font-meta);
+  font-size: var(--text-xs);
+  color: var(--ink-muted);
+}
+/* The asterisk on a required field's caption. It is aria-hidden and the
+   control itself carries `required`, so nothing here is the only signal —
+   this is the visible half of a pair, the same way .field-error is. */
+.req {
+  margin-left: var(--space-1);
+  color: var(--danger);
+}
+/* input[type="number"] was in none of these: every order, width and height
+   field rendered as a bare user-agent control among tokenised ones. */
+.field input[type="text"], .field input[type="number"], .field input:not([type]), .field textarea, .field select {
+  width: 100%;
+  padding: var(--space-2);
+  border: var(--rule-width) solid var(--rule);
+  background: var(--ground-raised);
+  color: var(--ink);
+  font-family: var(--font-meta);
+  font-size: var(--text-sm);
+}
+.field textarea { min-height: 6rem; resize: vertical; }
+/* A standalone summary field earns the 6rem above; a one-line bullet inside a
+   list row does not — five of them read as five heavy cards rather than a
+   list. Same resize handle, a much shorter rest height. min-height alone
+   does not get there: a <textarea> with no rows attribute defaults to an
+   intrinsic two-row size, and min-height is only a floor under that, not a
+   ceiling above it — so the box still rendered at its native ~58px
+   regardless of the smaller min-height. An explicit height overrides that
+   default sizing outright; min-height stays alongside it as the floor
+   resize:vertical cannot be dragged past.
+
+   The selector is the scalar item itself, not `.list-item .field`. Three
+   places build a .list-item — fields.js's nested lists, forms.js's collection
+   rows and blocks-editor.js's blocks — so scoping to the row reached every
+   textarea in every list collection and every block: ten description and
+   callout blocks between 160 and 455 characters, four of them on one project,
+   plus every code block, every raw HTML block and every milestone note, all
+   edited through a box one line high (measured in Edge: 40px each). A scalar
+   row in a list of scalars is the one case this was written for, and it is
+   exactly the case whose data-path ends in a bracket: fields.js gives such a
+   row the list index as its whole path segment, while a record's own field
+   always ends in a field name. */
+.field[data-path$="]"] textarea { height: 2.5rem; min-height: 2.5rem; }
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-meta);
+  font-size: var(--text-sm);
+  color: var(--ink);
+}
+
+fieldset {
+  border: var(--rule-width) solid var(--rule);
+  margin: 0 0 var(--space-4);
+  padding: var(--space-4);
+}
+legend {
+  font-family: var(--font-meta);
+  font-size: var(--text-xs);
+  color: var(--ink-muted);
+  padding: 0 var(--space-2);
+}
+
+/* .list-item's own margin-bottom is the one spacing rule that reaches every
+   list-item, in every renderer: fields.js wraps repeatable sub-fields in a
+   .list, but forms.js and blocks-editor.js append list-items straight into an
+   unclassed div with no gap of its own. So .list carries no gap — adding one
+   here would only double the space fields.js already gets from below. */
+.list { display: flex; flex-direction: column; }
+.list-item {
+  border: var(--rule-width) solid var(--rule);
+  padding: var(--space-3);
+  margin-bottom: var(--space-3);
+  position: relative;
+}
+/* A trailing field has nothing under it but the item's own padding, so its
+   margin would just double that padding. */
+.list-item .field:last-child { margin-bottom: 0; }
+
+/* Both renderers append this div before the fields it acts on, so it reads
+   as a footer for the item above rather than this item's own header. A
+   hairline underneath and a bit of padding turn it into a labelled strip
+   that belongs to what follows; the buttons are shrunk so they read as
+   controls rather than primary actions, and pushed to the right so a
+   leading label (blocks-editor.js's block-type <strong>) has the left edge
+   to itself, whether or not that label is actually present — the auto
+   margin lands on whichever button comes first either way. The strip's own
+   padding and margin are kept to the smallest space token: with no label,
+   this row is nothing but the buttons and a hairline, and it should cost no
+   more height than they need. */
+.row-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding-bottom: var(--space-1);
+  margin-bottom: var(--space-1);
+  border-bottom: var(--rule-width) solid var(--rule);
+}
+.row-controls strong {
+  font-family: var(--font-meta);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--ink-muted);
+}
+.row-controls .btn {
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--text-xs);
+}
+.row-controls .btn:first-of-type { margin-left: auto; }
+
+/* fields.js appends this button straight into the .list host, after the
+   rows. In a column flex container the default cross-axis stretch would
+   make it as wide as the rows it sits under, reading as a primary action on
+   par with Save — align-self opts it out of that stretch instead, sizing it
+   to its own label. Its border and hover both drop to the row controls'
+   quieter register (a hairline, not --ink; an accent outline on hover, not
+   an ink fill) so a repeated, secondary "add another row" reads as exactly
+   that, never as the one consequential action on the page. */
+.list > .btn {
+  align-self: flex-start;
+  border-color: var(--rule);
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--text-xs);
+}
+.list > .btn:hover {
+  background: none;
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.thumb {
+  max-width: 7.5rem;
+  max-height: 5rem;
+  border: var(--rule-width) solid var(--rule);
+  display: block;
+}
+
+.err { color: var(--danger); font-family: var(--font-meta); font-size: var(--text-xs); min-height: 1.2em; }
+
+/* showErrors (forms.js) appends this straight into the .field wrapper it
+   matched, as the last child after the label and control; .field's own flex
+   gap spaces it the same as every other child there, so it needs no margin
+   of its own. Colour alone never carries the error — the control beside it
+   also gets aria-invalid — this is the visible half of that pairing. */
+.field-error { color: var(--danger); font-family: var(--font-meta); font-size: var(--text-xs); }
+
+@media (max-width: 700px) {
+  /* Unwrapped, the topbar's six items — brand, who, status, two buttons, plus
+     the spacer — do not fit a 390px viewport at their minimum content widths
+     and force the whole page to scroll horizontally. Wrapping the row and
+     dropping the least essential item (the signed-in username; sign-in state
+     is otherwise obvious) keeps every control reachable without it. */
+  #topbar { flex-wrap: wrap; row-gap: var(--space-2); }
+  .who { display: none; }
+  /* One row for the switch, one for whatever it selected. `display: none`
+     takes the other two regions out of the grid entirely, so there are always
+     exactly two grid items and 1fr means "the rest of the screen". */
+  .layout { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+  #collections { border-right: 0; }
+  #preview-pane { border-left: 0; }
+
+  /* The path, the form and the preview do not fit side by side, so exactly
+     one shows at a time — never two, never none. admin/app.js's setMobileView
+     stamps which one on <body> and moves aria-pressed between the three
+     buttons below, so the switch is announced the same way any other
+     pressed/unpressed control is, not left to be inferred from what changed
+     on screen.
+
+     The rail joined this group at the end of the project. It used to sit
+     above the form permanently, as a wrapping ROW — a rule inherited
+     unchanged from when it held six short file-name buttons. Rendered at
+     390x780 with the real navigation, that cost 324px, 41% of the phone
+     viewport, to show four of twenty-three entries, and squeezed the form
+     everyone actually types in into 339px underneath. The row direction did
+     not wrap anything either: The path's group is full width, so the sections
+     group beside it collapsed to its own content width, 116px, and the
+     selected row's plate ended a third of the way across while every row
+     above it ran the full width. Full screen each, one at a time, is both
+     more room and one less thing that looks wrong. */
+  .view-toggle {
+    display: flex;
+    /* Always the first row: it is the switch, and DOM order would otherwise
+       put it under whichever region is showing. */
+    order: -1;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    border-bottom: var(--rule-width) solid var(--rule);
+  }
+  .view-toggle .btn[aria-pressed="true"] {
+    background: var(--accent-plate);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  #collections, #panel, #preview-pane { display: none; }
+  body[data-mobile-view="path"] #collections { display: flex; }
+  body[data-mobile-view="form"] #panel { display: block; }
+  body[data-mobile-view="preview"] #preview-pane { display: block; }
+}

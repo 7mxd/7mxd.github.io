@@ -1,4 +1,18 @@
-import { validateImage, sanitizeFilename } from './lib.js';
+import { validateUpload, sanitizeFilename } from './lib.js';
+
+// Every photograph on the site is one of these; every logo is a PNG and any
+// future icon can be an SVG. Route those two through admin/photos.js instead,
+// which resizes, uprights, and derives the five fields a photograph needs.
+const PHOTO_TYPES = ['image/jpeg', 'image/heic', 'image/heif'];
+
+// Shown to whoever pressed Upload on a field that is not the photograph
+// itself — most often the small version, which is derived, not chosen. It used
+// to name admin/photos.js, a file the person reading it will never open; what
+// they need to know is which button to press instead and what happens when
+// they do.
+const PHOTO_ELSEWHERE = 'Photographs are added on the "Photograph (large)" '
+  + 'field. Choosing one there fills in the small version, the width and the '
+  + 'height automatically — they are not typed in by hand.';
 
 export function readFileBase64(file) {
   return new Promise((resolve, reject) => {
@@ -7,21 +21,19 @@ export function readFileBase64(file) {
     r.onerror = reject; r.readAsDataURL(file);
   });
 }
-export async function pickAndUpload(client, file) {
-  const v = validateImage({ type: file.type, size: file.size });
+/** `accept` is the field's own declared filter (admin/schema.js), which
+ *  decides what this will take: images everywhere, and a PDF on the one field
+ *  that asks for one. A photograph is still routed away first — attachPhoto
+ *  resizes, uprights and derives five fields, and none of that applies here. */
+export async function pickAndUpload(client, file, accept) {
+  if (PHOTO_TYPES.includes(file.type)) {
+    throw new Error(PHOTO_ELSEWHERE);
+  }
+  const v = validateUpload({ type: file.type, size: file.size }, accept);
   if (!v.ok) throw new Error(v.error);
   const base64 = await readFileBase64(file);
   const path = 'assets/' + sanitizeFilename(file.name);
   let sha = null; try { const ex = await client.getFile(path); sha = ex.sha; } catch (_) {}
   await client.putBinary(path, base64, sha, 'admin: upload ' + sanitizeFilename(file.name));
   return path;
-}
-export function attachImageField(inputEl, model, fieldName, client, thumbEl) {
-  const picker = document.createElement('input'); picker.type = 'file'; picker.accept = 'image/*'; picker.style.display='none';
-  picker.addEventListener('change', async () => {
-    if (!picker.files[0]) return;
-    try { const path = await pickAndUpload(client, picker.files[0]); inputEl.value = path; model[fieldName] = path; if (thumbEl){ thumbEl.src = '../'+path; thumbEl.hidden=false; } }
-    catch (e) { alert('Upload failed: ' + e.message); }
-  });
-  return picker;
 }

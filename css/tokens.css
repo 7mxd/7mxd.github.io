@@ -129,6 +129,15 @@
      contrast. Rotated off the old warm #a5a49e onto --rule's blue-grey axis at
      the same lightness (L* 67.40 against 67.29). */
   --portrait-ring: #a0a4b0;
+  /* The site itself never errs, so it never needed these; the admin does.
+     Not derived from the accent hue like the rest of the palette — red is
+     red regardless of a site's chosen blue, and test/tokens-contrast.test.js
+     checks these for contrast, not for hue, for exactly that reason. Worst
+     case across all six grounds is 5.71:1; against --ground itself, 6.26:1
+     and 8.67:1. Darker is the emphasis step in light, matching --accent /
+     --accent-strong. */
+  --danger: #b3261e;
+  --danger-strong: #8e1b16;
 }
 
 [data-theme="dark"] {
@@ -155,6 +164,10 @@
   --accent-plate: #232b42;
   --portrait-ring: #52576b;
   --logo-ground: #d8d8d6;
+  /* Lighter is the emphasis step in dark, matching --accent / --accent-strong.
+     Against the ground, 9.00:1 and 10.53:1. */
+  --danger: #f2a49d;
+  --danger-strong: #ffb4ab;
 }
 
 /* The page is rendered by JavaScript, so js/theme.js always sets

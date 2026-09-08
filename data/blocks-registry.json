@@ -15,7 +15,11 @@
     "fields": [
       { "name": "caption", "type": "text", "label": "Caption", "required": false },
       { "name": "unit", "type": "string", "label": "Unit (e.g. NMSE)", "required": true },
-      { "name": "rows", "type": "list", "label": "Rows as label / value / highlight", "required": true }
+      { "name": "rows", "type": "list", "label": "Rows", "required": true,
+        "fields": [
+          { "name": "label", "type": "string", "label": "Label", "required": true },
+          { "name": "value", "type": "string", "label": "Value", "required": true },
+          { "name": "highlight", "type": "boolean", "label": "This is my result" } ] }
     ]
   },
 
@@ -24,10 +28,12 @@
     "label": "Image",
     "fields": [
       { "name": "src", "type": "image", "label": "Image", "required": true },
+      { "name": "srcSmall", "type": "image", "label": "Image (small)", "required": false },
       { "name": "alt", "type": "string", "label": "Alt text", "required": true },
       { "name": "caption", "type": "string", "label": "Caption (optional)", "required": false },
       { "name": "width", "type": "number", "label": "Intrinsic width, px", "required": true },
-      { "name": "height", "type": "number", "label": "Intrinsic height, px", "required": true }
+      { "name": "height", "type": "number", "label": "Intrinsic height, px", "required": true },
+      { "name": "widthSmall", "type": "number", "label": "Small width, px", "required": false }
     ]
   },
 
@@ -43,7 +49,11 @@
     "scope": ["project"],
     "label": "Callout",
     "fields": [
-      { "name": "tone", "type": "select", "options": ["note", "tip", "warning"], "label": "Tone", "required": true },
+      { "name": "tone", "type": "select", "label": "Tone", "required": true,
+        "options": [
+          { "label": "Note", "value": "note" },
+          { "label": "Tip", "value": "tip" },
+          { "label": "Warning", "value": "warning" } ] },
       { "name": "content", "type": "text", "label": "Content", "required": true }
     ]
   },
@@ -86,7 +96,8 @@
     "scope": ["education"],
     "label": "Coursework list",
     "fields": [
-      { "name": "items", "type": "list", "label": "Course names", "required": true }
+      { "name": "items", "type": "list", "label": "Courses", "required": true,
+        "itemField": { "name": "item", "type": "string", "label": "Course" } }
     ]
   },
 

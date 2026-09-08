@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { validateSiteData, normalizeSiteImages } from '../js/data.js';
 import { buildTimeline } from '../js/timeline.js';
-import { renderAll } from '../js/render.js';
+import { renderAll, kindLabel, KIND_LABELS } from '../js/render.js';
 
 const load = (name) => JSON.parse(readFileSync(new URL(`../data/${name}.json`, import.meta.url), 'utf8'));
 
@@ -127,6 +127,44 @@ test('every entry is a stop on the rail, under a year station', () => {
   );
   // Only the school diploma carries a year-only source date.
   assert.equal(undated.length, 1, `expected one undated entry, found ${undated.length}`);
+});
+
+test('every entry carries a real label for its kind, never the raw kind string', () => {
+  // KIND_LABELS has an entry for every structural kind and every milestone
+  // kind the real data uses; a raw fallback (kindLabel returning the bare
+  // "role"/"certification"/... string) means something in the real content
+  // reached a kind this map does not know about.
+  for (const e of TIMELINE.flatMap((g) => g.entries)) {
+    const label = kindLabel(e);
+    assert.ok(
+      Object.values(KIND_LABELS).includes(label),
+      `${e.id}: kindLabel fell back to "${label}", which is not a declared label`,
+    );
+  }
+});
+
+test('every rendered entry-kind span holds a declared label', () => {
+  const { sections } = renderFixture();
+  const spans = sections.get('path').innerHTML.match(/<span class="entry-kind">([^<]*)<\/span>/g) || [];
+  assert.equal(spans.length, TIMELINE.flatMap((g) => g.entries).length, 'not every entry rendered a kind label');
+  for (const span of spans) {
+    const label = span.replace(/<[^>]+>/g, '');
+    assert.ok(Object.values(KIND_LABELS).includes(label), `unexpected kind label rendered: "${label}"`);
+  }
+});
+
+test('a real certificate renders "Certificate", not the generic "Milestone" fallback', () => {
+  // cert-dataiku-ml-practitioner: milestones.json's kind is "certification".
+  // This is the one this task exists to get right — before it, every
+  // milestone rendered indistinguishably, or (mid-task) fell back to the
+  // generic word because milestoneKind hadn't reached the entry yet.
+  const { sections } = renderFixture();
+  const html = sections.get('path').innerHTML;
+  const start = html.indexOf('Dataiku ML Practitioner');
+  assert.ok(start > -1, 'fixture certificate not found in the rendered path');
+  const nearby = html.slice(start, start + 400);
+  assert.match(nearby, /<span class="entry-kind">Certificate<\/span>/);
+  assert.doesNotMatch(nearby, /<span class="entry-kind">Milestone<\/span>/);
 });
 
 test('the skills legend appears only when something is emphasised', () => {

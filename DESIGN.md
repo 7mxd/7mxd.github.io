@@ -83,6 +83,8 @@ changed weight and the page's whole structure stopped being beige.
 | `--rule` | `#dee2ea` | hairlines only, never text | — |
 | `--rule-accent` | `#c4d1e8` | pill, plate and date-badge hairlines only | — |
 | `--accent-plate` | `#dce7f9` | the availability line's plate, never text | — |
+| `--danger` | `#b3261e` | inline field errors | 6.26:1 |
+| `--danger-strong` | `#8e1b16` | save-status failures | 8.67:1 |
 
 ### Dark
 
@@ -98,6 +100,8 @@ changed weight and the page's whole structure stopped being beige.
 | `--rule` | `#2b3040` | — |
 | `--rule-accent` | `#374561` | — |
 | `--accent-plate` | `#232b42` | — |
+| `--danger` | `#f2a49d` | 9.00:1 |
+| `--danger-strong` | `#ffb4ab` | 10.53:1 |
 
 `--print-*` tokens live in a second `:root` block and are reassigned onto the
 same names inside `css/print.css`. Print is ink on white regardless of theme.
@@ -224,12 +228,16 @@ is honoured throughout.
 ## Constraints
 
 - No build step, no bundler, no runtime dependencies. Plain ES modules.
-- CSS plus JS under **36 KB gzipped**, which is what a reader downloads, with a
+- CSS plus JS under **40 KB gzipped**, which is what a reader downloads, with a
   100 KB uncompressed parse ceiling behind it. Both enforced by
   `test/budget.test.js`. It was one 80 KB uncompressed number until that became
   the binding constraint on the project and three pieces of work ended with
   comments being deleted to fit — a comment gzips to roughly a quarter of
-  itself, so it costs a reader almost nothing and the old count everything.
+  itself, so it costs a reader almost nothing and the old count everything. The
+  compressed number was 36 KB and reached 35.79 with the admin revamp, close
+  enough that the next change would have been paid for by deleting comments
+  again. Headroom is part of a budget; without it the number stops measuring the
+  page and starts measuring whoever edits next.
 - Banned and asserted against: `border-left`/`border-right` accent stripes over
   1px, `background-clip: text`, any teal (`#1d9bb8`, `#1a8fa8`, `#36b6d6`), and
   the token names `--paper`, `--cream`, `--sand`, `--bone`, `--linen`,

@@ -1,3 +1,5 @@
+import { blankValue } from './fields.js';
+
 export function blockTypesForScope(registry, scope) {
   return Object.entries(registry)
     .filter(([k, v]) => k !== '_comment' && Array.isArray(v.scope) && v.scope.includes(scope))
@@ -11,8 +13,6 @@ export function fieldsForBlock(registry, type) {
 
 export function newBlock(registry, type) {
   const block = { type };
-  for (const f of fieldsForBlock(registry, type)) {
-    block[f.name] = f.type === 'list' ? [] : '';
-  }
+  for (const f of fieldsForBlock(registry, type)) block[f.name] = blankValue(f);
   return block;
 }

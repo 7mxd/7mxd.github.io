@@ -7,9 +7,9 @@ const VALID_TYPES = new Set(['string','text','number','boolean','select','image'
 const namesOf = (fields) => fields.map(f => f.name);
 const sub = (fields, name) => fields.find(f => f.name === name);
 
-test('all 7 collections present', () => {
+test('all 9 collections present', () => {
   assert.deepEqual(COLLECTIONS.map(c => c.name).sort(),
-    ['education','experience','profile','projects','settings','skills','summary']);
+    ['education','experience','metrics','milestones','profile','projects','settings','skills','summary']);
 });
 test('every field has name/label and a valid type', () => {
   const walk = (fields) => fields.forEach(f => {
@@ -84,4 +84,55 @@ test('projects declare the timeline and anchor fields, with images not a lone im
   assert.ok(p.itemFields.some(f => f.type === 'blocks' && f.scope === 'project'));
   const links = namesOf(sub(p.itemFields, 'links').fields);
   assert.ok(!links.includes('android'), 'there is no Android build to link to');
+});
+
+import { readFileSync, readdirSync } from 'node:fs';
+const REGISTRY = JSON.parse(
+  readFileSync(new URL('../data/blocks-registry.json', import.meta.url), 'utf8'));
+
+function registryFields() {
+  return Object.entries(REGISTRY)
+    .filter(([k]) => !k.startsWith('_'))
+    .flatMap(([type, v]) => (v.fields || []).map((f) => ({ type, f })));
+}
+
+test('every registry select declares {label, value} options', () => {
+  // The callout tone dropdown rendered empty because the registry wrote plain
+  // strings while admin/schema.js wrote objects, and one renderer read .value
+  // off both.
+  for (const { type, f } of registryFields()) {
+    if (f.type !== 'select') continue;
+    assert.ok(Array.isArray(f.options), `${type}.${f.name} has no options`);
+    for (const o of f.options) {
+      assert.equal(typeof o, 'object', `${type}.${f.name} option is not an object`);
+      assert.ok(o.label && o.value, `${type}.${f.name} option missing label or value`);
+    }
+  }
+});
+
+test('every registry list says whether it holds scalars or records', () => {
+  // benchmark.rows are records and coursework.items are strings, and both said
+  // only "list". One renderer assumed strings and destroyed the records.
+  for (const { type, f } of registryFields()) {
+    if (f.type !== 'list') continue;
+    const scalars = Boolean(f.itemField);
+    const records = Array.isArray(f.fields);
+    assert.ok(scalars !== records,
+      `${type}.${f.name} must declare exactly one of itemField or fields`);
+  }
+});
+
+test('benchmark rows declare the record the site actually renders', () => {
+  const rows = REGISTRY.benchmark.fields.find((f) => f.name === 'rows');
+  const names = rows.fields.map((f) => f.name).sort();
+  assert.deepEqual(names, ['highlight', 'label', 'value']);
+});
+
+test('every data file is managed except the registry, which is schema', () => {
+  const files = readdirSync(new URL('../data/', import.meta.url))
+    .filter((f) => f.endsWith('.json'));
+  const managed = new Set(COLLECTIONS.map((c) => c.file.replace('data/', '')));
+  const unmanaged = files.filter((f) => !managed.has(f));
+  assert.deepEqual(unmanaged.sort(), ['blocks-registry.json'],
+    'a content file nobody can edit is the defect this revamp exists to remove');
 });
