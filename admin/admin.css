@@ -129,11 +129,25 @@ body { font-family: var(--font-meta); }
 #preview-pane {
   border-left: var(--rule-width) solid var(--rule);
 }
-#preview {
+/* :not([hidden]) for the same reason #login and #app above carry it: when the
+   preview never becomes ready, admin/preview.js hides the frame and puts a
+   notice in its place, and an unconditional `display` here would out-cascade
+   the user agent's [hidden] rule and leave the dead frame on screen under it. */
+#preview:not([hidden]) {
   display: block;
   width: 100%;
   height: 100%;
   border: 0;
+}
+/* The bounded wait expiring. A preview that never arrives otherwise looks
+   exactly like one that is up to date — the same published page, sitting
+   still — so the pane says which it is, in words, and gets out of the way. */
+.preview-unavailable {
+  margin: 0;
+  padding: var(--space-6);
+  font-family: var(--font-meta);
+  font-size: var(--text-sm);
+  color: var(--ink-muted);
 }
 
 /* The path can run past thirty rows once every job, course, project and

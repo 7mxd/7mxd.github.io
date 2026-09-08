@@ -14,6 +14,13 @@ export function mergeForPreview(base, collectionName, data) {
   return { ...base, [collectionName]: data };
 }
 
+/** How long the preview waits for the site inside it to say it has rendered
+ *  before giving up and saying so. Generous — the iframe starts navigating
+ *  at parse time and normally beats the admin's own boot — but bounded: the
+ *  alternative is waiting forever behind a frame that looks like the live
+ *  site and never moves again. */
+export const READY_TIMEOUT = 20000;
+
 /** `getBase` returns the full ten-key site dataset (see js/data.js's
  *  validateSiteData), built fresh from the admin's own live models — see
  *  admin/app.js's buildPreviewBase. Every collection is already in memory
@@ -32,30 +39,95 @@ export function mergeForPreview(base, collectionName, data) {
  *  and `site:rendered` event it sets in its `finally` block — and replays
  *  whatever the most recent `update()` asked for once that happens, so a
  *  keystroke during boot is delayed rather than lost. */
-export function createPreview(iframe, getBase) {
+export function createPreview(iframe, getBase, { timeout = READY_TIMEOUT } = {}) {
   let timer = null;
   let ready = false;
   let pending = null;
+  let watching = false;
+  let stallTimer = null;
+  let notice = null;
 
   function markReady() {
+    if (ready) return;
     ready = true;
+    clearTimeout(stallTimer);
+    clearUnavailable();
     if (!pending) return;
     const { collectionName, data } = pending;
     pending = null;
     render(collectionName, data).catch(logRenderError);
   }
 
-  iframe.addEventListener('load', () => {
+  /** The readiness path, shared by the `load` event and the direct call
+   *  below. `watching` is what keeps it from running twice: a single-threaded
+   *  page cannot interleave the two entry points, so whichever arrives first
+   *  claims the document and the other becomes a no-op rather than attaching
+   *  a second listener. */
+  function watchDocument() {
+    if (watching || ready) return;
     const doc = iframe.contentDocument;
     if (!doc) return;
-    // The iframe may finish booting before the preview ever gets here — in
-    // that case the mark is already set and there is no event left to wait
-    // for. Checking first, then attaching the listener, closes that race:
-    // nothing runs between the check and the attach in a single-threaded
-    // page, so the event can neither be missed nor double-handled.
+    // Every iframe starts on the `about:blank` document that its own `src`
+    // navigation then throws away. That document carries no site render and
+    // never will, so claiming it here would spend the single attach on a
+    // document already on its way out and leave the real one unwatched —
+    // the same dead preview this function exists to prevent, arrived at from
+    // the other side. `loading` is that story one step later: the real
+    // document exists but none of its scripts have run, so leave it to the
+    // `load` event rather than racing them.
+    if (doc.readyState === 'loading' || doc.URL === 'about:blank') return;
+    watching = true;
     if (doc.documentElement.dataset.rendered === 'true') markReady();
     else doc.addEventListener('site:rendered', markReady, { once: true });
-  });
+  }
+
+  // The pane around the frame, not a document this module does not own. If
+  // readiness never arrives — the site's own boot threw before its `finally`,
+  // or the iframe never loaded at all — the frame just sits there showing the
+  // published page, which is indistinguishable from a preview that is simply
+  // up to date. Saying so is the whole point: quiet, textual, and in the
+  // admin's own tokens.
+  const pane = iframe.parentNode;
+
+  function showUnavailable() {
+    if (ready || notice || !pane) return;
+    const doc = iframe.ownerDocument;
+    if (!doc) return;
+    iframe.hidden = true;
+    notice = doc.createElement('p');
+    notice.className = 'preview-unavailable';
+    notice.setAttribute('role', 'status');
+    notice.textContent = 'Preview unavailable — the page in this pane never '
+      + 'finished loading, so it is not showing your edits. Editing and saving '
+      + 'still work. Reload to try again.';
+    pane.appendChild(notice);
+  }
+
+  function clearUnavailable() {
+    if (!notice) return;
+    notice.remove();
+    notice = null;
+    iframe.hidden = false;
+  }
+
+  // Started before the readiness attach below, not after: that attach can
+  // mark the preview ready synchronously, and a timer armed afterwards would
+  // outlive the thing it was meant to time and cover a working preview with
+  // a failure notice twenty seconds in.
+  stallTimer = setTimeout(showUnavailable, timeout);
+
+  iframe.addEventListener('load', watchDocument);
+  // …and again, right now, because `load` may already have fired. admin/app.js
+  // constructs the preview only after loadAll()'s ten authenticated,
+  // never-cached GitHub calls resolve, while <iframe src="/"> begins
+  // navigating at HTML parse time and `hidden` does not defer it. On any
+  // reload with a warm cache the iframe wins that race and there is no `load`
+  // event left to hear: without this call the handler above never runs,
+  // `ready` stays false, and every update() parks in the not-ready branch
+  // forever — a preview pane showing the published site, reflecting no edit,
+  // with nothing in the console. A cold cache works, which is exactly why it
+  // reads as flaky rather than broken.
+  watchDocument();
 
   function logRenderError(err) {
     // A merge the site cannot render — a half-typed record, a photograph
