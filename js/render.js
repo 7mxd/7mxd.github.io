@@ -236,8 +236,11 @@ function orgLogoMarkup(logo) {
  *  for "milestone" itself since kindLabel() below resolves through that
  *  instead. Exported so admin/app.js's nav imports this rather than keeping
  *  a second copy. */
+// "Experience", not "Work": the page already has a Work section and it holds
+// projects, so a role labelled Work would point at the wrong one. It is also
+// the word the data file uses, and it sits with Education rather than against it.
 export const KIND_LABELS = {
-  role: 'Job', education: 'Education', project: 'Project',
+  role: 'Experience', education: 'Education', project: 'Project',
   certification: 'Certificate', award: 'Award', volunteering: 'Volunteering',
 };
 
