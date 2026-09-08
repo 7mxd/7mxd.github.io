@@ -23,9 +23,24 @@ let client = null, registry = null, current = null;
 const models = {};
 const shas = {};
 const dirty = {};
+// Collection name (or '*registry*') -> error message, for a file that failed
+// to fetch or to parse. loadAll() never lets one bad file take the other
+// eleven down with it; this is how the gap left in its place gets surfaced
+// instead of silently editing (and risking saving over) an empty stand-in.
+const loadErrors = {};
 // Which specific path entry (if any) is the open one, for aria-current.
 // Null when the open view is a whole-collection section rather than one row.
 let activeEntryId = null;
+
+// Interface labels: what kind of thing a row is, not anything Ahmed wrote.
+// buildTimeline() only stamps the coarse kind (role/education/project/
+// milestone) onto a composed entry — the finer milestone kind (certificate,
+// award, volunteering) lives on the record behind it. Resolving every
+// milestone row once, here, when the nav is (re)built is cheap — a find over
+// well under thirty records — and keeps nav.js from needing to know that a
+// milestone's real kind lives one hop away in a different file.
+const KIND_LABELS = { role: 'Job', education: 'Education', project: 'Project' };
+const MILESTONE_LABELS = { certification: 'Certificate', award: 'Award', volunteering: 'Volunteering' };
 
 // Structural interface labels, not content: "Selected work" and "About" are
 // how the nav names these sections, distinct from the panel legend text
@@ -48,24 +63,53 @@ function showLogin() { $('login').hidden = false; $('app').hidden = true; }
 function showApp() { $('login').hidden = true; $('app').hidden = false; }
 function setStatus(msg, state) { const el=$('save-status'); el.textContent=msg||''; el.dataset.state = state||''; }
 
+/** The empty stand-in for a collection whose file failed to load — the same
+ *  shape selectCollection already used for a brand-new (404) file, so the
+ *  rest of the app (renderForm, validateModel, buildTimeline) sees an
+ *  ordinary empty collection rather than undefined. */
+function emptyModel(c) { return c.kind === 'list' ? { [c.listKey]: [] } : {}; }
+
 /** Loads every collection's file, plus the block registry, in one pass —
  *  not just the four the timeline draws from. The live preview this admin is
  *  getting next needs every collection's data to render the page, and the
  *  timeline's own four files must be the very same in-memory objects the
  *  forms edit (see the `models` comment above). One loader that fetches
  *  everything keeps those two needs from drifting into two loaders that
- *  disagree; a per-section lazy fetch would only reintroduce that split. */
+ *  disagree; a per-section lazy fetch would only reintroduce that split.
+ *
+ *  It settles rather than rejects: before this task, one file's fetch failed
+ *  in isolation and only the registry gated boot at all. A bare Promise.all
+ *  over twelve files would regress that — one malformed file (a network
+ *  failure, or JSON a hand edit broke) would reject the whole batch, boot's
+ *  catch would bounce the owner back to the sign-in screen, and nothing
+ *  would be editable. So every file gets its own try/catch: a failure
+ *  records itself in `loadErrors` and the collection gets an empty stand-in
+ *  instead of stopping the other eleven. */
 async function loadAll() {
-  const [registryFile, ...files] = await Promise.all([
+  const results = await Promise.allSettled([
     client.getFile('data/blocks-registry.json'),
     ...COLLECTIONS.map((c) => client.getFile(c.file)),
   ]);
-  registry = JSON.parse(registryFile.content);
+  const [registryResult, ...fileResults] = results;
+  try {
+    if (registryResult.status !== 'fulfilled') throw registryResult.reason;
+    registry = JSON.parse(registryResult.value.content);
+  } catch (e) {
+    registry = {};
+    loadErrors['*registry*'] = e.message || String(e);
+  }
   COLLECTIONS.forEach((c, i) => {
-    const file = files[i];
-    shas[c.name] = file.sha;
-    const data = file.content ? JSON.parse(file.content) : (c.kind === 'list' ? { [c.listKey]: [] } : {});
-    models[c.name] = buildFormModel(c, data);
+    const result = fileResults[i];
+    try {
+      if (result.status !== 'fulfilled') throw result.reason;
+      const file = result.value;
+      shas[c.name] = file.sha;
+      const data = file.content ? JSON.parse(file.content) : emptyModel(c);
+      models[c.name] = buildFormModel(c, data);
+    } catch (e) {
+      models[c.name] = buildFormModel(c, emptyModel(c));
+      loadErrors[c.name] = e.message || String(e);
+    }
     dirty[c.name] = false;
   });
 }
@@ -76,8 +120,9 @@ async function boot() {
   const token = getToken();
   if (!token) return showLogin();
   client = createClient({ token });
-  try { await loadAll(); }
-  catch (e) { $('login-error').textContent = 'Failed to load content: '+e.message; return showLogin(); }
+  // loadAll() no longer throws — a failed file becomes a loadErrors entry
+  // and an empty stand-in, not a reason to bounce the owner to sign-in.
+  await loadAll();
   showApp();
   (async () => {
     try {
@@ -88,6 +133,27 @@ async function boot() {
   $('panel').addEventListener('input', () => { if (current) dirty[current.name] = true; });
   buildNav();
   openCollection('profile');
+  const failed = Object.keys(loadErrors);
+  if (failed.length) {
+    const names = failed.map((n) => (n === '*registry*' ? 'the block registry' : (getCollection(n)?.label || n)));
+    setStatus(`Could not load: ${names.join(', ')}. Everything else is still editable.`, 'error');
+  }
+}
+
+/** The display label for one row's kind. A milestone's own kind
+ *  (certification/award/volunteering) only lives on the record, not on the
+ *  entry buildTimeline composed, so labelling it precisely means resolving
+ *  it — safe to do here even for an entry whose collection failed to load
+ *  (resolveEntry then throws and this just falls back to "Milestone" rather
+ *  than surfacing an error a user didn't ask for by looking at the nav). */
+function kindLabelFor(entry) {
+  if (entry.kind !== 'milestone') return KIND_LABELS[entry.kind] || entry.kind;
+  try {
+    const { record } = resolveEntry(entry, models);
+    return MILESTONE_LABELS[record.kind] || 'Milestone';
+  } catch (e) {
+    return 'Milestone';
+  }
 }
 
 /** Builds the timeline fresh from the four collections' own live models —
@@ -97,7 +163,7 @@ function buildNav() {
   const entries = buildTimeline({
     experience: models.experience, education: models.education,
     projects: models.projects, milestones: models.milestones,
-  }).flatMap((g) => g.entries);
+  }).flatMap((g) => g.entries).map((entry) => ({ ...entry, kindLabel: kindLabelFor(entry) }));
   const nav = renderNav(document, {
     sections: REMAINING_SECTIONS, entries,
     onSelect: handleSelect,
@@ -124,10 +190,23 @@ function markActive() {
  *  reveals the same cached model the previous view was editing — so unlike
  *  the old per-file sidebar, there is no discard-changes prompt to guard the
  *  switch with. beforeunload below is where losing unsaved work is still a
- *  real risk, and it already covers every collection at once. */
+ *  real risk, and it already covers every collection at once.
+ *
+ *  resolveEntry throws for a ghost entry — stale data, or a record a hand
+ *  edit deleted straight out of the JSON file. Left uncaught, that throw
+ *  happens inside this click handler: a console error and nothing the owner
+ *  ever sees, which is exactly the silent failure this task exists to
+ *  prevent. Caught here and named on the status line instead. */
 function handleSelect(item) {
   if (item.source) {
-    const { collection, record } = resolveEntry(item, models);
+    let resolved;
+    try {
+      resolved = resolveEntry(item, models);
+    } catch (e) {
+      setStatus(`Could not open "${item.title}": ${e.message}`, 'error');
+      return;
+    }
+    const { collection, record } = resolved;
     activeEntryId = item.id;
     openCollection(collection);
     scrollToRecord(collection, record);
@@ -177,7 +256,6 @@ function focusRecord(collectionName, record) {
 
 function openCollection(name) {
   current = getCollection(name);
-  setStatus('');
   const ctx = {
     registry, client, renderBlocks,
     // Task 10 replaces this with attachPhoto, which derives web-sized copies.
@@ -187,12 +265,24 @@ function openCollection(name) {
     onError: (e) => setStatus('Upload failed: ' + e.message, 'error'),
   };
   renderForm($('panel'), current, models[current.name], ctx);
+  // A collection whose file failed to load renders an empty form here —
+  // say so every time it's opened, not just once at boot, and loudly enough
+  // that saving it (which the button below refuses) reads as the wrong move.
+  if (loadErrors[name]) {
+    setStatus(`${current.label} failed to load (${loadErrors[name]}) — this is an empty stand-in, not the real file. Reload the page after fixing it; do not save.`, 'error');
+  } else {
+    setStatus('');
+  }
   markActive();
 }
 
 $('save').onclick = async () => {
   if (!current) return;
   const name = current.name;
+  if (loadErrors[name]) {
+    setStatus(`Cannot save ${current.label} — it failed to load, so this is an empty stand-in. Reload the page after fixing the file on GitHub.`, 'error');
+    return;
+  }
   const errs = validateModel(current, models[name]);
   if (errs.length) { setStatus(errs[0].path+': '+errs[0].message, 'error'); return; }
   setStatus('Saving…'); $('save').disabled = true;

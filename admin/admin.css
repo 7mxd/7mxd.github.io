@@ -10,7 +10,10 @@
    here rather than repeated as a magic number; the contract test allows the
    prefix and nothing else. */
 :root {
-  --admin-sidebar: 14rem;
+  /* Widened from 14rem once The path started carrying real entry titles
+     instead of six short file names — most titles now clear two lines
+     instead of three or four. */
+  --admin-sidebar: 18rem;
 }
 
 * { box-sizing: border-box; }
@@ -159,6 +162,31 @@ body { font-family: var(--font-meta); }
   gap: var(--space-1);
 }
 .nav-list button { width: 100%; }
+
+/* A path row is two lines, not one run-on string: a meta line (date, kind)
+   above the title, so nineteen-plus rows of similar length have something
+   other than a middot to scan by. The meta line only ever gets ink-muted —
+   never the accent, which the site's own palette rule reserves for the
+   page's skeleton and identity, not for a date — and it stays that colour
+   even when the row is selected, since #collections button[aria-current]
+   only recolours text with no colour of its own; the title has none, so it
+   inherits the selected accent same as before this row grew a second line. */
+.nav-entry {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.nav-entry-meta {
+  font-family: var(--font-meta);
+  font-size: var(--text-xs);
+  color: var(--ink-muted);
+}
+.nav-entry-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 
 .nav-add {
   display: flex;

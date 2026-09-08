@@ -10,20 +10,24 @@ import { TIMELINE_KINDS } from './schema.js';
 
 const el = (doc, tag, props = {}) => Object.assign(doc.createElement(tag), props);
 
-/** Interface labels: what kind of thing a row is, not anything Ahmed wrote.
- *  buildTimeline() only stamps the coarse kind (role/education/project/
- *  milestone) onto a composed entry — the finer milestone kind (certificate,
- *  award, volunteering) lives on the record behind it. Re-deriving that here
- *  would mean resolving every row just to label it, which is exactly the
- *  "one implementation of the composition" rule admin/timeline-edit.js
- *  exists to keep. "Milestone" is close enough for a nav row. */
-const KIND_LABELS = { role: 'Job', education: 'Education', project: 'Project', milestone: 'Milestone' };
-
 function formatDate(entry) {
   if (!entry.badge) return String(entry.year ?? '');
   return entry.badge.month ? `${entry.badge.month} ${entry.badge.year}` : entry.badge.year;
 }
 
+/** Two lines per row, not one run-on string: a meta line (date, kind — muted,
+ *  small) and the title beneath it (ink, the size an ordinary button reads
+ *  at). Nineteen-plus same-weight, same-colour, middot-separated fragments
+ *  read as a wall of text with nothing to scan by; splitting date/kind from
+ *  title, and never accenting the meta line, gives a reader something to
+ *  anchor on without putting the accent anywhere the site's own palette rule
+ *  reserves for ink (dates and entry titles are ink there too).
+ *
+ *  Nothing here decides what "kind" a row is — `entry.kindLabel` is expected
+ *  to already be the display string (app.js computes it, resolving a
+ *  milestone's own record for "Certificate"/"Award"/"Volunteering" where
+ *  buildTimeline's composed entry only ever says "milestone"), so this stays
+ *  a plain map from entry to markup with no knowledge of collections. */
 function pathGroup(doc, entries, onSelect, onAdd) {
   const group = el(doc, 'div', { className: 'nav-group' });
   group.appendChild(el(doc, 'h2', { className: 'nav-heading', textContent: 'The path' }));
@@ -31,11 +35,11 @@ function pathGroup(doc, entries, onSelect, onAdd) {
   const list = el(doc, 'ul', { className: 'nav-list' });
   for (const entry of entries) {
     const li = el(doc, 'li');
-    const btn = el(doc, 'button', {
-      type: 'button',
-      className: 'nav-entry',
-      textContent: `${formatDate(entry)} · ${entry.title} · ${KIND_LABELS[entry.kind] || entry.kind}`,
-    });
+    const btn = el(doc, 'button', { type: 'button', className: 'nav-entry' });
+    const kindLabel = entry.kindLabel || entry.kind;
+    btn.append(
+      el(doc, 'span', { className: 'nav-entry-meta', textContent: `${formatDate(entry)} · ${kindLabel}` }),
+      el(doc, 'span', { className: 'nav-entry-title', textContent: entry.title }));
     btn.dataset.entryId = entry.id;
     btn.setAttribute('aria-current', 'false');
     btn.addEventListener('click', () => onSelect(entry));
