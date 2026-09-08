@@ -54,23 +54,47 @@ export function moveItem(list, from, to) {
 const el = (doc, tag, props = {}) => Object.assign(doc.createElement(tag), props);
 const bump = (node) => node.dispatchEvent(new Event('input', { bubbles: true }));
 
+// A module-level counter, not an id keyed off the field name: a later task
+// renders a second document for a live preview, and a fixed id per field
+// name would collide the moment both documents exist at once.
+let uid = 0;
+const nextId = () => 'field-' + (++uid);
+
+// object, list and blocks hand back a fieldset or a bare container, not a
+// single labelable element — a `<label for>` pointed at one does nothing a
+// screen reader honours, so those three never get an id to point at.
+const GROUP_TYPES = new Set(['object', 'list', 'blocks']);
+
 /** A labelled control for one field. `ctx` carries { doc, client, registry,
  *  renderBlocks, uploadImage } — everything a field might need and nothing it
- *  builds itself. */
+ *  builds itself.
+ *
+ *  `field.label === ''` means "no caption for this control" (the scalar rows
+ *  inside a list of strings, which would otherwise show their own index as a
+ *  label) — distinct from `field.label` simply absent, which falls back to
+ *  `field.name`. Whenever a caption is shown for an atomic control, the
+ *  control gets a generated id and the label points at it with `htmlFor`, so
+ *  the caption is the control's accessible name and not just nearby text. */
 export function renderField(doc, field, record, ctx) {
   const wrap = el(doc, 'div', { className: 'field' });
-  if (field.type !== 'boolean') {
-    wrap.appendChild(el(doc, 'label', { textContent: field.label || field.name }));
+  const labelText = field.label === '' ? null : (field.label || field.name);
+  const id = (field.type !== 'boolean' && !GROUP_TYPES.has(field.type) && labelText != null)
+    ? nextId() : null;
+  if (field.type !== 'boolean' && labelText != null) {
+    const label = el(doc, 'label', { textContent: labelText });
+    if (id) label.htmlFor = id;
+    wrap.appendChild(label);
   }
-  wrap.appendChild(controlFor(doc, field, record, ctx));
+  wrap.appendChild(controlFor(doc, field, record, ctx, id));
   wrap.dataset.path = field.name;
   return wrap;
 }
 
-function controlFor(doc, field, record, ctx) {
+function controlFor(doc, field, record, ctx, id) {
   switch (field.type) {
     case 'text': case 'code': {
       const ta = el(doc, 'textarea', { value: readField(field, record) });
+      if (id) ta.id = id;
       ta.addEventListener('input', () => writeField(field, record, ta.value));
       return ta;
     }
@@ -83,11 +107,13 @@ function controlFor(doc, field, record, ctx) {
     }
     case 'number': {
       const inp = el(doc, 'input', { type: 'number', value: readField(field, record) });
+      if (id) inp.id = id;
       inp.addEventListener('input', () => writeField(field, record, inp.value));
       return inp;
     }
     case 'select': {
       const sel = el(doc, 'select');
+      if (id) sel.id = id;
       for (const o of field.options || []) {
         sel.appendChild(el(doc, 'option', { value: o.value, textContent: o.label }));
       }
@@ -95,7 +121,7 @@ function controlFor(doc, field, record, ctx) {
       sel.addEventListener('change', () => { writeField(field, record, sel.value); bump(sel); });
       return sel;
     }
-    case 'image': return imageControl(doc, field, record, ctx);
+    case 'image': return imageControl(doc, field, record, ctx, id);
     case 'object': {
       const set = el(doc, 'fieldset');
       set.appendChild(el(doc, 'legend', { textContent: field.label || field.name }));
@@ -113,6 +139,7 @@ function controlFor(doc, field, record, ctx) {
     }
     default: {
       const inp = el(doc, 'input', { type: 'text', value: readField(field, record) });
+      if (id) inp.id = id;
       inp.addEventListener('input', () => writeField(field, record, inp.value));
       return inp;
     }
@@ -168,9 +195,10 @@ function listControl(doc, field, record, ctx) {
   return host;
 }
 
-function imageControl(doc, field, record, ctx) {
+function imageControl(doc, field, record, ctx, id) {
   const host = el(doc, 'div');
   const inp = el(doc, 'input', { type: 'text', value: readField(field, record) });
+  if (id) inp.id = id;
   inp.addEventListener('input', () => writeField(field, record, inp.value));
   const thumb = el(doc, 'img', { className: 'thumb' });
   thumb.hidden = !record[field.name];
