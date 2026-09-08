@@ -84,7 +84,7 @@ const toBase64 = (buf) => {
 // something is very wrong (a stuck loop, a client that never reports a path
 // as free); this is "stop and tell the owner" territory, not a number a real
 // photograph library should ever reach.
-const MAX_SLUG_VARIANTS = 50;
+export const MAX_SLUG_VARIANTS = 50;
 
 /** getFile's real contract (admin/github.js): a missing file *resolves* with
  *  `sha: null` — it does not throw for "not found". It throws only for a
@@ -114,7 +114,7 @@ function pathsForSlug(slug) {
 
 /** The slug a committed large-derivative path was built from, or null if the
  *  path isn't shaped like one (a blank field, or a hand-typed path). */
-function slugOfLargePath(path) {
+export function slugOfLargePath(path) {
   const m = typeof path === 'string' && /^assets\/photos\/derived\/(.+)-1600\.jpg$/.exec(path);
   return m ? m[1] : null;
 }
@@ -123,7 +123,7 @@ function slugOfLargePath(path) {
  *  numbered variant of it assigned by an earlier collision (`slug-2`,
  *  `slug-3`, ...). Slugs are sanitizeFilename output: lowercase letters,
  *  digits, and hyphens only, so embedding one in a RegExp needs no escaping. */
-function sameSlugFamily(existingSlug, slug) {
+export function sameSlugFamily(existingSlug, slug) {
   return existingSlug === slug || new RegExp(`^${slug}-\\d+$`).test(existingSlug);
 }
 
@@ -135,7 +135,7 @@ function sameSlugFamily(existingSlug, slug) {
  *  replacement into this exact field" apart from "an unrelated photo that
  *  happens to collide" needs the record being edited and the server's
  *  existing files, so it lives here rather than in derivedPaths. */
-async function resolvePaths(file, record, client) {
+export async function resolvePaths(file, record, client) {
   const candidate = derivedPaths(file.name);
   const currentSlug = slugOfLargePath(record.src);
   // The field's current photo already lives under this filename's slug
