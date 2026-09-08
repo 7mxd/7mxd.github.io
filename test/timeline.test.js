@@ -1,7 +1,14 @@
 // test/timeline.test.js
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { buildTimeline } from '../js/timeline.js';
+
+const load = (n) => JSON.parse(readFileSync(new URL(`../data/${n}.json`, import.meta.url), 'utf8'));
+const REAL = {
+  experience: load('experience'), education: load('education'),
+  projects: load('projects'), milestones: load('milestones'),
+};
 
 const empty = { experience: { items: [] }, education: { items: [] }, projects: { items: [] }, milestones: { items: [] } };
 
@@ -127,4 +134,25 @@ test('an impossible month is dropped, but 01 and 12 are kept', () => {
 
 test('an empty payload produces an empty timeline, not an error', () => {
   assert.deepEqual(buildTimeline(empty), []);
+});
+
+test('every composed entry says which file and record it came from', () => {
+  // The admin resolves a timeline row back to the record behind it. Without
+  // this it would have to reimplement composition, which is the drift the
+  // shared-code rule exists to prevent.
+  const groups = buildTimeline(REAL);
+  const entries = groups.flatMap((g) => g.entries);
+  assert.ok(entries.length > 0);
+  const collections = new Set(['experience', 'education', 'projects', 'milestones']);
+  for (const e of entries) {
+    assert.ok(e.source, `${e.id} has no source`);
+    assert.ok(collections.has(e.source.collection), `${e.id}: ${e.source.collection}`);
+    assert.equal(e.source.id, e.id, `${e.id}: source.id must address the record`);
+  }
+});
+
+test('no two records share an id, so source.id addresses exactly one', () => {
+  const groups = buildTimeline(REAL);
+  const ids = groups.flatMap((g) => g.entries).map((e) => e.source.id);
+  assert.equal(new Set(ids).size, ids.length, 'duplicate id across the timeline');
 });
