@@ -5,6 +5,7 @@
  *  records flattened to "[object Object]" — lives entirely in the value logic.
  *  A bug that cannot be tested is a bug that comes back.
  */
+import { uploadRule } from './lib.js';
 
 /** The empty value for a field, matching the shape it declares. */
 export function blankValue(field) {
@@ -301,24 +302,40 @@ function listControl(doc, field, record, ctx, path) {
   return host;
 }
 
+// Which committed paths can be shown as a picture. Settings' CV is a `.pdf`
+// on an `image` field, and an <img> pointed at a PDF renders as a broken
+// image — the browser's "this file is missing" icon, on a file that is
+// perfectly fine and did upload. So the thumbnail follows the file, not the
+// field type.
+const RENDERABLE_IMAGE = /\.(png|jpe?g|svg|webp|gif|avif)$/i;
+
 function imageControl(doc, field, record, ctx, id) {
   const host = el(doc, 'div');
+  const rule = uploadRule(field.accept);
   const inp = el(doc, 'input', { type: 'text', value: readField(field, record) });
   if (id) inp.id = id;
   inp.addEventListener('input', () => writeField(field, record, inp.value));
   const thumb = el(doc, 'img', { className: 'thumb' });
-  thumb.hidden = !record[field.name];
-  if (record[field.name]) thumb.src = '../' + record[field.name];
-  const picker = el(doc, 'input', { type: 'file', accept: 'image/*' });
+  const showThumb = () => {
+    const value = record[field.name];
+    const isImage = typeof value === 'string' && RENDERABLE_IMAGE.test(value);
+    thumb.hidden = !isImage;
+    if (isImage) thumb.src = '../' + value;
+  };
+  showThumb();
+  // The field's own declared filter, so the dialog offers what the field
+  // actually takes — the CV asks for a PDF and used to be handed an
+  // image-only dialog it could not answer.
+  const picker = el(doc, 'input', { type: 'file', accept: rule.accept });
   picker.hidden = true;
-  const btn = el(doc, 'button', { type: 'button', className: 'btn ghost', textContent: 'Upload image' });
+  const btn = el(doc, 'button', { type: 'button', className: 'btn ghost', textContent: rule.button });
   btn.addEventListener('click', () => picker.click());
   picker.addEventListener('change', async () => {
     if (!picker.files[0] || !ctx.uploadImage) return;
     try {
       await ctx.uploadImage(picker.files[0], record, field);
       inp.value = record[field.name] || '';
-      if (record[field.name]) { thumb.src = '../' + record[field.name]; thumb.hidden = false; }
+      showThumb();
       // Order matters. `input` goes first, while this node is still in the
       // tree, so app.js's panel listener marks the collection dirty and feeds
       // the preview; the rewrite goes second, because the group that answers

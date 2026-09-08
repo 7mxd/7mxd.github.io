@@ -1,4 +1,4 @@
-import { validateImage, sanitizeFilename } from './lib.js';
+import { validateUpload, sanitizeFilename } from './lib.js';
 
 // Every photograph on the site is one of these; every logo is a PNG and any
 // future icon can be an SVG. Route those two through admin/photos.js instead,
@@ -21,11 +21,15 @@ export function readFileBase64(file) {
     r.onerror = reject; r.readAsDataURL(file);
   });
 }
-export async function pickAndUpload(client, file) {
+/** `accept` is the field's own declared filter (admin/schema.js), which
+ *  decides what this will take: images everywhere, and a PDF on the one field
+ *  that asks for one. A photograph is still routed away first — attachPhoto
+ *  resizes, uprights and derives five fields, and none of that applies here. */
+export async function pickAndUpload(client, file, accept) {
   if (PHOTO_TYPES.includes(file.type)) {
     throw new Error(PHOTO_ELSEWHERE);
   }
-  const v = validateImage({ type: file.type, size: file.size });
+  const v = validateUpload({ type: file.type, size: file.size }, accept);
   if (!v.ok) throw new Error(v.error);
   const base64 = await readFileBase64(file);
   const path = 'assets/' + sanitizeFilename(file.name);

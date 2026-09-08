@@ -22,8 +22,28 @@ export function sanitizeFilename(name) {
   const slug = base.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
   return ext ? `${slug}.${ext}` : slug;
 }
-export function validateImage({ type, size }) {
-  if (!IMG_TYPES.includes(type)) return { ok: false, error: `Unsupported type ${type}. Allowed: PNG, JPEG, SVG, WebP.` };
-  if (size > MAX_IMG) return { ok: false, error: `Image too large (max ${MAX_IMG / (1024 * 1024)}MB).` };
+/** What a field's `accept` (admin/schema.js) means, on both sides of the file
+ *  dialog: the filter the dialog itself uses, the MIME types accepted back
+ *  from it, and what to call the button.
+ *
+ *  Declared together on purpose. Settings' CV field has said `accept: '.pdf'`
+ *  since the schema was written and nothing read it — the picker hardcoded
+ *  `image/*`, so the dialog would not offer a PDF at all, and this function
+ *  refused `application/pdf` even if one arrived. The CV button is on the
+ *  hero, and the requirement was that everything on the page be editable, so
+ *  it could not be replaced without a developer. Splitting the dialog filter
+ *  from the allowlist is what let the two drift; keeping them in one table is
+ *  what stops a field offering a file it then refuses. */
+const UPLOAD_RULES = {
+  '.pdf': { accept: '.pdf,application/pdf', types: ['application/pdf'], allowed: 'PDF', button: 'Upload PDF' },
+};
+const IMAGE_RULE = { accept: 'image/*', types: IMG_TYPES, allowed: 'PNG, JPEG, SVG, WebP', button: 'Upload image' };
+
+export function uploadRule(accept) { return UPLOAD_RULES[accept] || IMAGE_RULE; }
+
+export function validateUpload({ type, size }, accept) {
+  const rule = uploadRule(accept);
+  if (!rule.types.includes(type)) return { ok: false, error: `Unsupported type ${type}. Allowed: ${rule.allowed}.` };
+  if (size > MAX_IMG) return { ok: false, error: `File too large (max ${MAX_IMG / (1024 * 1024)}MB).` };
   return { ok: true };
 }

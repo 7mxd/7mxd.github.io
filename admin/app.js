@@ -321,7 +321,9 @@ function openCollection(name) {
       if (field.name === 'src') {
         await attachPhoto(file, record, field, client);
       } else {
-        record[field.name] = await pickAndUpload(client, file);
+        // The field's own `accept` decides what pickAndUpload will take, so
+        // Settings' CV field gets a PDF and everything else stays an image.
+        record[field.name] = await pickAndUpload(client, file, field.accept);
       }
     },
     onError: (e) => setStatus('Upload failed: ' + e.message, 'error'),
