@@ -8,7 +8,7 @@
     {
       "source": "/api/(.*)",
       "headers": [
-        { "key": "Access-Control-Allow-Origin", "value": "https://7mxd.github.io" },
+        { "key": "Access-Control-Allow-Origin", "value": "https://www.7mxd.me" },
         { "key": "Access-Control-Allow-Methods", "value": "GET, POST, OPTIONS" },
         { "key": "Access-Control-Allow-Headers", "value": "Content-Type" }
       ]
@@ -16,7 +16,7 @@
     {
       "source": "/(auth|callback)",
       "headers": [
-        { "key": "Access-Control-Allow-Origin", "value": "https://7mxd.github.io" },
+        { "key": "Access-Control-Allow-Origin", "value": "https://www.7mxd.me" },
         { "key": "Access-Control-Allow-Methods", "value": "GET, POST, OPTIONS" },
         { "key": "Access-Control-Allow-Headers", "value": "Content-Type" }
       ]
