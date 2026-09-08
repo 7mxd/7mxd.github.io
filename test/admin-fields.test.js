@@ -44,9 +44,28 @@ test('a list of records survives a read and a write unchanged', () => {
   ];
   const rec = { rows };
   assert.deepEqual(readField(field, rec), rows);
-  writeField(field, rec, readField(field, rec));
-  assert.deepEqual(rec.rows, rows);
+
+  // Write a genuinely different array — a deep copy with one value edited,
+  // one highlight flipped, and one row added — rather than the same
+  // reference already sitting at rec.rows. Round-tripping the identical
+  // reference through writeField would pass even if writeField ignored its
+  // `raw` argument entirely, which is exactly the write path that used to
+  // discard real data and leave three literal "[object Object]" strings.
+  const edited = rows.map((r) => ({ ...r }));
+  edited[0].value = '0.031';
+  edited[1].highlight = false;
+  edited.push({ label: 'Runner-up, 1993', value: '0.035' });
+
+  writeField(field, rec, edited);
+  assert.deepEqual(rec.rows, edited);
+  assert.notDeepEqual(rec.rows, rows);
   assert.equal(JSON.stringify(rec.rows).includes('[object Object]'), false);
+});
+
+test('readField returns an empty list for a blocks field with no value yet', () => {
+  // blankValue({ type: 'blocks' }) is []; readField must agree, or
+  // controlFor's blocks case hands ctx.renderBlocks a '' to .forEach over.
+  assert.deepEqual(readField({ type: 'blocks', name: 'blocks' }, {}), []);
 });
 
 test('blankValue matches the shape the field declares', () => {

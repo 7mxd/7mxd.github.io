@@ -25,6 +25,7 @@ export function blankValue(field) {
 export function readField(field, record) {
   const v = record ? record[field.name] : undefined;
   if (field.type === 'list') return Array.isArray(v) ? v : [];
+  if (field.type === 'blocks') return Array.isArray(v) ? v : blankValue(field);
   if (field.type === 'object') return v && typeof v === 'object' ? v : blankValue(field);
   if (field.type === 'boolean') return Boolean(v);
   return v ?? '';
