@@ -262,6 +262,10 @@
 .entry-meta {
   display: flex;
   flex-wrap: wrap;
+  /* The type label runs a size smaller than the rest of the row, so the items
+     sit on a shared baseline rather than on a shared box edge. The logo sets
+     its own align-self and is unaffected. */
+  align-items: baseline;
   gap: var(--space-3);
   margin: var(--space-1) 0 var(--space-3);
   font-family: var(--font-meta);
@@ -305,17 +309,20 @@
    grey clause. Shared by the Selected Work meta row below. */
 .entry-org, .work-org { color: var(--ink); font-weight: 500; }
 .entry-dates, .work-dates { font-variant-numeric: tabular-nums; }
-/* Dates and the kind wrap as one unit at a narrow width, not two — else a
-   date that still fits can strand "· Job" alone on the next line. */
-.entry-meta-sub { display: inline-flex; flex-wrap: wrap; gap: var(--space-3); }
-/* The type label, e.g. "Certificate": plain metadata like the date beside it,
-   with the page's own quiet separator (see .skill-list) ahead of it whenever
-   something already precedes it — a date in the same sub-group (role,
-   education, project), or, when a milestone carries no date, the org one
-   level up. */
-.entry-kind:not(:first-child)::before,
-.entry-meta > .entry-meta-sub:not(:first-child) > .entry-kind:first-child::before {
-  content: "· "; color: var(--ink-muted);
+/* The type label: "Experience", "Certificate", "Volunteering". It classifies
+   the entry rather than stating anything about it, so it is set as a label and
+   not as another grey fact in the row — which is also why it takes the accent,
+   the same job the accent does on skill and block labels. Trailing the row it
+   was indistinguishable from the date beside it and, worse, sat at a different
+   x on every entry, since the row's length varies with the employer's name.
+   Leading, it holds one column the eye can run down. */
+.entry-kind {
+  flex: none;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
 }
 
 .entry-note {
