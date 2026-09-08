@@ -85,3 +85,45 @@ test('projects declare the timeline and anchor fields, with images not a lone im
   const links = namesOf(sub(p.itemFields, 'links').fields);
   assert.ok(!links.includes('android'), 'there is no Android build to link to');
 });
+
+import { readFileSync } from 'node:fs';
+const REGISTRY = JSON.parse(
+  readFileSync(new URL('../data/blocks-registry.json', import.meta.url), 'utf8'));
+
+function registryFields() {
+  return Object.entries(REGISTRY)
+    .filter(([k]) => !k.startsWith('_'))
+    .flatMap(([type, v]) => (v.fields || []).map((f) => ({ type, f })));
+}
+
+test('every registry select declares {label, value} options', () => {
+  // The callout tone dropdown rendered empty because the registry wrote plain
+  // strings while admin/schema.js wrote objects, and one renderer read .value
+  // off both.
+  for (const { type, f } of registryFields()) {
+    if (f.type !== 'select') continue;
+    assert.ok(Array.isArray(f.options), `${type}.${f.name} has no options`);
+    for (const o of f.options) {
+      assert.equal(typeof o, 'object', `${type}.${f.name} option is not an object`);
+      assert.ok(o.label && o.value, `${type}.${f.name} option missing label or value`);
+    }
+  }
+});
+
+test('every registry list says whether it holds scalars or records', () => {
+  // benchmark.rows are records and coursework.items are strings, and both said
+  // only "list". One renderer assumed strings and destroyed the records.
+  for (const { type, f } of registryFields()) {
+    if (f.type !== 'list') continue;
+    const scalars = Boolean(f.itemField);
+    const records = Array.isArray(f.fields);
+    assert.ok(scalars !== records,
+      `${type}.${f.name} must declare exactly one of itemField or fields`);
+  }
+});
+
+test('benchmark rows declare the record the site actually renders', () => {
+  const rows = REGISTRY.benchmark.fields.find((f) => f.name === 'rows');
+  const names = rows.fields.map((f) => f.name).sort();
+  assert.deepEqual(names, ['highlight', 'label', 'value']);
+});
