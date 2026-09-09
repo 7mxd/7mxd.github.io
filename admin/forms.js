@@ -1,4 +1,4 @@
-import { renderField, blankValue, moveItem, drawFields, ownsRecord } from './fields.js';
+import { renderField, blankValue, moveItem, drawFields, ownsRecord, destinationIndex, focusAfterMutation, rowsOf, announceRemoval } from './fields.js';
 
 /** What to call a record on its collapsed header.
  *
@@ -62,22 +62,31 @@ function itemBox(items, itemFields, i, ctx, collection, host, rerender, listKey)
   const name = document.createElement('strong'); name.className = 'record-name';
   name.textContent = recordName(items[i], collectionLabel, i);
   head.appendChild(name);
-  const mk = (text, label, fn) => {
+  const mk = (text, label, act, fn) => {
     const b = document.createElement('button');
     b.type = 'button'; b.className = 'btn ghost'; b.textContent = text;
+    b.dataset.act = act;
     b.setAttribute('aria-label', `${label} ${collectionLabel} ${i + 1}`);
     b.addEventListener('click', (e) => {
       // Inside a <summary>, a click that reaches the browser's default action
       // toggles the disclosure. Reordering a record must not also close it.
       e.preventDefault(); e.stopPropagation();
       fn(); rerender(); host.dispatchEvent(new Event('input', { bubbles: true }));
+      // rerender() rebuilt every record, so the clicked button is gone and
+      // focus is on <body>. Put it on the same control in the row that now
+      // holds the reader's place.
+      focusAfterMutation(rowsOf(host), destinationIndex(act, i, items.length), act,
+        host.parentElement?.querySelector('.list-add'));
     });
     return b;
   };
   head.append(
-    mk('↑', 'Move up', () => moveItem(items, i, i - 1)),
-    mk('↓', 'Move down', () => moveItem(items, i, i + 1)),
-    mk('Remove', 'Remove', () => items.splice(i, 1)));
+    mk('↑', 'Move up', 'up', () => moveItem(items, i, i - 1)),
+    mk('↓', 'Move down', 'down', () => moveItem(items, i, i + 1)),
+    mk('Remove', 'Remove', 'remove', () => {
+      const [gone] = items.splice(i, 1);
+      announceRemoval(host, { list: items, index: i, item: gone, label: collectionLabel });
+    }));
   box.appendChild(head);
   const body = document.createElement('div'); body.className = 'record-body';
   box.appendChild(body);
@@ -142,7 +151,8 @@ function listCollection(collection, model, ctx) {
   syncBulk();
 
   const add = document.createElement('button');
-  add.type = 'button'; add.className = 'btn'; add.textContent = 'Add';
+  add.type = 'button'; add.className = 'btn list-add'; add.textContent = 'Add';
+  add.setAttribute('aria-label', `Add ${collection.label}`);
   add.addEventListener('click', () => {
     items.push(blankValue({ type: 'object', fields: collection.itemFields }));
     rerender();

@@ -168,6 +168,9 @@ async function boot() {
     // the iframe keeps showing whatever it last rendered instead.
     if (!loadErrors[current.name]) preview.update(current.name, modelToData(current, models[current.name]));
   });
+  // Dispatched by forms.js and fields.js from the list a row was removed from.
+  $('panel').addEventListener('field:removed', (e) => showUndo(e.detail));
+  $('undo').addEventListener('click', undoRemoval);
   for (const [name, id] of MOBILE_VIEWS) $(id).onclick = () => setMobileView(name);
   setMobileView('form');
   buildNav();
@@ -315,7 +318,47 @@ function focusRecord(collectionName, record) {
   node.querySelector('input, textarea, select')?.focus();
 }
 
+/** The one removal that can still be put back, and the button that does it.
+ *
+ *  Held here rather than in the renderers: forms.js and fields.js both replace
+ *  every row on each redraw, and blocks-editor.js rebuilds its whole
+ *  container, so nothing down there survives long enough to own this. */
+let lastRemoval = null;
+
+function showUndo(detail) {
+  lastRemoval = detail;
+  const btn = $('undo');
+  btn.textContent = `Undo removing ${detail.label}`;
+  btn.hidden = false;
+  // Focus goes to the button rather than announcing through the status line,
+  // which is aria-live and would interrupt whatever it was already saying.
+  btn.focus();
+}
+
+function hideUndo() {
+  lastRemoval = null;
+  const btn = $('undo');
+  btn.hidden = true;
+  btn.textContent = '';
+}
+
+function undoRemoval() {
+  if (!lastRemoval) return;
+  const { list, index, item } = lastRemoval;
+  list.splice(Math.min(index, list.length), 0, item);
+  hideUndo();
+  if (current) {
+    dirty[current.name] = true;
+    refreshDirtyMarks();
+    openCollection(current.name);
+    buildNav();
+  }
+}
+
 function openCollection(name) {
+  // The offer names a list in the collection being closed, and splicing into
+  // it after the panel has moved on would edit a file nobody is looking at.
+  hideUndo();
   current = getCollection(name);
   const ctx = {
     registry, client, renderBlocks,
@@ -438,7 +481,12 @@ $('save').onclick = async () => {
         break;
       }
     }
-  } finally { $('save').disabled = false; }
+  } finally {
+    $('save').disabled = false;
+    // A record that has been published is no longer the one the offer names:
+    // putting it back would re-insert into a list the save has moved past.
+    if (saved.length) hideUndo();
+  }
 
   if (!failed) {
     // blockedNote already opens with its own leading space ("Cannot save…")

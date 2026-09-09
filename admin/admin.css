@@ -623,3 +623,8 @@ fieldset:has(> .list[data-empty]) > legend { padding-left: 0; }
    all three for every group inside it pushed a photograph's Alt text 84px in
    from the panel edge, against 24px for the same field on Profile. */
 .record-body fieldset { border: 0; padding: 0; margin-inline-start: var(--space-3); }
+
+/* "Add entry" is two controls now: the select states which kind, the button
+   commits it. See admin/nav.js for the defect that split them. */
+.nav-add-label { display: flex; flex-direction: column; gap: var(--space-1); }
+.nav-add-commit:disabled { opacity: 0.5; cursor: not-allowed; }

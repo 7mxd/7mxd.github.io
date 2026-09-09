@@ -55,6 +55,47 @@ export function writeField(field, record, raw) {
 /** Reorder in place. Out-of-range targets are a no-op rather than an error:
  *  the up control on the first row and the down control on the last one are
  *  ordinary clicks, not mistakes. */
+/** Say that a row was removed, so something above can offer to put it back.
+ *
+ *  Removal is a bare splice with no confirm and no undo anywhere in the admin.
+ *  The record's last saved state is one commit back on main, so it is
+ *  recoverable, but only by leaving the tool. This event is dispatched from
+ *  the still-connected list host and handled once in app.js: a closure-local
+ *  undo would die with the next redraw, and blocks-editor.js rebuilds its
+ *  whole container, so there is no node down here that reliably survives. */
+export function announceRemoval(host, detail) {
+  host.dispatchEvent?.(new CustomEvent('field:removed', { bubbles: true, detail }));
+}
+
+/** Which row should hold focus once a list has redrawn after a mutation.
+ *
+ *  `length` is the list's length AFTER the change. Focus follows the ROW, not
+ *  the position: after "up" the moved row is one higher, so putting focus back
+ *  at the original index would land on the row that was displaced — click it
+ *  twice and the pair just swaps back and forth, which is why a tag could not
+ *  be walked from the end of a list to the front. A remove has no row of its
+ *  own to return to, so focus holds the position, stepping back only when the
+ *  list ran out; -1 means the list is empty and the caller should fall back to
+ *  its Add button. */
+export function destinationIndex(act, i, length) {
+  if (act === 'remove') return length ? Math.min(i, length - 1) : -1;
+  if (act === 'up') return Math.max(0, i - 1);
+  return Math.min(length - 1, i + 1);
+}
+
+/** The item rows of a redrawn list, skipping whatever else shares the host
+ *  (the Add button, and for a scalar list nothing else). */
+export function rowsOf(host) {
+  return [...(host?.children || [])].filter((n) => String(n.className || '').split(' ').includes('list-item'));
+}
+
+/** Put focus on the same control in the row that now holds the reader's
+ *  place. `rows` is the redrawn list; `fallback` is used when it is empty. */
+export function focusAfterMutation(rows, index, act, fallback) {
+  const target = index < 0 ? fallback : rows[index]?.querySelector(`[data-act="${act}"]`);
+  target?.focus?.();
+}
+
 export function moveItem(list, from, to) {
   if (to < 0 || to >= list.length || from < 0 || from >= list.length) return list;
   const [item] = list.splice(from, 1);
@@ -311,16 +352,27 @@ function listControl(doc, field, record, ctx, path) {
     items.forEach((item, i) => {
       const row = el(doc, 'div', { className: 'list-item' });
       const ctrls = el(doc, 'div', { className: 'row-controls' });
-      const btn = (text, label, fn) => {
+      const btn = (text, label, act, fn) => {
         const b = el(doc, 'button', { type: 'button', className: 'btn ghost', textContent: text });
+        b.dataset.act = act;
         b.setAttribute('aria-label', `${label} ${field.label || field.name} ${i + 1}`);
-        b.addEventListener('click', () => { fn(); draw(); bump(host); });
+        b.addEventListener('click', () => {
+          fn(); draw(); bump(host);
+          // draw() has just replaced every row, including the button that was
+          // clicked, so focus is on <body> by now unless it is put back.
+          focusAfterMutation(rowsOf(host), destinationIndex(act, i, items.length), act,
+            host.querySelector('.list-add'));
+        });
         return b;
       };
       ctrls.append(
-        btn('↑', 'Move up', () => moveItem(items, i, i - 1)),
-        btn('↓', 'Move down', () => moveItem(items, i, i + 1)),
-        btn('Remove', 'Remove', () => items.splice(i, 1)));
+        btn('↑', 'Move up', 'up', () => moveItem(items, i, i - 1)),
+        btn('↓', 'Move down', 'down', () => moveItem(items, i, i + 1)),
+        btn('Remove', 'Remove', 'remove', () => {
+          const [gone] = items.splice(i, 1);
+          announceRemoval(host, { list: items, index: i, item: gone,
+            label: field.itemField?.label || field.label || field.name });
+        }));
 
       if (field.itemField) {
         // A scalar item has no name of its own to key a record by, so the
@@ -348,7 +400,8 @@ function listControl(doc, field, record, ctx, path) {
       host.appendChild(row);
     });
 
-    const add = el(doc, 'button', { type: 'button', className: 'btn', textContent: 'Add' });
+    const add = el(doc, 'button', { type: 'button', className: 'btn list-add', textContent: 'Add' });
+    add.setAttribute('aria-label', `Add ${field.itemField?.label || field.label || field.name}`);
     add.addEventListener('click', () => {
       items.push(field.itemField
         ? blankValue(field.itemField)
@@ -392,6 +445,14 @@ function imageControl(doc, field, record, ctx, id) {
   btn.addEventListener('click', () => picker.click());
   picker.addEventListener('change', async () => {
     if (!picker.files[0] || !ctx.uploadImage) return;
+    // An upload is many seconds of work: photos.js probes for a free filename,
+    // encodes two derivatives and PUTs four files. None of that said anything,
+    // so the only feedback was a button that looked idle while it worked.
+    const resting = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Uploading…';
+    btn.setAttribute('aria-busy', 'true');
+    host.querySelector('.field-error')?.remove();
     try {
       await ctx.uploadImage(picker.files[0], record, field);
       inp.value = record[field.name] || '';
@@ -402,7 +463,22 @@ function imageControl(doc, field, record, ctx, id) {
       // it may replace this very node.
       bump(host);
       announceRewrite(host, record);
-    } catch (e) { ctx.onError?.(e); }
+    } catch (e) {
+      // At the field, not in the top bar: the status line is cleared by the
+      // next navigation, so a failure reported there vanished on the click
+      // that went looking for it.
+      const msg = el(doc, 'p', { className: 'field-error', textContent: e?.message || 'Upload failed.' });
+      msg.setAttribute('role', 'alert');
+      host.appendChild(msg);
+      ctx.onError?.(e);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = resting;
+      btn.removeAttribute('aria-busy');
+      // Always, including after a failure. Without it, re-picking the same
+      // file fires no `change` event at all and the button reads as dead.
+      picker.value = '';
+    }
   });
   host.append(inp, btn, picker, thumb);
   return host;

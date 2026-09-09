@@ -52,6 +52,10 @@
       <span id="who" class="who"></span>
       <span class="spacer"></span>
       <span id="save-status" class="save-status" aria-live="polite"></span>
+      <!-- Beside the status line, never inside it: that span is aria-live, so
+           a button parked in there would be re-announced on every status
+           change. Hidden until there is something to put back. -->
+      <button id="undo" class="btn ghost" hidden></button>
       <button id="save" class="btn">Save</button>
       <button id="signout" class="btn ghost">Sign out</button>
     </header>
