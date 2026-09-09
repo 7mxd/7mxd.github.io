@@ -310,7 +310,14 @@ body { font-family: var(--font-meta); }
 .field input[type="text"], .field input[type="number"], .field input:not([type]), .field textarea, .field select {
   width: 100%;
   padding: var(--space-2);
-  border: var(--rule-width) solid var(--rule);
+  /* --rule against --ground-raised is 1.30:1, below the 3:1 that WCAG 1.4.11
+     asks of a control's own boundary — the edge of every input in the editor
+     was effectively invisible to anyone who needs contrast. --ink-muted is
+     6.72:1 light and 5.90:1 dark, and is already a token the palette tests
+     cover. The decorative hairlines (fieldsets, row strips) stay on --rule:
+     they are not control boundaries, and darkening them all equally would
+     only make the stack more uniform than it already is. */
+  border: var(--rule-width) solid var(--ink-muted);
   background: var(--ground-raised);
   color: var(--ink);
   font-family: var(--font-meta);
@@ -561,3 +568,58 @@ legend {
 /* Collapse and expand the whole list from its legend, since seeing the list
    is the reason to collapse a record in the first place. */
 legend .bulk-toggle { margin-left: var(--space-3); }
+
+/* ---- Scalar lists are chips, not records ---------------------------------
+   listControl stamps the item type on the host, so a list of tags and a list
+   of photographs can stop rendering identically. A tag used to cost a border,
+   12px of padding, 12px of margin, its own hairlined button strip and a
+   full-width input: about 88px for one word, and four tags for 350px.
+
+   Filed after the control rule above, not beside the other .list rules: this
+   selector and `.field input[type="text"]` carry identical specificity, so
+   source order is the only thing that lets the chip width win. */
+.list[data-item="string"],
+.list[data-item="text"] {
+  flex-flow: row wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+.list[data-item="string"] > .list-item,
+.list[data-item="text"] > .list-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+.list[data-item="string"] .row-controls,
+.list[data-item="text"] .row-controls {
+  border-bottom: 0;
+  padding: 0;
+  margin: 0;
+}
+.list[data-item="string"] .field,
+.list[data-item="text"] .field { margin-bottom: 0; }
+.list[data-item="string"] .field input { width: 10rem; }
+.list[data-item="text"] .field textarea { width: 18rem; min-height: 2.5rem; }
+
+/* Four pixels between "move this" and "delete this" is not enough space. */
+.row-controls .btn:last-child { margin-left: var(--space-3); }
+
+/* An empty list is a bordered fieldset wrapping a single anonymous button —
+   about 78px of chrome around nothing, six times over in the projects form.
+   Stamped in draw() rather than matched with :has(), so it cannot quietly
+   stop applying the day the DOM shifts. */
+.list[data-empty] { gap: 0; }
+fieldset:has(> .list[data-empty]) {
+  border: 0;
+  padding: 0;
+  margin-bottom: var(--space-3);
+}
+fieldset:has(> .list[data-empty]) > legend { padding-left: 0; }
+
+/* A record already carries a border, a header and 12px of padding. Repeating
+   all three for every group inside it pushed a photograph's Alt text 84px in
+   from the panel edge, against 24px for the same field on Profile. */
+.record-body fieldset { border: 0; padding: 0; margin-inline-start: var(--space-3); }
