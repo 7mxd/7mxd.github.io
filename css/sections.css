@@ -325,6 +325,25 @@
   color: var(--accent);
 }
 
+/* A recognition — an award, a certificate, a volunteering entry — is a point
+   in time among spans of work, and the label is the only thing on the row that
+   says which. It rendered identically for every kind, so the category only
+   registered if you stopped and read the word; a reader scanning the timeline
+   told me the milestones did not come forward. Set on a plate, the same
+   grammar the hero's pills already use, it can be found at a glance.
+
+   Deliberately not larger or bolder than a role's: the plate marks what class
+   of thing the entry is, it does not promote a one-day certificate above two
+   years of work. Under prefers-contrast the plate collapses to the raised
+   surface and --rule-accent goes to the full accent, so the marker survives as
+   an outline rather than disappearing with the tint. */
+.entry.is-milestone .entry-kind {
+  background: var(--accent-plate);
+  border: var(--rule-width) solid var(--rule-accent);
+  border-radius: 999px;
+  padding: 0.1em 0.6em;
+}
+
 .entry-note {
   font-family: var(--font-meta);
   font-size: var(--text-sm);

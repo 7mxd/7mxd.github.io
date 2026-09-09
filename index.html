@@ -77,8 +77,14 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400..600&family=Public+Sans:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400..600&family=Public+Sans:wght@400;500;600&display=swap">
-<!-- Amiri is subsetted to the ten glyphs of the Arabic name. -->
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&text=%D8%A3%D8%AD%D9%85%D8%AF%20%D8%B9%D9%84%D9%88%D9%8A%20%D8%B1%D8%B6%D9%8A&display=swap">
+<!-- Amiri is subsetted to exactly the Arabic this site sets: the name, and
+     the one Arabic pill in data/profile.json. It used to cover the name
+     alone, while css/sections.css asks for the same family on the pill — so
+     the pill's other letters came from whatever the browser fell back to.
+     Arabic is cursive, and a fallback that lands per character breaks the
+     joining: the word rendered disconnected, which is how a reader reported
+     it. test/fonts-arabic-subset.test.js keeps this in step with the data. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&text=%D8%A3%D8%AD%D9%85%D8%AF%20%D8%B9%D9%84%D9%88%D9%8A%20%D8%B1%D8%B6%D9%8A%20%D8%B9%D9%84%D9%88%D9%85%20%D8%A7%D9%84%D8%A8%D9%8A%D8%A7%D9%86%D8%A7%D8%AA&display=swap">
 
 <link rel="stylesheet" href="css/tokens.css">
 <link rel="stylesheet" href="css/base.css">
