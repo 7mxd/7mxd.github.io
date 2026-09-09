@@ -2,7 +2,7 @@
 
 Personal portfolio for a data scientist in Abu Dhabi. Static site, no build step, plain photo-led editorial design.
 
-**[7mxd.github.io](https://7mxd.github.io)**
+**[www.7mxd.me](https://www.7mxd.me)**
 
 ## Stack
 
@@ -10,7 +10,7 @@ Personal portfolio for a data scientist in Abu Dhabi. Static site, no build step
 - Content stored in `data/*.json`, rendered client-side by the modules in `js/`
 - Admin UI under `admin/` for editing content via GitHub API
 - Tests via `node --test` (see `test/`)
-- Hosted on GitHub Pages with a custom CNAME
+- Hosted on Vercel, served at the custom domain www.7mxd.me
 
 ## Running locally
 

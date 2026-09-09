@@ -12,11 +12,22 @@ const css = readFileSync(new URL('../admin/admin.css', import.meta.url), 'utf8')
 const html = readFileSync(new URL('../admin/index.html', import.meta.url), 'utf8');
 const stripped = css.replace(/\/\*[\s\S]*?\*\//g, ' ');
 
+// The order the cascade actually sees, read from the link tags themselves.
+// Taken as raw substring positions instead, a comment that merely named one of
+// these files counted as loading it, and the first such comment reported the
+// stylesheets as loading in the wrong order.
+const sheets = [...html.matchAll(/<link[^>]+rel="stylesheet"[^>]*>/g)]
+  .map((m) => (m[0].match(/href="([^"]+)"/) || [])[1])
+  .filter(Boolean);
+
 test('the admin loads the site\'s own tokens and base stylesheet', () => {
   assert.match(html, /href="\.\.\/css\/tokens\.css"/);
   assert.match(html, /href="\.\.\/css\/base\.css"/);
-  assert.ok(html.indexOf('tokens.css') < html.indexOf('base.css'), 'tokens must load first');
-  assert.ok(html.indexOf('base.css') < html.indexOf('admin.css'), 'admin.css must load last');
+  const at = (name) => sheets.findIndex((h) => h.endsWith(name));
+  assert.ok(at('tokens.css') !== -1 && at('base.css') !== -1 && at('admin.css') !== -1,
+    `a stylesheet is missing; the admin links ${sheets.join(', ') || 'nothing'}`);
+  assert.ok(at('tokens.css') < at('base.css'), 'tokens must load first');
+  assert.ok(at('base.css') < at('admin.css'), 'admin.css must load last');
 });
 
 test('admin.css declares no colour of its own', () => {

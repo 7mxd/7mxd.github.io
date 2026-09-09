@@ -1,6 +1,6 @@
 import { toBase64, fromBase64 } from './lib.js';
 
-const REPO = '7mxd/7mxd.github.io';
+const REPO = '7mxd/7mxd-Portfolio';
 export function contentsUrl(path) { return `https://api.github.com/repos/${REPO}/contents/${path}`; }
 export function decodeFile(resp) { return { content: fromBase64(resp.content), sha: resp.sha }; }
 export function putBody({ message, contentString, sha, branch = 'main' }) {
