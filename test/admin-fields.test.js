@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readField, writeField, blankValue, moveItem } from '../admin/fields.js';
+import { readField, writeField, blankValue, moveItem, destinationIndex } from '../admin/fields.js';
 import { COLLECTIONS, getCollection } from '../admin/schema.js';
 
 test('a number field writes a Number, never the input string', () => {
@@ -146,4 +146,28 @@ test('every field type in the registry is one the renderer implements', () => {
       assert.ok(IMPLEMENTED.has(f.type), `${type}.${f.name} is type ${f.type}`);
     }
   }
+});
+
+// --- Where focus lands after a list mutates --------------------------------
+// Every reorder and remove redraws the list, which detaches the button that
+// was just clicked and drops focus to <body>. The pointer consequence is
+// sharper than the keyboard one: rows are uniform height, so after "up" the
+// cursor sits over the row that was displaced, and a second click moves it
+// back. The pair oscillates and a tag cannot be walked from position 8 to 1.
+
+test('moving a row up follows the row, not the position', () => {
+  assert.equal(destinationIndex('up', 3, 8), 2);
+  assert.equal(destinationIndex('up', 0, 8), 0, 'the first row has nowhere to go');
+});
+
+test('moving a row down follows the row', () => {
+  assert.equal(destinationIndex('down', 3, 8), 4);
+  assert.equal(destinationIndex('down', 7, 8), 7, 'the last row has nowhere to go');
+});
+
+test('removing a row leaves focus where the row was', () => {
+  // length is the length AFTER the splice, so removing index 3 of 8 leaves 7.
+  assert.equal(destinationIndex('remove', 3, 7), 3);
+  assert.equal(destinationIndex('remove', 7, 7), 6, 'removing the last row steps back');
+  assert.equal(destinationIndex('remove', 0, 0), -1, 'an emptied list has no row to focus');
 });

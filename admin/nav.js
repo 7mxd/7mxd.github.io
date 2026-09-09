@@ -68,21 +68,38 @@ function pathGroup(doc, entries, onSelect, onAdd) {
   }
   group.appendChild(list);
 
+  // Choosing a kind states an intent; a separate button commits it.
+  //
+  // These used to be the same act: `change` on the select called onAdd
+  // directly. On Windows, arrow-keying a closed <select> fires `change` on
+  // every option it passes, so reaching Volunteering past Experience,
+  // Education, Project and Certificate created four blank records in four
+  // different collections — each of which then failed validation and blocked
+  // Save for every section, with no indication of where they had come from.
+  const add = el(doc, 'div', { className: 'nav-add' });
   // A <label> wrapping its control needs no id to point at — the browser
-  // already treats the select as the label's accessible control.
-  const add = el(doc, 'label', { className: 'nav-add' });
-  add.appendChild(el(doc, 'span', { textContent: 'Add entry' }));
+  // already treats the select as the label's accessible control. The button
+  // stays outside it, or clicking the button would activate the label and
+  // throw focus back into the select.
+  const lab = el(doc, 'label', { className: 'nav-add-label' });
+  lab.appendChild(el(doc, 'span', { textContent: 'Add entry' }));
   const select = el(doc, 'select');
   select.appendChild(el(doc, 'option', { value: '', textContent: 'Choose a kind…', selected: true, disabled: true }));
   for (const kind of TIMELINE_KINDS) {
     select.appendChild(el(doc, 'option', { value: kind.key, textContent: kind.label }));
   }
-  select.addEventListener('change', () => {
+  lab.appendChild(select);
+  const commit = el(doc, 'button', { type: 'button', className: 'btn nav-add-commit', textContent: 'Add entry' });
+  commit.disabled = true;
+  select.addEventListener('change', () => { commit.disabled = !select.value; });
+  commit.addEventListener('click', () => {
     if (!select.value) return;
-    onAdd(select.value);
+    const kind = select.value;
     select.value = '';
+    commit.disabled = true;
+    onAdd(kind);
   });
-  add.appendChild(select);
+  add.append(lab, commit);
   group.appendChild(add);
 
   return group;
