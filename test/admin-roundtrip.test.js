@@ -41,6 +41,7 @@ class FakeNode {
     this.tagName = String(tag).toUpperCase();
     this.childNodes = [];
     this.dataset = {};
+    this.attributes = {};
     this.className = '';
   }
   get children() { return this.childNodes.filter((n) => n instanceof FakeNode); }
@@ -48,9 +49,26 @@ class FakeNode {
   append(...ns) { for (const n of ns) this.childNodes.push(n); }
   set innerHTML(v) { if (v === '') this.childNodes = []; }
   get innerHTML() { return ''; }
-  setAttribute() {}
+  setAttribute(k, v) { this.attributes[k] = String(v); }
+  getAttribute(k) { return k in this.attributes ? this.attributes[k] : null; }
   addEventListener() {}
   querySelectorAll() { return []; }
+  /** Enough of querySelector for the one call the renderer makes: find the
+   *  first control among this node's descendants. The selector's :not() guard
+   *  is ignored because a scalar list item never holds a file input — the
+   *  image branch returns a wrapper long before this runs. */
+  querySelector(sel) {
+    const tags = sel.split(',').map((t) => t.trim().replace(/[:\[].*$/, '').toUpperCase());
+    const walk = (n) => {
+      for (const c of n.children) {
+        if (tags.includes(c.tagName)) return c;
+        const deep = walk(c);
+        if (deep) return deep;
+      }
+      return null;
+    };
+    return walk(this);
+  }
   remove() {}
 }
 globalThis.document = {
@@ -155,4 +173,32 @@ test('the schema declares no field the data files do not carry, beyond documente
     walkFields(collection.kind === 'single' ? collection.fields : collection.itemFields);
   }
   assert.deepEqual(missing, [], 'schema declares fields no data file carries');
+});
+
+// --- Every control the form draws must have a name a screen reader can read -
+// The scalar rows inside a list (tags, bullets) are rendered with `label: ''`,
+// which suppresses the visible caption AND the <label> element and its id. So
+// eight tag inputs had no accessible name at all, sitting beside buttons that
+// were carefully labelled "Remove Tag 3". The caption stays suppressed; the
+// announced name is set directly on the control.
+test('every scalar list control is given an accessible name', () => {
+  const collection = COLLECTIONS.find((c) => c.name === 'projects');
+  const model = buildFormModel(collection, readJson(collection.file));
+  const panel = document.createElement('div');
+  renderForm(panel, collection, model, RENDER_CTX);
+
+  const controls = [];
+  (function walk(n) {
+    if (n.dataset?.item && n.dataset.item !== 'record') {
+      for (const row of n.children) {
+        const c = row.querySelector('input, textarea, select');
+        if (c) controls.push(c);
+      }
+    }
+    for (const c of n.children || []) walk(c);
+  })(panel);
+
+  assert.ok(controls.length, 'the projects form should draw at least one scalar list control');
+  const unnamed = controls.filter((c) => !c.getAttribute('aria-label'));
+  assert.deepEqual(unnamed, [], `${unnamed.length} scalar list controls have no accessible name`);
 });

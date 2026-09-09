@@ -296,9 +296,18 @@ function listControl(doc, field, record, ctx, path) {
   const host = el(doc, 'div', { className: 'list' });
   const items = readField(field, record);
   record[field.name] = items;
+  // A list of tags and a list of photographs are not the same shape of thing,
+  // and rendering them identically is what made a one-word tag cost as much
+  // vertical space as a whole record. Stamped rather than sniffed in CSS: a
+  // `:has()` chain deep enough to tell them apart stops matching silently the
+  // day the DOM shifts, and this branch is already here.
+  host.dataset.item = field.itemField ? (field.itemField.type || 'string') : 'record';
 
   const draw = () => {
     host.innerHTML = '';
+    // An empty list is a bordered box around a lone Add button. The stylesheet
+    // flattens it, but only if something says it is empty.
+    if (items.length) delete host.dataset.empty; else host.dataset.empty = 'true';
     items.forEach((item, i) => {
       const row = el(doc, 'div', { className: 'list-item' });
       const ctrls = el(doc, 'div', { className: 'row-controls' });
@@ -312,7 +321,6 @@ function listControl(doc, field, record, ctx, path) {
         btn('↑', 'Move up', () => moveItem(items, i, i - 1)),
         btn('↓', 'Move down', () => moveItem(items, i, i + 1)),
         btn('Remove', 'Remove', () => items.splice(i, 1)));
-      row.appendChild(ctrls);
 
       if (field.itemField) {
         // A scalar item has no name of its own to key a record by, so the
@@ -320,8 +328,19 @@ function listControl(doc, field, record, ctx, path) {
         // sets items[i] directly, with no intermediate holder to go stale.
         // The same numeric name tells composePath this is a bracketed leaf,
         // not a dotted field, when renderField stamps its data-path.
-        row.appendChild(renderField(doc, { ...field.itemField, name: String(i), label: '' }, items, ctx, path));
+        const node = renderField(doc, { ...field.itemField, name: String(i), label: '' }, items, ctx, path);
+        // `label: ''` means "draw no caption", which also means renderField
+        // minted no id and no <label> — so these controls had no accessible
+        // name at all, sitting beside buttons that did. The visible caption
+        // stays suppressed; only the announced one is restored.
+        node.querySelector('input:not([type="file"]), textarea, select')
+          ?.setAttribute('aria-label', `${field.itemField.label || field.label || field.name} ${i + 1}`);
+        // Control first, then its buttons. Reordering these two in CSS instead
+        // would put the buttons before the input for anyone tabbing through,
+        // which is a focus-order failure traded for a spacing win.
+        row.append(node, ctrls);
       } else {
+        row.appendChild(ctrls);
         const redraw = () => drawFields(doc, row, field.fields, item, ctx, `${path}[${i}]`);
         redraw();
         ownsRecord(row, item, redraw);

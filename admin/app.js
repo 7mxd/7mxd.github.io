@@ -296,7 +296,16 @@ function nodeFor(collectionName, record) {
 }
 
 function scrollToRecord(collectionName, record) {
-  nodeFor(collectionName, record)?.scrollIntoView({ block: 'center' });
+  const node = nodeFor(collectionName, record);
+  if (!node) return;
+  // Records collapse, so the one the rail just asked for has to be opened
+  // before it is scrolled to — otherwise picking an entry scrolls to a closed
+  // header and looks like the click did nothing. Ancestors too: a role sits
+  // inside a company's own disclosure.
+  for (let n = node; n; n = n.parentElement) {
+    if (n.tagName === 'DETAILS') n.open = true;
+  }
+  node.scrollIntoView({ block: 'center' });
 }
 
 function focusRecord(collectionName, record) {
