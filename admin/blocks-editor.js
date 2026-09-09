@@ -4,7 +4,7 @@ import { moveItem, drawFields, ownsRecord } from './fields.js';
 export function renderBlocks(container, blocks, scope, registry, ctx) {
   container.innerHTML = '';
   const list = document.createElement('div');
-  blocks.forEach((block, i) => list.appendChild(blockItem(blocks, i, scope, registry, () => renderBlocks(container, blocks, scope, registry, ctx), ctx)));
+  blocks.forEach((block, i) => list.appendChild(blockItem(blocks, i, scope, registry, () => renderBlocks(container, blocks, scope, registry, ctx), ctx, container)));
   container.appendChild(list);
   const add = document.createElement('select');
   add.innerHTML = `<option value="">+ Add block…</option>` +
@@ -18,7 +18,7 @@ export function renderBlocks(container, blocks, scope, registry, ctx) {
   });
   container.appendChild(add);
 }
-function blockItem(blocks, i, scope, registry, rerender, ctx) {
+function blockItem(blocks, i, scope, registry, rerender, ctx, container) {
   const block = blocks[i];
   const wrap = document.createElement('div'); wrap.className = 'list-item';
   const ctrls = document.createElement('div'); ctrls.className = 'row-controls';
@@ -26,7 +26,13 @@ function blockItem(blocks, i, scope, registry, rerender, ctx) {
   ctrls.appendChild(typeLabel);
   const mk = (label, fn) => {
     const b = document.createElement('button'); b.type = 'button'; b.className = 'btn ghost'; b.textContent = label;
-    b.onclick = () => { fn(); rerender(); ctrls.dispatchEvent(new Event('input', { bubbles: true })); };
+    // Dispatched from `container`, not from this strip. `rerender` clears
+    // container.innerHTML, which detaches the strip and everything under it,
+    // and an event fired from a detached node bubbles to nobody — so the edit
+    // never reached app.js, the collection was never marked dirty, and Save
+    // answered "Nothing to publish" while the reorder sat in memory. The
+    // container survives the rerender because only its contents are replaced.
+    b.onclick = () => { fn(); rerender(); container.dispatchEvent(new Event('input', { bubbles: true })); };
     return b;
   };
   ctrls.append(
