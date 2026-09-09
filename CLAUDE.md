@@ -1,13 +1,13 @@
-# Ahmed Alawi Radhi, Portfolio (7mxd.github.io)
+# Ahmed Alawi Radhi, Portfolio (7mxd-Portfolio)
 
-Static personal portfolio hosted on GitHub Pages. Pure HTML/CSS/JS, no framework, no build step. Content lives in `data/*.json` and is rendered client-side by the modules in `js/`.
+Static personal portfolio hosted on Vercel. Pure HTML/CSS/JS, no framework, no build step. Content lives in `data/*.json` and is rendered client-side by the modules in `js/`.
 
 ## Stack
 
 - HTML / CSS / Vanilla JS (ES2020+, loaded as ES modules from `js/main.js`)
 - Data in `data/`: `profile.json`, `summary.json`, `education.json`, `experience.json`, `skills.json`, `projects.json`, `settings.json`, plus `milestones.json`, `metrics.json`, and `blocks-registry.json`
 - Images and logos in `assets/`
-- Hosted on GitHub Pages with custom CNAME. A lightweight admin UI lives under `admin/`.
+- Hosted on Vercel at the custom domain www.7mxd.me. A lightweight admin UI lives under `admin/`.
 
 ## Running locally
 
@@ -30,7 +30,7 @@ python -m http.server 8000
 
 ## Design Context
 
-Static site at [7mxd.github.io](https://7mxd.github.io). This section is the
+Static site at [www.7mxd.me](https://www.7mxd.me). This section is the
 source of truth for design decisions. The full rationale lives in
 `docs/superpowers/specs/2026-09-06-editorial-revamp-design.md`.
 

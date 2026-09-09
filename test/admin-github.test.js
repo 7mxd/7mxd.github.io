@@ -5,7 +5,7 @@ import { toBase64 } from '../admin/lib.js';
 
 test('contentsUrl targets the repo', () => {
   assert.equal(contentsUrl('data/profile.json'),
-    'https://api.github.com/repos/7mxd/7mxd.github.io/contents/data/profile.json');
+    'https://api.github.com/repos/7mxd/7mxd-Portfolio/contents/data/profile.json');
 });
 test('decodeFile base64-decodes content and keeps sha', () => {
   const resp = { content: toBase64('{"a":1}'), sha: 'abc', encoding: 'base64' };
