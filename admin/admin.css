@@ -14,10 +14,19 @@
      instead of six short file names — most titles now clear two lines
      instead of three or four. */
   --admin-sidebar: 18rem;
-  /* The preview column. Fixed rather than 1fr alongside the form: the site
-     it renders is a single ~46rem measure, and letting it grow with a wide
-     monitor would just pad that measure with more margin, not more page. */
+  /* The preview column's FLOOR, not its width. It was fixed at this value on
+     the reasoning that the site is a single ~46rem measure, so extra width
+     would only pad it with margin. That was wrong in one direction: the site
+     has breakpoints at 40rem and 46rem, and a 30rem frame renders the phone
+     layout, so the preview never showed the desktop page the visitor sees.
+     Below 46rem the surplus did nothing; above it the surplus buys the real
+     nav and the two-up gallery. It takes every spare pixel now, which also
+     retires the dead band the form's own max-width used to leave behind. */
   --admin-preview: 30rem;
+  /* A form narrower than this is not a form. The middle track used to be a
+     bare 1fr, so between 701 and ~1050px it collapsed to a sliver with its
+     own scrollbar and nothing on screen admitted anything was wrong. */
+  --admin-form-min: 24rem;
 }
 
 * { box-sizing: border-box; }
@@ -114,6 +123,23 @@ body { font-family: var(--font-meta); }
   grid-template-columns: var(--admin-sidebar) 1fr var(--admin-preview);
   flex: 1;
   min-height: 0;
+}
+
+/* The wide stage. The form keeps its reading measure, but the measure is now
+   the TRACK's cap rather than a max-width on a box sitting inside a wider
+   track — which is what used to strand every pixel past 1504 as bare ground
+   between the form's scrollbar and the preview's border. Resolved widths:
+   1200 gives 288/432/480, 1600 gives 288/736/576, 1920 gives 288/736/896. */
+@media (min-width: 1200px) {
+  .layout {
+    grid-template-columns:
+      var(--admin-sidebar)
+      minmax(var(--admin-form-min), var(--measure-wide))
+      minmax(var(--admin-preview), 1fr);
+  }
+  /* Only here. Below this the layout drops to two columns, where an uncapped
+     panel would render single-line inputs the better part of a metre wide. */
+  #panel { max-width: none; }
 }
 
 /* Hidden above the breakpoint: the form and the preview both show at once,
@@ -470,3 +496,68 @@ legend {
   body[data-mobile-view="form"] #panel { display: block; }
   body[data-mobile-view="preview"] #preview-pane { display: block; }
 }
+
+/* ---- Collapsible records -------------------------------------------------
+   A record is a <details>: the browser owns the expanded state, announces it,
+   and operates it from the keyboard, so none of that is reimplemented here.
+   The summary is the record's only view while it is closed, which is why it
+   carries the name as well as the controls. */
+
+/* The panel scrolls, and #app is 100vh with the page's wash pinned to the
+   viewport behind it, so a sticky header over a transparent body would drag a
+   pale rectangle across tinted paper. */
+#app:not([hidden]) { background-color: var(--ground); }
+
+.record { padding: 0; }
+.record > .record-head {
+  cursor: pointer;
+  padding: var(--space-2) var(--space-3);
+  /* .row-controls spends its margin below the hairline; a sticky header must
+     spend it above, or field text slides through the unpainted gap. */
+  margin-bottom: 0;
+  padding-bottom: var(--space-2);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--ground);
+}
+.record[open] > .record-head { border-bottom: var(--rule-width) solid var(--rule); }
+.record:not([open]) > .record-head { border-bottom: 0; }
+.record > .record-body { padding: var(--space-3); }
+
+/* The native marker disappears the moment a summary becomes a flex container,
+   so the chevron is drawn here. currentColor keeps it inside the colour
+   contract and correct in both themes without naming a value. */
+.record-head::-webkit-details-marker { display: none; }
+.record-head { list-style: none; }
+.record-head::before {
+  content: "";
+  flex: none;
+  width: 0.4rem;
+  height: 0.4rem;
+  margin-right: var(--space-1);
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(-45deg);
+  opacity: 0.7;
+}
+.record[open] > .record-head::before { transform: rotate(45deg); }
+
+/* The name is the anchor for the eye in a collapsed list, so it is the one
+   thing in the panel that steps above the label size everything else uses. */
+.record-name {
+  font-family: var(--font-meta);
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* .row-controls pushes the first button right with an auto margin, which the
+   name would otherwise absorb. */
+.record-head .btn:first-of-type { margin-left: auto; }
+
+/* Collapse and expand the whole list from its legend, since seeing the list
+   is the reason to collapse a record in the first place. */
+legend .bulk-toggle { margin-left: var(--space-3); }
