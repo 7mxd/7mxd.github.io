@@ -1,5 +1,16 @@
 const KEY = 'gh_token';
-const OAUTH_BASE = 'https://7mxd-oauth.vercel.app';
+
+/** Where the OAuth popup starts and, more importantly, the origin its reply is
+ *  required to come from.
+ *
+ *  Both endpoints are rewrites on this same origin (see `vercel.json`), so the
+ *  popup ends on the site's own origin and posts from there. Pinning the Vercel
+ *  project domain here instead made the expected origin disagree with the real
+ *  one the moment the site moved to its custom domain: sign-in would have been
+ *  rejected as untrusted even once GitHub accepted the redirect. Derived from
+ *  the page so the two cannot drift again, and taken as an argument so a test
+ *  can supply an origin without a browser. */
+export function oauthBase(location) { return location.origin; }
 
 export function getToken() {
   return sessionStorage.getItem(KEY);
@@ -50,7 +61,8 @@ const MESSAGES = {
 
 export function signIn() {
   return new Promise((resolve, reject) => {
-    const popup = window.open(`${OAUTH_BASE}/auth`, 'oauth', 'width=600,height=700');
+    const base = oauthBase(window.location);
+    const popup = window.open(`${base}/auth`, 'oauth', 'width=600,height=700');
     if (!popup) return reject(new Error('Popup blocked'));
     const poll = setInterval(() => {
       if (popup.closed) {
@@ -60,7 +72,7 @@ export function signIn() {
       }
     }, 500);
     function onMessage(e) {
-      const r = classifyAuthMessage(e, OAUTH_BASE);
+      const r = classifyAuthMessage(e, base);
       if (!r.ok) {
         // A message from a wrong origin used to return silently here, which is
         // why a broken deploy looked identical to the user closing the popup.
